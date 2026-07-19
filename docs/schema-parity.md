@@ -1,8 +1,9 @@
 # Bot API schema parity
 
 Hermes measures compatibility against a deterministic inventory derived from
-Telegram's official Bot API documentation. The checked-in Bot API 10.2
-inventory contains:
+Telegram's official Bot API documentation. Each release pins its audited Bot
+API version in `spec/bot-api.json`. The manifest shipped with Hermes 1.0.0
+records Bot API 10.2 and contains:
 
 | Surface | Official count | Missing in Hermes |
 | --- | ---: | ---: |
