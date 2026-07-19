@@ -1,0 +1,70 @@
+name: Bug report
+description: Report reproducible incorrect behavior in Hermes
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never include bot tokens, webhook secrets, or credential-bearing Telegram file URLs. Report security vulnerabilities through the private advisory link instead.
+  - type: input
+    id: hermes-version
+    attributes:
+      label: Hermes version
+      description: For example, v1.0.0 or a commit SHA.
+    validations:
+      required: true
+  - type: input
+    id: go-version
+    attributes:
+      label: Go version
+      placeholder: go1.26.5
+    validations:
+      required: true
+  - type: dropdown
+    id: delivery
+    attributes:
+      label: Update delivery mode
+      options:
+        - Long polling
+        - Webhook
+        - Standalone API client
+        - Not applicable
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem
+      description: Explain what happened and why it appears incorrect.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide the smallest complete program or test that reproduces the issue.
+      render: go
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Add relevant errors, responses, race output, or traces after removing credentials and identifiers.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I reproduced this with the latest stable Hermes release.
+          required: true
+        - label: I removed all credentials and private Telegram identifiers.
+          required: true
