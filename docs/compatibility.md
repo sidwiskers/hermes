@@ -6,9 +6,11 @@ deprecation must identify a direct migration path.
 
 ## Bot API support
 
-- The typed client targets Telegram Bot API 10.2.
-- A checked-in Bot API 10.2 schema inventory covers all 185 methods, 937
-  parameters, 362 objects, 1,838 object fields, 26 unions, and 187 variants.
+- Each Hermes release targets the Bot API version recorded in the checked-in
+  `spec/bot-api.json` manifest.
+- Hermes 1.0.0 targets Bot API 10.2. Its release inventory covers all 185
+  methods, 937 parameters, 362 objects, 1,838 object fields, 26 unions, and 187
+  variants in that version.
 - Source-audit tests require zero missing methods, parameters, objects, fields,
   union roots, or union variants. They also verify requiredness, Go wire types,
   JSON optionality, and optional-object nilability.
@@ -16,9 +18,11 @@ deprecation must identify a direct migration path.
 - Unknown update fields can be preserved with `WithRawUpdates(true)` or `DecodeUpdate(..., true)`.
 
 The current zero-gap static schema report and remaining behavioral conformance
-work are published in [`schema-parity.md`](schema-parity.md). Each Bot API
-release requires a regenerated manifest, models, aliases, and reviewed source
-audit.
+work are published in [`schema-parity.md`](schema-parity.md). After Telegram
+publishes a Bot API release, a Hermes typed update requires a regenerated
+manifest, models, aliases, and reviewed source audit. Until then, the raw call
+layers provide forward-compatible access without claiming typed support that
+has not yet been audited.
 
 ## Go compatibility
 
