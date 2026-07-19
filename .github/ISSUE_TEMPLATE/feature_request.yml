@@ -1,0 +1,39 @@
+name: Feature request
+description: Propose a focused addition or API improvement
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the concrete use case that is difficult today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API or behavior
+      description: Show the smallest user-facing API that would solve the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include raw Bot API calls or composition with existing packages where relevant.
+  - type: textarea
+    id: impact
+    attributes:
+      label: Compatibility and performance impact
+      description: Note wire-format, allocation, dependency, concurrency, or migration implications.
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Project principles
+      options:
+        - label: This preserves the standard-library-only core.
+          required: true
+        - label: This does not require reflection in dispatch or request paths.
+          required: true
