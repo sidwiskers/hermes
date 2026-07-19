@@ -1,5 +1,10 @@
 # Hermes
 
+[![CI](https://github.com/sidwiskers/hermes/actions/workflows/ci.yml/badge.svg)](https://github.com/sidwiskers/hermes/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/sidwiskers/hermes.svg)](https://pkg.go.dev/github.com/sidwiskers/hermes)
+[![Release](https://img.shields.io/github/v/release/sidwiskers/hermes)](https://github.com/sidwiskers/hermes/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Hermes is a fast, small Telegram Bot API library **and** framework for modern Go. The module and root package share the `hermes` name.
 
 ```go
