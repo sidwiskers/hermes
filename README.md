@@ -91,7 +91,7 @@ integrations. The runtime engine remains internal and replaceable.
 - **Easy syntax:** common actions are one clear method call.
 - **No hidden magic:** explicit contexts, errors, middleware, and concurrency limits.
 - **Expandable without rewrites:** transport, typed API, and framework layers are separate.
-- **Bot API 10.2-complete:** all 185 official methods have typed entry points; ephemeral messages and Rich Messages are native concepts rather than compatibility patches.
+- **Schema-complete releases:** every supported Bot API version is audited against a checked-in official inventory; ephemeral messages and Rich Messages are native concepts rather than compatibility patches.
 
 ## Install
 
@@ -120,12 +120,16 @@ variables are documented in [`docs/releasing.md`](docs/releasing.md).
 
 ## Project status
 
-Hermes 1.0.0 is the stable release. It has typed entry points for all 185
-methods in Telegram Bot API 10.2, a
-permanent raw escape hatch, streamed uploads/downloads, bounded update
-dispatch, race-tested routing, retry-safe webhooks, and a standard-library-only
-runtime. Static schema parity is at zero known gaps across methods, parameters,
-objects, fields, unions, requiredness, wire types, and optionality.
+Hermes 1.0.0 is the stable release. Its typed API is audited against the Bot API
+version recorded in `spec/bot-api.json`, with zero known static parity gaps at
+release time. It also provides permanent raw escape hatches, streamed
+uploads/downloads, bounded update dispatch, race-tested routing, retry-safe
+webhooks, and a standard-library-only runtime.
+
+Telegram evolves independently of Hermes. Version-specific claims and exact
+surface counts live in [`docs/schema-parity.md`](docs/schema-parity.md) and the
+changelog; `Call` and `CallMultipart` provide day-zero access to newly released
+methods while the next typed schema update is prepared.
 
 The code is held to stable-v1 gates rather than treating “v1” as a first
 iteration. Deterministic local, Telegram test-DC, credentialed production,
@@ -244,7 +248,8 @@ bot.Callback("private_stats", func(c *hermes.Context) error {
 
 The context automatically supplies the receiver, callback-query identifier, or incoming ephemeral-message reply identifier.
 
-The typed API supports ephemeral delivery for all 12 methods introduced in Bot API 10.2:
+The typed API supports ephemeral delivery across every ephemeral-capable send
+method in the checked-in schema:
 
 - message, photo, animation, audio, document, sticker;
 - video, video note, voice;
@@ -485,13 +490,13 @@ fmt.Println(request.Method, request.JSON["text"])
 
 It records JSON and multipart requests and can queue successful or Telegram-style error responses.
 
-## Complete Bot API 10.2 surface
+## Complete, versioned Bot API surface
 
 The current structured foundation includes:
 
 - broad update decoding with optional raw forward compatibility;
 - message, callback, command, chat, webhook, file, edit/delete, forwarding, and chat-action methods;
-- all Bot API 10.2 ephemeral-capable send methods;
+- every ephemeral-capable send method in the checked-in schema;
 - albums with typed media items and streamed multi-file attachments;
 - polls, dice, reactions, members, moderation, permissions, invite links, and chat administration;
 - Rich Messages with all 21 input blocks and streamed nested media;
@@ -503,7 +508,11 @@ The current structured foundation includes:
 - streamed primary media uploads and file downloads;
 - filters, groups, typed callback codecs, middleware, and deterministic testing.
 
-The typed method inventory is checked against all 185 methods in the official Bot API 10.2 specification. The raw `Call` and `CallMultipart` layers remain permanent escape hatches for forward compatibility.
+Each Hermes release pins and audits an official Bot API schema manifest. The
+exact version, surface counts, and audit result are recorded in
+[`docs/schema-parity.md`](docs/schema-parity.md). The raw `Call` and
+`CallMultipart` layers remain permanent escape hatches for forward
+compatibility.
 
 See [`docs/design.md`](docs/design.md) and [`docs/roadmap.md`](docs/roadmap.md).
 Runnable polling, webhook, upload, inline-mode, payment, and standalone-client
