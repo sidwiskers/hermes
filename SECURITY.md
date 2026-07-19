@@ -2,9 +2,15 @@
 
 ## Supported versions
 
-Until the first stable tag, security fixes are made on the default branch.
-After v1.0, the latest v1 minor release receives security fixes. Older minor
-releases are supported only when a published advisory explicitly says so.
+| Version | Supported |
+| --- | --- |
+| Latest `1.x` minor | Yes |
+| Older `1.x` minors | By published advisory only |
+| Pre-1.0 releases | No |
+
+Security fixes are made on the default branch and released from the latest
+supported minor line. A published advisory will state explicitly when support
+is extended to an older minor release.
 
 ## Reporting a vulnerability
 
