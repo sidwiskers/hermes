@@ -134,5 +134,7 @@ After automated and manual gates pass:
 1. Replace the `Unreleased` changelog heading with the version and date.
 2. Confirm `go.mod`, the schema version, examples, and README agree.
 3. Run `./scripts/release-check.sh` once more from the exact release commit.
-4. Create a signed semantic-version tag and publish release notes linking the
-   archived evidence.
+4. Create an immutable semantic-version tag from that exact commit and publish
+   release notes linking the archived evidence.
+5. Prefer a signed annotated tag when a maintainer signing identity is
+   configured. Never move or replace a tag after it is public.
