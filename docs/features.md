@@ -7,7 +7,7 @@ tools separate. Applications pay only for packages they import.
 
 | Capability | Support |
 | --- | --- |
-| Telegram Bot API | Complete typed Bot API 10.2 surface: 185 methods, 937 parameters, 362 objects, 1,838 fields, 26 unions, and 187 variants |
+| Telegram Bot API | Schema-audited typed surface for the version recorded in `spec/bot-api.json`; exact release counts are published in [`schema-parity.md`](schema-parity.md) |
 | Forward compatibility | Raw JSON and multipart calls; optional raw update preservation |
 | Uploads | Constant-memory streamed single and multi-file multipart uploads |
 | Downloads | Validated paths, bounded errors, streamed readers and writers |
