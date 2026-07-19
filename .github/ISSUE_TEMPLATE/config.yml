@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/sidwiskers/hermes/security/advisories/new
+    about: Report vulnerabilities privately; never open a public security issue.
+  - name: Telegram Bot API documentation
+    url: https://core.telegram.org/bots/api
+    about: Check whether behavior is defined by Telegram before filing a Hermes issue.
