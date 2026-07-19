@@ -2,9 +2,25 @@
 set -euo pipefail
 
 version="$(go env GOVERSION)"
-patch="${version#go1.26.}"
-if [[ "$version" != go1.26.* || ! "$patch" =~ ^[0-9]+$ || "$patch" -lt 5 ]]; then
-	printf 'release validation requires patched Go 1.26.5 or newer in the 1.26 series; found %s\n' "$version" >&2
+minimum_major=1
+minimum_minor=26
+minimum_patch=5
+version_supported=false
+
+if [[ "$version" =~ ^go([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+	major="${BASH_REMATCH[1]}"
+	minor="${BASH_REMATCH[2]}"
+	patch="${BASH_REMATCH[3]}"
+
+	if (( major > minimum_major ||
+		(major == minimum_major && minor > minimum_minor) ||
+		(major == minimum_major && minor == minimum_minor && patch >= minimum_patch) )); then
+		version_supported=true
+	fi
+fi
+
+if [[ "$version_supported" != true ]]; then
+	printf 'release validation requires stable Go 1.26.5 or newer; found %s\n' "$version" >&2
 	exit 1
 fi
 
