@@ -1,0 +1,438 @@
+Hermes competitor benchmark
+date_utc: 2026-07-19T03:33:16Z
+go: go version go1.26.5 linux/amd64
+gomaxprocs: 1
+count: 10
+benchtime: 1s
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+go_env:
+{
+	"CGO_ENABLED": "1",
+	"GOAMD64": "v1",
+	"GOARCH": "amd64",
+	"GOOS": "linux"
+}
+
+[hermes]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	  121604	      9840 ns/op	    1909 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  112101	      9890 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  128589	      9689 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  127665	      9822 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  127212	      9706 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  127018	     10169 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  111608	     10111 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  121191	      9870 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  124370	     10431 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  120372	     10238 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkRouterExact1           	10540324	       113.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	10743506	       114.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	10704028	       111.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	 9641738	       112.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	10826299	       112.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	10688463	       113.0 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	10872990	       112.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	10589918	       116.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	 9183064	       124.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	10838360	       112.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	 9987667	       123.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	10040265	       124.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	10021706	       127.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	 9757719	       123.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	 9761899	       123.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	 9433417	       123.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	 9842932	       133.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	 9776511	       124.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	 9273512	       122.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	 9931392	       129.0 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10     	 8849974	       136.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10     	 8010450	       140.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10     	 9149449	       134.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10     	 8875857	       133.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10     	 9258489	       131.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10     	 9282114	       132.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10     	 8957478	       133.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10     	 8655938	       134.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10     	 9190956	       132.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10     	 9163974	       133.0 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAPICall                	  100452	     11706 ns/op	    4064 B/op	      39 allocs/op
+BenchmarkAPICall                	  107655	     10727 ns/op	    4064 B/op	      39 allocs/op
+BenchmarkAPICall                	  104547	     10841 ns/op	    4064 B/op	      39 allocs/op
+BenchmarkAPICall                	   94678	     10746 ns/op	    4064 B/op	      39 allocs/op
+BenchmarkAPICall                	  118620	     10613 ns/op	    4064 B/op	      39 allocs/op
+BenchmarkAPICall                	  113823	     10561 ns/op	    4064 B/op	      39 allocs/op
+BenchmarkAPICall                	  115760	     10554 ns/op	    4064 B/op	      39 allocs/op
+BenchmarkAPICall                	  100437	     11113 ns/op	    4064 B/op	      39 allocs/op
+BenchmarkAPICall                	  115087	     10916 ns/op	    4064 B/op	      39 allocs/op
+BenchmarkAPICall                	  111928	     10487 ns/op	    4064 B/op	      39 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks	65.220s
+
+[tgbotapi]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks/competitors/tgbotapi
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	  123046	      9673 ns/op	    1602 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  134395	     10039 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   98964	     10360 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  120794	     10114 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  115297	      9656 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  132537	      9803 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  123969	      9702 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  122907	      9621 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  129962	      9695 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  116853	      9793 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkAPICall                	  104935	     12091 ns/op	    4304 B/op	      51 allocs/op
+BenchmarkAPICall                	  105858	     11599 ns/op	    4304 B/op	      51 allocs/op
+BenchmarkAPICall                	  109713	     11694 ns/op	    4304 B/op	      51 allocs/op
+BenchmarkAPICall                	   95679	     11302 ns/op	    4304 B/op	      51 allocs/op
+BenchmarkAPICall                	  114193	     10824 ns/op	    4304 B/op	      51 allocs/op
+BenchmarkAPICall                	  112959	     10870 ns/op	    4304 B/op	      51 allocs/op
+BenchmarkAPICall                	  116896	     10946 ns/op	    4304 B/op	      51 allocs/op
+BenchmarkAPICall                	  116173	     10834 ns/op	    4304 B/op	      51 allocs/op
+BenchmarkAPICall                	  111558	     11150 ns/op	    4304 B/op	      51 allocs/op
+BenchmarkAPICall                	  112107	     10981 ns/op	    4304 B/op	      51 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks/competitors/tgbotapi	24.386s
+
+[telebot]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks/competitors/telebot
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	   97840	     10227 ns/op	    1940 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  126544	      9958 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  123955	      9699 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  126638	      9740 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  126435	      9942 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  125059	      9748 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  114672	      9896 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  109197	      9588 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  109336	      9616 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  108996	      9622 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkRouterExact1           	 1000000	      1129 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1115 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1082196	      1123 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1085 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1111 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1168 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1108 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1099 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1125 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1141 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	  889881	      1193 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	  935914	      1156 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	  969729	      1152 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	 1044956	      1143 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	  951045	      1168 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	  959174	      1189 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	  955191	      1139 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	 1026729	      1179 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	 1023487	      1161 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	 1000000	      1134 ns/op	     672 B/op	       5 allocs/op
+BenchmarkRouterMiddleware10     	  645973	      1614 ns/op	     832 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  625573	      1670 ns/op	     832 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  802692	      1625 ns/op	     832 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  827000	      1583 ns/op	     832 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  826597	      1607 ns/op	     832 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  822216	      1561 ns/op	     832 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  814348	      1657 ns/op	     832 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  771225	      1581 ns/op	     832 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  784857	      1638 ns/op	     832 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  716431	      1598 ns/op	     832 B/op	      15 allocs/op
+BenchmarkAPICall                	   69405	     16651 ns/op	    5778 B/op	      58 allocs/op
+BenchmarkAPICall                	   73602	     16610 ns/op	    5768 B/op	      58 allocs/op
+BenchmarkAPICall                	   63987	     17192 ns/op	    5772 B/op	      58 allocs/op
+BenchmarkAPICall                	   76147	     15609 ns/op	    5768 B/op	      58 allocs/op
+BenchmarkAPICall                	   71828	     16260 ns/op	    5768 B/op	      58 allocs/op
+BenchmarkAPICall                	   66390	     16311 ns/op	    5768 B/op	      58 allocs/op
+BenchmarkAPICall                	   68343	     16413 ns/op	    5768 B/op	      58 allocs/op
+BenchmarkAPICall                	   65967	     15984 ns/op	    5768 B/op	      58 allocs/op
+BenchmarkAPICall                	   62388	     16178 ns/op	    5768 B/op	      58 allocs/op
+BenchmarkAPICall                	   67333	     16329 ns/op	    5768 B/op	      58 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks/competitors/telebot	57.711s
+
+[telebotv4]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks/competitors/telebotv4
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	  113236	     10636 ns/op	    2677 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  115758	     10660 ns/op	    2672 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  125676	     10812 ns/op	    2672 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  120542	     10896 ns/op	    2672 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  101466	     10701 ns/op	    2672 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  109072	     10983 ns/op	    2672 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  121986	     10618 ns/op	    2672 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  119167	     10310 ns/op	    2672 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  114572	     10556 ns/op	    2672 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  122150	     10343 ns/op	    2672 B/op	      20 allocs/op
+BenchmarkRouterExact1           	 1000000	      1188 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1           	  972222	      1237 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1           	  928460	      1186 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1           	  943806	      1245 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1           	  919522	      1284 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1210 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1165 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1161 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1178 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1           	 1000000	      1189 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	 1000000	      1212 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	 1000000	      1200 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	  915068	      1314 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	  836457	      1212 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	 1000000	      1309 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	 1000000	      1244 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	 1000000	      1248 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	 1000000	      1191 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	 1000000	      1197 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterExact1000        	  981841	      1285 ns/op	     736 B/op	       5 allocs/op
+BenchmarkRouterMiddleware10     	  704148	      1702 ns/op	     896 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  586663	      1748 ns/op	     896 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  715660	      1849 ns/op	     896 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  751926	      1809 ns/op	     896 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  631149	      1918 ns/op	     896 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  740972	      1756 ns/op	     896 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  720697	      1687 ns/op	     896 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  717261	      1793 ns/op	     896 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  692163	      1791 ns/op	     896 B/op	      15 allocs/op
+BenchmarkRouterMiddleware10     	  667581	      1895 ns/op	     896 B/op	      15 allocs/op
+BenchmarkAPICall                	   58022	     17550 ns/op	    6517 B/op	      58 allocs/op
+BenchmarkAPICall                	   71035	     17615 ns/op	    6504 B/op	      58 allocs/op
+BenchmarkAPICall                	   71260	     17204 ns/op	    6504 B/op	      58 allocs/op
+BenchmarkAPICall                	   72733	     17186 ns/op	    6504 B/op	      58 allocs/op
+BenchmarkAPICall                	   73077	     16487 ns/op	    6504 B/op	      58 allocs/op
+BenchmarkAPICall                	   66099	     16577 ns/op	    6504 B/op	      58 allocs/op
+BenchmarkAPICall                	   65286	     16452 ns/op	    6504 B/op	      58 allocs/op
+BenchmarkAPICall                	   67010	     15891 ns/op	    6505 B/op	      58 allocs/op
+BenchmarkAPICall                	   71680	     16993 ns/op	    6505 B/op	      58 allocs/op
+BenchmarkAPICall                	   76326	     15808 ns/op	    6504 B/op	      58 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks/competitors/telebotv4	60.387s
+
+[gotgbot]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks/competitors/gotgbot
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	   66272	     15670 ns/op	    3337 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   79194	     14799 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   82492	     14671 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   67665	     15256 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   82618	     14794 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   86113	     14230 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   87337	     14692 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   79646	     15133 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   82263	     16063 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   84495	     14513 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkRouterExact1           	 1616572	       738.7 ns/op	     328 B/op	       7 allocs/op
+BenchmarkRouterExact1           	 1625037	       731.1 ns/op	     328 B/op	       7 allocs/op
+BenchmarkRouterExact1           	 1576533	       757.1 ns/op	     328 B/op	       7 allocs/op
+BenchmarkRouterExact1           	 1578025	       761.9 ns/op	     328 B/op	       7 allocs/op
+BenchmarkRouterExact1           	 1666299	       738.9 ns/op	     328 B/op	       7 allocs/op
+BenchmarkRouterExact1           	 1648854	       735.8 ns/op	     328 B/op	       7 allocs/op
+BenchmarkRouterExact1           	 1694305	       723.5 ns/op	     328 B/op	       7 allocs/op
+BenchmarkRouterExact1           	 1681275	       724.1 ns/op	     328 B/op	       7 allocs/op
+BenchmarkRouterExact1           	 1617668	       735.6 ns/op	     328 B/op	       7 allocs/op
+BenchmarkRouterExact1           	 1623150	       724.4 ns/op	     328 B/op	       7 allocs/op
+BenchmarkRouterExact1000        	    6336	    191769 ns/op	   32296 B/op	    1006 allocs/op
+BenchmarkRouterExact1000        	    6634	    189519 ns/op	   32296 B/op	    1006 allocs/op
+BenchmarkRouterExact1000        	    6544	    193804 ns/op	   32296 B/op	    1006 allocs/op
+BenchmarkRouterExact1000        	    6267	    198765 ns/op	   32296 B/op	    1006 allocs/op
+BenchmarkRouterExact1000        	    6208	    196769 ns/op	   32296 B/op	    1006 allocs/op
+BenchmarkRouterExact1000        	    6432	    193436 ns/op	   32296 B/op	    1006 allocs/op
+BenchmarkRouterExact1000        	    6470	    191290 ns/op	   32296 B/op	    1006 allocs/op
+BenchmarkRouterExact1000        	    6296	    196445 ns/op	   32296 B/op	    1006 allocs/op
+BenchmarkRouterExact1000        	    6295	    199229 ns/op	   32296 B/op	    1006 allocs/op
+BenchmarkRouterExact1000        	    5283	    195004 ns/op	   32296 B/op	    1006 allocs/op
+BenchmarkAPICall                	   27783	     40135 ns/op	    8392 B/op	      97 allocs/op
+BenchmarkAPICall                	   31153	     37608 ns/op	    8316 B/op	      97 allocs/op
+BenchmarkAPICall                	   32929	     36143 ns/op	    8314 B/op	      97 allocs/op
+BenchmarkAPICall                	   33444	     36980 ns/op	    8312 B/op	      97 allocs/op
+BenchmarkAPICall                	   27584	     43062 ns/op	    8312 B/op	      97 allocs/op
+BenchmarkAPICall                	   33522	     35592 ns/op	    8312 B/op	      97 allocs/op
+BenchmarkAPICall                	   32763	     35916 ns/op	    8320 B/op	      97 allocs/op
+BenchmarkAPICall                	   32701	     35796 ns/op	    8312 B/op	      97 allocs/op
+BenchmarkAPICall                	   33330	     35712 ns/op	    8312 B/op	      97 allocs/op
+BenchmarkAPICall                	   31642	     36916 ns/op	    8312 B/op	      97 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks/competitors/gotgbot	48.098s
+
+[gotelegrambot]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks/competitors/gotelegrambot
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	  104820	      9695 ns/op	    1990 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  130933	      9510 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  109484	      9803 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  121557	      9510 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  131535	      9766 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  130148	      9587 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  124528	      9771 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  117606	      9609 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  118326	      9652 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  131115	      9649 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkRouterExact1           	31666172	        37.33 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	29806446	        39.67 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	32388345	        38.47 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	32370171	        37.63 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	31897921	        37.88 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	25779862	        40.18 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	29652508	        39.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	31105684	        39.25 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	32130019	        38.87 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1           	31783922	        38.04 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	   86688	     13721 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	   88651	     13805 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	   89024	     13709 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	   85671	     13625 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	   81820	     13909 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	   88782	     13719 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	   88501	     13913 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	   87409	     13826 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	   88413	     13696 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000        	   89164	     13662 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10     	 2367321	       495.0 ns/op	     160 B/op	      10 allocs/op
+BenchmarkRouterMiddleware10     	 2158808	       530.6 ns/op	     160 B/op	      10 allocs/op
+BenchmarkRouterMiddleware10     	 2365963	       502.6 ns/op	     160 B/op	      10 allocs/op
+BenchmarkRouterMiddleware10     	 2372148	       499.4 ns/op	     160 B/op	      10 allocs/op
+BenchmarkRouterMiddleware10     	 2490578	       487.6 ns/op	     160 B/op	      10 allocs/op
+BenchmarkRouterMiddleware10     	 2455158	       494.2 ns/op	     160 B/op	      10 allocs/op
+BenchmarkRouterMiddleware10     	 2021725	       593.6 ns/op	     160 B/op	      10 allocs/op
+BenchmarkRouterMiddleware10     	 2453806	       497.6 ns/op	     160 B/op	      10 allocs/op
+BenchmarkRouterMiddleware10     	 2381101	       495.4 ns/op	     160 B/op	      10 allocs/op
+BenchmarkRouterMiddleware10     	 2375097	       493.7 ns/op	     160 B/op	      10 allocs/op
+BenchmarkAPICall                	   43896	     25516 ns/op	    5889 B/op	      88 allocs/op
+BenchmarkAPICall                	   43593	     25759 ns/op	    5888 B/op	      88 allocs/op
+BenchmarkAPICall                	   42614	     27492 ns/op	    5888 B/op	      88 allocs/op
+BenchmarkAPICall                	   45414	     26143 ns/op	    5888 B/op	      88 allocs/op
+BenchmarkAPICall                	   49798	     26331 ns/op	    5888 B/op	      88 allocs/op
+BenchmarkAPICall                	   48481	     25016 ns/op	    5888 B/op	      88 allocs/op
+BenchmarkAPICall                	   49182	     25383 ns/op	    5888 B/op	      88 allocs/op
+BenchmarkAPICall                	   48968	     24980 ns/op	    5888 B/op	      88 allocs/op
+BenchmarkAPICall                	   49167	     25173 ns/op	    5888 B/op	      88 allocs/op
+BenchmarkAPICall                	   45912	     25320 ns/op	    5888 B/op	      88 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks/competitors/gotelegrambot	59.720s
+
+[telego]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks/competitors/telego
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	  153694	      7001 ns/op	    4075 B/op	       9 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  184282	      6294 ns/op	    4048 B/op	       9 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  171942	      6466 ns/op	    4048 B/op	       9 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  182836	      6388 ns/op	    4048 B/op	       9 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  191947	      6310 ns/op	    4048 B/op	       9 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  200685	      6075 ns/op	    4048 B/op	       9 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  212502	      6061 ns/op	    4048 B/op	       9 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  211096	      5964 ns/op	    4048 B/op	       9 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  209509	      6393 ns/op	    4048 B/op	       9 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  168454	      6130 ns/op	    4048 B/op	       9 allocs/op
+BenchmarkRouterExact1           	   39756	     26656 ns/op	    6285 B/op	      31 allocs/op
+BenchmarkRouterExact1           	   99104	     12811 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterExact1           	  108547	     11714 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterExact1           	  114052	     11500 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterExact1           	  120286	     11599 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterExact1           	  109807	     11637 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterExact1           	  114003	     11644 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterExact1           	  104853	     11831 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterExact1           	  121419	     11866 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterExact1           	  114513	     12027 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterExact1000        	     100	  10876341 ns/op	 4704317 B/op	   13006 allocs/op
+BenchmarkRouterExact1000        	     100	  11225260 ns/op	 4704326 B/op	   13006 allocs/op
+BenchmarkRouterExact1000        	     100	  11222089 ns/op	 4704326 B/op	   13006 allocs/op
+BenchmarkRouterExact1000        	     100	  10934994 ns/op	 4704317 B/op	   13006 allocs/op
+BenchmarkRouterExact1000        	     100	  10919769 ns/op	 4704317 B/op	   13006 allocs/op
+BenchmarkRouterExact1000        	     100	  10948160 ns/op	 4704317 B/op	   13006 allocs/op
+BenchmarkRouterExact1000        	     100	  10739081 ns/op	 4704317 B/op	   13006 allocs/op
+BenchmarkRouterExact1000        	     100	  10906494 ns/op	 4704317 B/op	   13006 allocs/op
+BenchmarkRouterExact1000        	     100	  11274200 ns/op	 4704317 B/op	   13006 allocs/op
+BenchmarkRouterExact1000        	     100	  10932838 ns/op	 4704326 B/op	   13006 allocs/op
+BenchmarkRouterMiddleware10     	  107106	     12542 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterMiddleware10     	  107661	     12840 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterMiddleware10     	  108349	     12446 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterMiddleware10     	   81187	     12842 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterMiddleware10     	   97741	     12978 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterMiddleware10     	  108057	     12272 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterMiddleware10     	   95706	     12326 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterMiddleware10     	   92980	     12111 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterMiddleware10     	  104467	     13077 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkRouterMiddleware10     	  108484	     12638 ns/op	    4896 B/op	      18 allocs/op
+BenchmarkAPICall                	   53216	     22648 ns/op	    5935 B/op	      42 allocs/op
+BenchmarkAPICall                	   54795	     22099 ns/op	    5931 B/op	      42 allocs/op
+BenchmarkAPICall                	   48883	     23066 ns/op	    5931 B/op	      42 allocs/op
+BenchmarkAPICall                	   44568	     25071 ns/op	    5931 B/op	      42 allocs/op
+BenchmarkAPICall                	   49554	     23439 ns/op	    5931 B/op	      42 allocs/op
+BenchmarkAPICall                	   54235	     22343 ns/op	    5931 B/op	      42 allocs/op
+BenchmarkAPICall                	   54264	     22925 ns/op	    5931 B/op	      42 allocs/op
+BenchmarkAPICall                	   55690	     22225 ns/op	    5931 B/op	      42 allocs/op
+BenchmarkAPICall                	   56310	     22781 ns/op	    5931 B/op	      42 allocs/op
+BenchmarkAPICall                	   47713	     23252 ns/op	    5931 B/op	      42 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks/competitors/telego	61.443s
+
+[gotg]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks/competitors/gotg
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	   91610	     11296 ns/op	    1957 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  110530	     10841 ns/op	    1952 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  121764	     10711 ns/op	    1952 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  116088	     10810 ns/op	    1952 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  109616	     10834 ns/op	    1952 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   96634	     10958 ns/op	    1952 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   94730	     10607 ns/op	    1952 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  110424	     10486 ns/op	    1952 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  100554	     11874 ns/op	    1952 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  114608	     10610 ns/op	    1952 B/op	      20 allocs/op
+BenchmarkRouterExact1           	 3825412	       312.0 ns/op	      72 B/op	       3 allocs/op
+BenchmarkRouterExact1           	 4002757	       320.8 ns/op	      72 B/op	       3 allocs/op
+BenchmarkRouterExact1           	 3841760	       313.4 ns/op	      72 B/op	       3 allocs/op
+BenchmarkRouterExact1           	 3979485	       305.6 ns/op	      72 B/op	       3 allocs/op
+BenchmarkRouterExact1           	 3736885	       309.0 ns/op	      72 B/op	       3 allocs/op
+BenchmarkRouterExact1           	 3638443	       313.0 ns/op	      72 B/op	       3 allocs/op
+BenchmarkRouterExact1           	 3711219	       317.3 ns/op	      72 B/op	       3 allocs/op
+BenchmarkRouterExact1           	 3715344	       318.4 ns/op	      72 B/op	       3 allocs/op
+BenchmarkRouterExact1           	 3878697	       311.3 ns/op	      72 B/op	       3 allocs/op
+BenchmarkRouterExact1           	 3829968	       322.6 ns/op	      72 B/op	       3 allocs/op
+BenchmarkRouterExact1000        	   14029	     84663 ns/op	   16408 B/op	       2 allocs/op
+BenchmarkRouterExact1000        	   14187	     84092 ns/op	   16408 B/op	       2 allocs/op
+BenchmarkRouterExact1000        	   14244	     83826 ns/op	   16408 B/op	       2 allocs/op
+BenchmarkRouterExact1000        	   14062	     84015 ns/op	   16408 B/op	       2 allocs/op
+BenchmarkRouterExact1000        	   13951	     88564 ns/op	   16408 B/op	       2 allocs/op
+BenchmarkRouterExact1000        	   12930	     91202 ns/op	   16408 B/op	       2 allocs/op
+BenchmarkRouterExact1000        	   14094	     90267 ns/op	   16408 B/op	       2 allocs/op
+BenchmarkRouterExact1000        	   14538	     83993 ns/op	   16408 B/op	       2 allocs/op
+BenchmarkRouterExact1000        	   13687	     86233 ns/op	   16408 B/op	       2 allocs/op
+BenchmarkRouterExact1000        	   13077	     90020 ns/op	   16408 B/op	       2 allocs/op
+BenchmarkRouterMiddleware10     	 1000000	      1128 ns/op	     312 B/op	      13 allocs/op
+BenchmarkRouterMiddleware10     	 1120479	      1067 ns/op	     312 B/op	      13 allocs/op
+BenchmarkRouterMiddleware10     	 1000000	      1041 ns/op	     312 B/op	      13 allocs/op
+BenchmarkRouterMiddleware10     	 1000000	      1043 ns/op	     312 B/op	      13 allocs/op
+BenchmarkRouterMiddleware10     	 1000000	      1076 ns/op	     312 B/op	      13 allocs/op
+BenchmarkRouterMiddleware10     	 1000000	      1062 ns/op	     312 B/op	      13 allocs/op
+BenchmarkRouterMiddleware10     	 1000000	      1208 ns/op	     312 B/op	      13 allocs/op
+BenchmarkRouterMiddleware10     	 1000000	      1102 ns/op	     312 B/op	      13 allocs/op
+BenchmarkRouterMiddleware10     	 1000000	      1041 ns/op	     312 B/op	      13 allocs/op
+BenchmarkRouterMiddleware10     	 1000000	      1080 ns/op	     312 B/op	      13 allocs/op
+BenchmarkAPICall                	  105351	     10769 ns/op	    4672 B/op	      51 allocs/op
+BenchmarkAPICall                	  119420	     10774 ns/op	    4672 B/op	      51 allocs/op
+BenchmarkAPICall                	   99001	     11183 ns/op	    4672 B/op	      51 allocs/op
+BenchmarkAPICall                	  102696	     10746 ns/op	    4672 B/op	      51 allocs/op
+BenchmarkAPICall                	   99926	     10714 ns/op	    4672 B/op	      51 allocs/op
+BenchmarkAPICall                	  100916	     10469 ns/op	    4672 B/op	      51 allocs/op
+BenchmarkAPICall                	  102201	     10643 ns/op	    4672 B/op	      51 allocs/op
+BenchmarkAPICall                	   99954	     10942 ns/op	    4672 B/op	      51 allocs/op
+BenchmarkAPICall                	  116038	     10500 ns/op	    4672 B/op	      51 allocs/op
+BenchmarkAPICall                	  109815	     10887 ns/op	    4672 B/op	      51 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks/competitors/gotg	58.064s

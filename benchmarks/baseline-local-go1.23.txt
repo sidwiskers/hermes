@@ -1,0 +1,59 @@
+# Local Round 5 baseline
+# Go: go version go1.23.2 linux/amd64
+# Date: 2026-07-15
+# GOMAXPROCS=1
+# BENCH_COUNT=2 BENCH_TIME=500ms
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/tg/benchmarks
+cpu: AMD EPYC 9V74 80-Core Processor
+BenchmarkDecodeUpdate/fast    	  113170	      5358 ns/op	    1504 B/op	      19 allocs/op
+BenchmarkDecodeUpdate/fast    	  113576	      5680 ns/op	    1504 B/op	      19 allocs/op
+BenchmarkDecodeUpdate/preserve_raw         	  105748	      5787 ns/op	    1856 B/op	      20 allocs/op
+BenchmarkDecodeUpdate/preserve_raw         	  109291	      5571 ns/op	    1856 B/op	      20 allocs/op
+BenchmarkDecodeUpdateBatch100              	    1094	    511382 ns/op	  174152 B/op	    1018 allocs/op
+BenchmarkDecodeUpdateBatch100              	    1263	    524213 ns/op	  174152 B/op	    1018 allocs/op
+PASS
+ok  	github.com/sidwiskers/tg/benchmarks	4.060s
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/tg/benchmarks
+cpu: AMD EPYC 9V74 80-Core Processor
+BenchmarkWebhookDecode/fast         	   61620	      9141 ns/op	    7704 B/op	      40 allocs/op
+BenchmarkWebhookDecode/fast         	   64839	      8949 ns/op	    7704 B/op	      40 allocs/op
+BenchmarkWebhookDecode/preserve_raw 	   69613	      8690 ns/op	    8152 B/op	      39 allocs/op
+BenchmarkWebhookDecode/preserve_raw 	   65659	      9017 ns/op	    8152 B/op	      39 allocs/op
+PASS
+ok  	github.com/sidwiskers/tg/benchmarks	2.754s
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/tg/benchmarks
+cpu: AMD EPYC 9V74 80-Core Processor
+BenchmarkRouterExact1             	 8606067	        73.34 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1             	 8977182	        75.49 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1PoolDisabled 	 5016602	       116.8 ns/op	      80 B/op	       1 allocs/op
+BenchmarkRouterExact1PoolDisabled 	 4960207	       119.5 ns/op	      80 B/op	       1 allocs/op
+BenchmarkRouterExact1000          	 7662130	        74.60 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterExact1000          	 8184181	        74.27 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10       	 6050139	        88.27 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterMiddleware10       	 6121378	        87.88 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterStartup1000        	    1624	    362731 ns/op	  381984 B/op	    3955 allocs/op
+BenchmarkRouterStartup1000        	    1725	    365136 ns/op	  382082 B/op	    3956 allocs/op
+PASS
+ok  	github.com/sidwiskers/tg/benchmarks	6.820s
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/tg/benchmarks
+cpu: AMD EPYC 9V74 80-Core Processor
+BenchmarkAPICall 	   88717	      5681 ns/op	    3240 B/op	      39 allocs/op
+BenchmarkAPICall 	   89996	      5897 ns/op	    3240 B/op	      39 allocs/op
+PASS
+ok  	github.com/sidwiskers/tg/benchmarks	1.200s
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/tg/benchmarks
+cpu: AMD EPYC 9V74 80-Core Processor
+BenchmarkMultipartUpload1MiB 	    5400	    105468 ns/op	9942.13 MB/s	    6809 B/op	      91 allocs/op
+BenchmarkMultipartUpload1MiB 	    5504	    105623 ns/op	9927.58 MB/s	    6809 B/op	      91 allocs/op
+PASS
+ok  	github.com/sidwiskers/tg/benchmarks	1.200s

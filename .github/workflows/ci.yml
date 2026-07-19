@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Verify
+        run: ./scripts/verify.sh
+
+      - name: Verify competitor adapters
+        run: ./scripts/verify-competitors.sh
+
+      - name: Vulnerability and dependency audit
+        run: ./scripts/security-check.sh
+
+      - name: Fuzz smoke tests
+        shell: bash
+        run: |
+          GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzDecodeUpdate$' -fuzztime 2s ./types
+          GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzCommandParsing$' -fuzztime 2s ./framework
+          GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzTelegramEnvelopeDecode$' -fuzztime 2s ./api
+          GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzMethodValidation$' -fuzztime 2s ./api
+          GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzMultipartHeaderValidation$' -fuzztime 2s ./api
+          GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzInt64CallbackRoundTrip$' -fuzztime 2s .
+
+      - name: Benchmark smoke test
+        run: go test -run '^$' -bench 'BenchmarkRouterExact1$' -benchtime 100ms ./benchmarks
+
+      - name: Compile examples
+        run: go test ./examples/...
+
+      - name: Compile live conformance suite
+        run: go test -tags=integration -run '^$' ./integration
+
+  portable:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -count=1 ./...

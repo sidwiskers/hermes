@@ -1,0 +1,104 @@
+Hermes competitor benchmark
+date_utc: 2026-07-16T14:14:40Z
+go: go version go1.26.0 linux/amd64
+gomaxprocs: 1
+count: 10
+benchtime: 1s
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+go_env:
+{
+	"CGO_ENABLED": "1",
+	"GOAMD64": "v1",
+	"GOARCH": "amd64",
+	"GOOS": "linux"
+}
+
+[hermes]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	  108676	     10952 ns/op	    1909 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  116560	     11022 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  122394	     11476 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  101620	     11681 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  113827	     11340 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   87302	     11690 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   99886	     11687 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   87862	     11491 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  106783	     11035 ns/op	    1904 B/op	      18 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   98752	     11676 ns/op	    1904 B/op	      18 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks	11.937s
+
+[tgbotapi]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks/competitors/tgbotapi
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	  106807	     11179 ns/op	    1602 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  123235	     10121 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  120730	     10608 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  120764	     10231 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  123849	     10238 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  114834	     11095 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   94705	     10766 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  103471	     10857 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   99832	     11727 ns/op	    1600 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  111367	     10385 ns/op	    1600 B/op	      20 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks/competitors/tgbotapi	12.010s
+
+[telebot]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks/competitors/telebot
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	   80727	     13043 ns/op	    1941 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  113540	     11376 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  104065	     12666 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   94698	     12009 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   98014	     11650 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  105463	     11021 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  110820	     11158 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   89336	     12615 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   89300	     11430 ns/op	    1936 B/op	      20 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   99748	     11390 ns/op	    1936 B/op	      20 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks/competitors/telebot	11.674s
+
+[gotgbot]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks/competitors/gotgbot
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	   66213	     18022 ns/op	    3337 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   73622	     16154 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   73279	     17379 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   75891	     16135 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   72886	     17361 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   62518	     18056 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   73724	     16663 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   76264	     16653 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   65347	     16433 ns/op	    3328 B/op	      25 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   72201	     15788 ns/op	    3328 B/op	      25 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks/competitors/gotgbot	12.038s
+
+[gotelegrambot]
+goos: linux
+goarch: amd64
+pkg: github.com/sidwiskers/hermes/benchmarks/competitors/gotelegrambot
+cpu: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+BenchmarkCompetitorDecodeUpdate 	  102732	     11430 ns/op	    1990 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  122792	     10958 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  104859	     11320 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  100602	     11622 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  103878	     11774 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   95497	     12437 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	  106599	     12162 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   93698	     11653 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   89593	     11477 ns/op	    1984 B/op	      19 allocs/op
+BenchmarkCompetitorDecodeUpdate 	   99421	     12190 ns/op	    1984 B/op	      19 allocs/op
+PASS
+ok  	github.com/sidwiskers/hermes/benchmarks/competitors/gotelegrambot	11.965s
