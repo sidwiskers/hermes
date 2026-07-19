@@ -28,7 +28,7 @@ has not yet been audited.
 
 The module declares Go 1.26.5 as its minimum toolchain so users do not build
 Hermes with known standard-library vulnerabilities in Go 1.26.0–1.26.4.
-Release evidence must be produced by an actual patched Go 1.26 toolchain.
+Release evidence must be produced by a stable Go 1.26.5 or newer toolchain.
 Temporarily lowering the module
 directive can be useful for local development on an older compiler, but it is
 not accepted as release validation and must never be committed.
