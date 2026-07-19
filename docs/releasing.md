@@ -5,7 +5,7 @@ does not prove live Telegram behavior or production reliability by itself.
 
 ## Automated release gate
 
-Run from a clean worktree with Go 1.26.5 or a newer patch in the 1.26 series:
+Run from a clean worktree with stable Go 1.26.5 or newer:
 
 ```bash
 ./scripts/release-check.sh
