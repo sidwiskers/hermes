@@ -20,7 +20,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          go-version: stable
+          check-latest: true
           cache: true
 
       - name: Verify
@@ -51,6 +52,44 @@ jobs:
       - name: Compile live conformance suite
         run: go test -tags=integration -run '^$' ./integration
 
+  minimum-go:
+    name: Test (Go 1.25)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GOTOOLCHAIN: local
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Set up latest Go 1.25 patch
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.25.x'
+          check-latest: true
+          cache: true
+
+      - name: Confirm minimum toolchain
+        shell: bash
+        run: |
+          version="$(go env GOVERSION)"
+          [[ "$version" == go1.25.* ]]
+
+      - name: Verify generated sources
+        run: ./scripts/check-generated.sh
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -shuffle=on -count=1 ./...
+
+      - name: Compile examples and live conformance suite
+        run: |
+          go test ./examples/...
+          go test -tags=integration -run '^$' ./integration/...
+
   portable:
     name: Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -67,7 +106,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          go-version: stable
+          check-latest: true
           cache: true
 
       - name: Vet

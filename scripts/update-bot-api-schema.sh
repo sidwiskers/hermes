@@ -6,7 +6,8 @@ generated="$(mktemp)"
 trap 'rm -f "$snapshot" "$generated"' EXIT
 
 curl --fail --location --silent --show-error \
-  https://core.telegram.org/bots/api \
+	--connect-timeout 15 --max-time 120 --retry 3 --retry-all-errors \
+	https://core.telegram.org/bots/api \
   --output "$snapshot"
 
 go run ./internal/cmd/botapi-schema \

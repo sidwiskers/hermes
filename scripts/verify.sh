@@ -9,6 +9,7 @@ fi
 
 ./scripts/check-secrets.sh
 ./scripts/check-generated.sh
+./scripts/test-check-go-version.sh
 
 go vet ./...
 go test -shuffle=on -count=1 ./...

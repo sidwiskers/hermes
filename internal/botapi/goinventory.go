@@ -244,15 +244,14 @@ func (inventory GoInventory) addTypeFieldInfo(result map[string]GoField, key str
 func Audit(schema Manifest, inventory GoInventory) AuditReport {
 	var report AuditReport
 	for _, method := range schema.Methods {
-		if len(method.Parameters) == 0 {
-			continue
-		}
 		covered := make(map[string]GoField)
 		inventory.addTypeFieldInfo(covered, NormalizeName(exportedName(method.Name)+"Params"), make(map[string]bool))
+		bound := false
 		for _, function := range inventory.Functions {
 			if !contains(function.Strings, method.Name) {
 				continue
 			}
+			bound = true
 			for _, parameter := range function.Parameters {
 				if parameter.Type != "" {
 					inventory.addTypeFieldInfo(covered, NormalizeName(parameter.Type), make(map[string]bool))
@@ -265,7 +264,7 @@ func Audit(schema Manifest, inventory GoInventory) AuditReport {
 				covered[literal] = GoField{}
 			}
 		}
-		if len(covered) == 0 {
+		if !bound {
 			report.MissingMethodBindings = append(report.MissingMethodBindings, method.Name)
 		}
 		for _, parameter := range method.Parameters {

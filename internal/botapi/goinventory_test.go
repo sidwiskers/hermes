@@ -87,10 +87,23 @@ func TestAuditFindsSchemaGaps(t *testing.T) {
 
 	got := Audit(schema, inventory)
 	want := AuditReport{
-		MissingMethodParams:  []MissingGap{{Owner: "getThing", Name: "missing"}},
-		MissingObjectFields:  []MissingGap{{Owner: "Thing", Name: "missing"}},
-		MissingUnionVariants: []MissingGap{{Owner: "Choice", Name: "OtherThing"}},
+		MissingMethodBindings: []string{"getThing"},
+		MissingMethodParams:   []MissingGap{{Owner: "getThing", Name: "missing"}},
+		MissingObjectFields:   []MissingGap{{Owner: "Thing", Name: "missing"}},
+		MissingUnionVariants:  []MissingGap{{Owner: "Choice", Name: "OtherThing"}},
 	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("report = %#v, want %#v", got, want)
+	}
+}
+
+func TestAuditRequiresBindingForParameterlessMethod(t *testing.T) {
+	t.Parallel()
+	schema := Manifest{Methods: []Method{{Name: "getStatus"}}}
+	inventory := GoInventory{Types: make(map[string]*GoType)}
+
+	got := Audit(schema, inventory)
+	want := AuditReport{MissingMethodBindings: []string{"getStatus"}}
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("report = %#v, want %#v", got, want)
 	}
