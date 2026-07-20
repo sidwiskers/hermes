@@ -26,12 +26,19 @@ has not yet been audited.
 
 ## Go compatibility
 
-The module declares Go 1.26.5 as its minimum toolchain so users do not build
-Hermes with known standard-library vulnerabilities in Go 1.26.0–1.26.4.
-Release evidence must be produced by an actual patched Go 1.26 toolchain.
-Temporarily lowering the module
-directive can be useful for local development on an older compiler, but it is
-not accepted as release validation and must never be committed.
+The module declares Go 1.25.0 as its language and consumer compatibility floor.
+CI compiles and tests with the latest Go 1.25 patch under `GOTOOLCHAIN=local`,
+and independently runs the complete gates with the current stable Go release.
+The `toolchain go1.26.5` line is a contributor recommendation; Go does not use a
+dependency module's toolchain recommendation to select an application's
+toolchain.
+
+Applications should use the latest patch available in their chosen Go line.
+The application toolchain supplies the standard library, so an old patch can
+retain vulnerabilities even when Hermes itself is current. Stable-release
+evidence must be produced by Go 1.26.5 or any newer stable release, including
+future Go lines such as 1.27 and 1.28. Prerelease and development toolchains do
+not qualify as release evidence.
 
 ## Semantic versioning
 

@@ -99,9 +99,11 @@ integrations. The runtime engine remains internal and replaceable.
 go get github.com/sidwiskers/hermes
 ```
 
-Hermes requires Go 1.26.5 or newer in the Go 1.26 line. The patch-level floor
-prevents applications from being built with known standard-library
-vulnerabilities present in the original Go 1.26.0 toolchain.
+Hermes supports Go 1.25 and every newer stable Go release. Use the latest patch
+available in your chosen Go line: the application toolchain supplies the
+standard library and therefore determines which standard-library security fixes
+are present. The module recommends Go 1.26.5 to contributors without forcing
+that toolchain on applications that import Hermes.
 
 ## Telegram test environment
 
@@ -129,7 +131,10 @@ webhooks, and a standard-library-only runtime.
 Telegram evolves independently of Hermes. Version-specific claims and exact
 surface counts live in [`docs/schema-parity.md`](docs/schema-parity.md) and the
 changelog; `Call` and `CallMultipart` provide day-zero access to newly released
-methods while the next typed schema update is prepared.
+methods while the next typed schema update is prepared. The deterministic
+[`Hermes Guardian`](docs/maintenance.md) watches the official API, regenerates
+safe additions, and opens evidence-backed draft updates without depending on a
+specific AI provider.
 
 The code is held to stable-v1 gates rather than treating “v1” as a first
 iteration. Deterministic local, Telegram test-DC, credentialed production,

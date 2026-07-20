@@ -46,12 +46,12 @@ type Field struct {
 }
 
 type Stats struct {
-	Methods      int
-	Parameters   int
-	Objects      int
-	ObjectFields int
-	Unions       int
-	Variants     int
+	Methods      int `json:"methods"`
+	Parameters   int `json:"parameters"`
+	Objects      int `json:"objects"`
+	ObjectFields int `json:"object_fields"`
+	Unions       int `json:"unions"`
+	Variants     int `json:"variants"`
 }
 
 func Load(path string) (Manifest, error) {

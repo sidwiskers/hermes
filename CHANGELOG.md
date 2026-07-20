@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+### Compatibility and maintenance
+
+- Lowered the consumer language floor to Go 1.25 while retaining Go 1.26.5 as
+  the recommended contributor toolchain and testing both the latest Go 1.25
+  patch and the current stable release in CI.
+- Made release-toolchain validation accept every future stable Go release after
+  Go 1.26.5 while rejecting older, prerelease, and development toolchains.
+- Added Hermes Guardian: a deterministic daily Bot API watcher, semantic schema
+  diff, safe regeneration pipeline, zero-gap classification, draft pull-request
+  workflow, and infrastructure-failure reporting.
+- Closed the schema audit's parameterless-method blind spot so every official
+  method requires an actual typed binding, even when it accepts no parameters.
+- Defined a provider-neutral repair contract so any current or future coding
+  agent can consume the same evidence without making project maintenance depend
+  on one vendor or model name.
+
 ## 1.0.0 - 2026-07-19
 
 ### Hermes identity and release polish

@@ -22,3 +22,8 @@ go test -race -shuffle=on ./...
 
 Maintainers preparing a release must use the actual target toolchain and run
 `./scripts/release-check.sh`; see [`docs/releasing.md`](docs/releasing.md).
+
+Bot API maintenance starts with `./scripts/guardian.sh`. Its diff and audit
+files form a provider-neutral repair bundle; follow
+[`docs/maintenance.md`](docs/maintenance.md) and never edit the official
+manifest or generated files to conceal a parity gap.

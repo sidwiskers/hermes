@@ -40,6 +40,13 @@ go run ./internal/cmd/botapi-audit -json
 CI requires the complete report to remain at zero and verifies that generated
 models and facade aliases are byte-for-byte current.
 
+The scheduled [Hermes Guardian](maintenance.md) parses the same source daily.
+It ignores documentation-only HTML changes, classifies protocol changes into a
+machine-readable diff, regenerates safe declarations, and opens a draft pull
+request. If new Telegram semantics cannot be completed mechanically, Guardian
+keeps the exact parity report in the pull request instead of guessing or
+weakening this audit.
+
 ## Completion strategy
 
 1. Use marker interfaces and discriminator-aware encoding for request unions,

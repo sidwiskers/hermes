@@ -15,6 +15,8 @@ func main() {
 	specPath := flag.String("spec", "spec/bot-api.json", "checked-in Bot API manifest")
 	root := flag.String("root", ".", "Hermes module root")
 	jsonOutput := flag.Bool("json", false, "write the complete report as JSON")
+	allowGaps := flag.Bool("allow-gaps", false, "report parity gaps without returning a failing status")
+	statusPath := flag.String("status-file", "", "optional file receiving complete or gaps")
 	flag.Parse()
 
 	schema, err := botapi.Load(*specPath)
@@ -27,13 +29,22 @@ func main() {
 	}
 	report := botapi.Audit(schema, inventory)
 	failed := report.GapCount() != 0
+	if *statusPath != "" {
+		status := "complete\n"
+		if failed {
+			status = "gaps\n"
+		}
+		if err := os.WriteFile(*statusPath, []byte(status), 0o644); err != nil {
+			fatal(fmt.Errorf("write audit status: %w", err))
+		}
+	}
 	if *jsonOutput {
 		encoder := json.NewEncoder(os.Stdout)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(report); err != nil {
 			fatal(err)
 		}
-		if failed {
+		if failed && !*allowGaps {
 			os.Exit(1)
 		}
 		return
@@ -54,7 +65,7 @@ func main() {
 	fmt.Printf("  non-nilable optional object fields: %d\n", len(report.NonNilableObjectOptionals))
 	fmt.Printf("  missing union types: %d\n", len(report.MissingUnionTypes))
 	fmt.Printf("  missing union variants: %d\n", len(report.MissingUnionVariants))
-	if failed {
+	if failed && !*allowGaps {
 		os.Exit(1)
 	}
 }
