@@ -114,9 +114,17 @@ func objectChangesAreAdditive(before, after []Object, changed []string) bool {
 }
 
 func fieldsAreAdditive(before, after []Field) bool {
+	previous := make(map[string]Field, len(before))
+	for _, field := range before {
+		previous[field.Name] = field
+	}
+
 	current := make(map[string]Field, len(after))
 	for _, field := range after {
 		current[field.Name] = field
+		if _, exists := previous[field.Name]; !exists && field.Required {
+			return false
+		}
 	}
 	for _, field := range before {
 		if next, exists := current[field.Name]; !exists || !reflect.DeepEqual(field, next) {

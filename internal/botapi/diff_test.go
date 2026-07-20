@@ -61,6 +61,22 @@ func TestCompareSurfaceClassifiesAdditiveObjectsAsMechanical(t *testing.T) {
 	}
 }
 
+func TestCompareSurfaceRequiresReviewForNewRequiredObjectField(t *testing.T) {
+	before := testManifest()
+	after := testManifest()
+	after.Version = "1.1"
+	after.Objects[0].Fields = append(after.Objects[0].Fields, Field{
+		Name:     "business_connection_id",
+		Type:     "String",
+		Required: true,
+	})
+
+	diff := CompareSurface(before, after)
+	if diff.Classification != "review" || len(diff.ReviewReasons) == 0 {
+		t.Fatalf("classification = %q, reasons = %v, want review", diff.Classification, diff.ReviewReasons)
+	}
+}
+
 func TestCompareSurfaceRequiresReviewForVersionOnlyRelease(t *testing.T) {
 	before := testManifest()
 	after := testManifest()
