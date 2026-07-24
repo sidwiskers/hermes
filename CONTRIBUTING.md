@@ -9,6 +9,10 @@ The core is intentionally strict.
 5. Add unit and race tests for every concurrent behavior.
 6. Add benchmarks for changes to routing, decoding, or request construction.
 7. Preserve the raw escape hatch when adding typed abstractions.
+8. Preserve the package dependency map in `docs/design.md`; package paths are
+   public API, not folders to rearrange cosmetically.
+9. Keep machine contracts in `spec/`, maintainer commands in `internal/cmd/`,
+   and generated source in its owning package with a `zz_` prefix.
 
 Before submitting:
 

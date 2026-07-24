@@ -90,7 +90,7 @@ jobs:
             types/zz_botapi_generated.go \
             api/zz_botapi_aliases_generated.go \
             zz_botapi_aliases_generated.go \
-            api-surface.txt
+            spec/api-surface.txt
           git commit -m "Update Telegram Bot API schema to ${VERSION}"
           git push --force-with-lease origin "HEAD:${branch}"
           printf 'branch=%s\n' "$branch" >>"$GITHUB_OUTPUT"

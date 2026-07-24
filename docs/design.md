@@ -1,5 +1,30 @@
 # Design
 
+## Repository layout
+
+Hermes follows Go's directory-as-package model. Public package directories are
+part of the import API, so source files stay flat inside their owning package
+instead of being placed in cosmetic subdirectories.
+
+| Path | Ownership |
+| --- | --- |
+| `/` | Public `hermes` facade and conventional project metadata |
+| `api/`, `types/`, `framework/` | Low-level protocol, schemas, and routing primitives |
+| `session/`, `fsm/`, `dedupe/`, `ratelimit/`, `observe/` | Optional production capabilities |
+| `testkit/` | Public network-free testing support |
+| `internal/runtime/` | Private polling, webhook, and dispatch engine |
+| `internal/botapi/`, `internal/cmd/` | Private schema maintenance libraries and commands |
+| `cmd/` | Maintainer-facing benchmark and soak executables |
+| `examples/`, `integration/` | Runnable examples and opt-in live verification |
+| `benchmarks/` | Reproducible workloads, competitor adapters, fixtures, and results |
+| `spec/` | Versioned machine contracts: Telegram schema and exported Go API |
+| `scripts/`, `docs/`, `.github/` | Repository automation, engineering documentation, and forge configuration |
+
+Production files use domain names inside each package. Generated files keep a
+`zz_` prefix so they sort after reviewed source. Tests are named for the
+behavior or domain they verify rather than the development pass that introduced
+them.
+
 ## Package architecture
 
 The project is one versioned Go module with strict package boundaries:
@@ -33,18 +58,23 @@ An optional public package for deterministic API request recording without Teleg
 
 This dependency direction is intentional:
 
-```text
-types <- api
-  ^       ^
-  |       |
-framework            internal/runtime
-          \           /
-           root hermes
-                ^
-              testkit
-```
+| Package | Allowed Hermes imports |
+| --- | --- |
+| `types` | none |
+| `api` | `types` |
+| `framework` | `api`, `types` |
+| `internal/runtime` | `api`, `types` |
+| root `hermes` | `api`, `framework`, `internal/runtime`, `types` |
+| `session` | `framework` |
+| `fsm` | `framework`, `session` |
+| `dedupe` | `framework` |
+| `ratelimit` | `framework`, `session` |
+| `observe` | `api`, `framework` |
+| `testkit` | root `hermes`, `api` |
 
 No lower layer imports the root facade, so there are no package cycles and each layer can be tested independently. Runtime lifecycle remains internal; the framework package is public because its types are part of the root API.
+`internal/architecture` tests this dependency map and the dedicated
+documentation file for every public package.
 
 ## Routing
 

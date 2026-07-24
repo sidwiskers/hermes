@@ -1,5 +1,3 @@
-// Package botapi owns the checked-in representation of the official Telegram
-// Bot API schema and the tools that derive it from Telegram's documentation.
 package botapi
 
 import (

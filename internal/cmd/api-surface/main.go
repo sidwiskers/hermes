@@ -40,7 +40,7 @@ type listedPackage struct {
 }
 
 func main() {
-	output := flag.String("output", "api-surface.txt", "manifest output path, or - for stdout")
+	output := flag.String("output", "spec/api-surface.txt", "manifest output path, or - for stdout")
 	flag.Parse()
 
 	manifest, err := generate()

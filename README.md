@@ -70,6 +70,10 @@ github.com/sidwiskers/hermes
 └── testkit                # optional network-free test recorder
 ```
 
+The complete repository ownership map—including `spec`, maintenance tooling,
+examples, integration suites, and performance evidence—is documented in
+[`docs/design.md`](docs/design.md#repository-layout).
+
 Most applications import only the root package. Low-level-only applications can skip the framework entirely:
 
 ```go

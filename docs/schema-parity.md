@@ -1,9 +1,10 @@
 # Bot API schema parity
 
-Hermes measures compatibility against a deterministic inventory derived from
-Telegram's official Bot API documentation. Each release pins its audited Bot
-API version in `spec/bot-api.json`. The manifest shipped with Hermes 1.0.0
-records Bot API 10.2 and contains:
+Hermes measures compatibility against deterministic inventories derived from
+Telegram's official Bot API documentation and the compiled Go packages. Each
+release pins its audited Bot API version in `spec/bot-api.json` and its exported
+Go declarations in `spec/api-surface.txt`. The Bot API manifest shipped with
+Hermes 1.0.0 records Bot API 10.2 and contains:
 
 | Surface | Official count | Missing in Hermes |
 | --- | ---: | ---: |
@@ -38,7 +39,7 @@ go run ./internal/cmd/botapi-audit -json
 ```
 
 CI requires the complete report to remain at zero and verifies that generated
-models and facade aliases are byte-for-byte current.
+models, facade aliases, and `spec/api-surface.txt` are byte-for-byte current.
 
 The scheduled [Hermes Guardian](maintenance.md) parses the same source daily.
 It ignores documentation-only HTML changes, classifies protocol changes into a

@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestContextRound4Actions(t *testing.T) {
+func TestContextMediaActions(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
