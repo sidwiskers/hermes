@@ -29,7 +29,7 @@ fi
 
 go run ./internal/cmd/api-surface -output "$api_surface"
 
-if ! cmp --silent api-surface.txt "$api_surface"; then
-	printf 'api-surface.txt changed; regenerate it and review compatibility intentionally\n' >&2
+if ! cmp --silent spec/api-surface.txt "$api_surface"; then
+	printf 'spec/api-surface.txt changed; regenerate it and review compatibility intentionally\n' >&2
 	exit 1
 fi

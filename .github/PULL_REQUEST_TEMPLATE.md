@@ -6,7 +6,7 @@ Describe the problem and the approach taken.
 
 - [ ] Tests cover the changed behavior.
 - [ ] `gofmt`, `go vet`, and `go test -race -shuffle=on ./...` pass.
-- [ ] Generated schemas, aliases, and `api-surface.txt` are current when applicable.
+- [ ] Generated schemas, aliases, and `spec/api-surface.txt` are current when applicable.
 - [ ] Public API changes include documentation and migration notes.
 - [ ] Hot-path changes include representative benchmark results.
 - [ ] Logs, fixtures, and examples contain no bot tokens or private identifiers.

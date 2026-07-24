@@ -1,4 +1,3 @@
-// Package testkit provides a deterministic in-memory Bot API transport for tests.
 package testkit
 
 import (

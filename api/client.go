@@ -1,4 +1,3 @@
-// Package api is the standalone low-level Telegram Bot API client.
 package api
 
 import (

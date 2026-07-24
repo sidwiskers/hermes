@@ -48,7 +48,7 @@ fi
 
 cp "$candidate" spec/bot-api.json
 go run ./internal/cmd/botapi-models
-go run ./internal/cmd/api-surface -output api-surface.txt
+go run ./internal/cmd/api-surface -output spec/api-surface.txt
 
 go run ./internal/cmd/botapi-audit \
 	-json \
