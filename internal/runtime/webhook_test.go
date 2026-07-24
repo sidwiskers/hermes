@@ -138,6 +138,32 @@ func TestWebhookFastAndRawModes(t *testing.T) {
 	}
 }
 
+func BenchmarkWebhookHandler(b *testing.B) {
+	const payload = `{"update_id":4,"message":{"message_id":1,"from":{"id":2,"is_bot":false,"first_name":"Soak"},"chat":{"id":1,"type":"private"},"text":"/start"}}`
+	for _, test := range []struct {
+		name     string
+		preserve bool
+	}{
+		{name: "fast"},
+		{name: "preserve_raw", preserve: true},
+	} {
+		b.Run(test.name, func(b *testing.B) {
+			handler := WebhookHandler(
+				WebhookOptions{PreserveRawUpdate: test.preserve},
+				func(context.Context, *telegram.Update, bool) bool { return true },
+			)
+			b.ReportAllocs()
+			for b.Loop() {
+				response := httptest.NewRecorder()
+				handler.ServeHTTP(response, webhookRequest(payload))
+				if response.Code != http.StatusOK {
+					b.Fatalf("status=%d", response.Code)
+				}
+			}
+		})
+	}
+}
+
 func TestWebhookSecurityAndBackpressure(t *testing.T) {
 	t.Parallel()
 

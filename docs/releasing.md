@@ -111,12 +111,14 @@ go run ./cmd/hermessoak -duration 30m -max-concurrent 128 -workers 64
 ```
 
 It emits a JSON record containing accepted and controlled-overload counts,
-unexpected statuses, latency buckets, update metrics, allocations, heap,
-goroutine counts, peak concurrency, and drain state. The build-tagged live soak
-can be enabled with `HERMES_TEST_SOAK_DURATION` in the Telegram test suite.
-Synthetic success is not a substitute for a sustained deployment: archive the
-report together with host limits, traffic shape, downstream latency, and live
-error/retry telemetry.
+unexpected statuses, latency buckets, update metrics, allocations per request,
+heap and live-object start/end/peak values, stack start/end/peak values, GC
+cycles and pause time, goroutine counts, peak concurrency, and drain state. A
+forced final collection separates transient workload memory from retained
+memory. The build-tagged live soak can be enabled with
+`HERMES_TEST_SOAK_DURATION` in the Telegram test suite. Synthetic success is
+not a substitute for a sustained deployment: archive the report together with
+host limits, traffic shape, downstream latency, and live error/retry telemetry.
 
 The checked-in Go 1.26.5 harness record processed 12,736,273 requests over two
 minutes with injected handler delay: 1,865,724 were accepted, 10,870,549 were

@@ -197,3 +197,16 @@ func TestDispatcherReservationSteadyStateIsAllocationFree(t *testing.T) {
 		t.Fatalf("reservation allocations = %v", allocations)
 	}
 }
+
+func BenchmarkDispatcherQueueAndDrain(b *testing.B) {
+	dispatcher := NewDispatcher(1, func(context.Context, *telegram.Update) {})
+	ctx := context.Background()
+	update := &telegram.Update{UpdateID: 1}
+	b.ReportAllocs()
+	for b.Loop() {
+		if !dispatcher.Queue(ctx, update, true) {
+			b.Fatal("queue failed")
+		}
+		dispatcher.Wait()
+	}
+}

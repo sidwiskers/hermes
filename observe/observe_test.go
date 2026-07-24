@@ -85,6 +85,18 @@ func TestMetricsTracksUpdatesAndCalls(t *testing.T) {
 	}
 }
 
+func BenchmarkMetricsMiddleware(b *testing.B) {
+	metrics := new(Metrics)
+	handler := Middleware(metrics)(func(*framework.Context) error { return nil })
+	ctx := testContext()
+	b.ReportAllocs()
+	for b.Loop() {
+		if err := handler(ctx); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
 func testContext() *framework.Context {
 	update := &types.Update{UpdateID: 9, Message: &types.Message{
 		Chat: types.Chat{ID: 1},

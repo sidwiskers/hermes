@@ -3,6 +3,7 @@ package fsm
 import (
 	"context"
 	"errors"
+	"runtime"
 	"sync"
 	"testing"
 
@@ -66,6 +67,42 @@ func TestMachineTransitionsAndPersistsData(t *testing.T) {
 	})
 	if err := inspect(ctx); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func BenchmarkMachineConstruction(b *testing.B) {
+	sessions := session.New(
+		session.NewMemory[Snapshot[testState, testData]](0),
+		session.ByUser,
+	)
+	b.ReportAllocs()
+	for b.Loop() {
+		machine := New(sessions, stateStart)
+		runtime.KeepAlive(machine)
+	}
+}
+
+func TestMachineRuleMapsAreAllocatedOnDemand(t *testing.T) {
+	sessions := session.New(
+		session.NewMemory[Snapshot[testState, testData]](0),
+		session.ByUser,
+	)
+	machine := New(sessions, stateStart)
+	if machine.startup.rules != nil || machine.startup.any != nil {
+		t.Fatal("empty machine eagerly allocated rule maps")
+	}
+	if err := machine.Add(Rule[testState, testData]{
+		From:  stateStart,
+		Event: "advance",
+		To:    stateDone,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if machine.startup.rules == nil {
+		t.Fatal("state-specific rule map was not initialized")
+	}
+	if machine.startup.any != nil {
+		t.Fatal("unused fallback rule map was allocated")
 	}
 }
 

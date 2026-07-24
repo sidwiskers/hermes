@@ -3,6 +3,7 @@ package dedupe
 import (
 	"context"
 	"errors"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -114,6 +115,119 @@ func TestMemoryExpiryCapacityAndRelease(t *testing.T) {
 	}
 	if err := store.Release(ctx, first); err != nil || store.Len() != 0 {
 		t.Fatalf("release err=%v len=%d", err, store.Len())
+	}
+}
+
+func TestMemoryConcurrentBoundNeverExceeded(t *testing.T) {
+	store := NewMemory(MemoryConfig{MaxEntries: 8})
+	var group sync.WaitGroup
+	for index := range 64 {
+		group.Add(1)
+		go func() {
+			defer group.Done()
+			_, err := store.Claim(
+				context.Background(),
+				Key{UpdateID: int64(index + 1)},
+				time.Minute,
+			)
+			if err != nil && !errors.Is(err, ErrCapacity) {
+				t.Errorf("claim: %v", err)
+			}
+		}()
+	}
+	group.Wait()
+	if store.Len() != 8 {
+		t.Fatalf("len=%d, want 8", store.Len())
+	}
+	if retained := retainedMemoryEntries(store); retained != store.Len() {
+		t.Fatalf("retained entries=%d, counter=%d", retained, store.Len())
+	}
+}
+
+func TestMemoryShardMapsAreLazyAndReleased(t *testing.T) {
+	store := NewMemory()
+	assertAllocatedShardMaps(t, store, 0)
+
+	key := Key{UpdateID: 1}
+	if claimed, err := store.Claim(context.Background(), key, time.Minute); err != nil || !claimed {
+		t.Fatalf("claim=%v err=%v", claimed, err)
+	}
+	assertAllocatedShardMaps(t, store, 1)
+
+	if err := store.Release(context.Background(), key); err != nil {
+		t.Fatal(err)
+	}
+	assertAllocatedShardMaps(t, store, 0)
+}
+
+func TestMemoryReleasesShardMapsAfterChurn(t *testing.T) {
+	store := NewMemory(MemoryConfig{MaxEntries: 0})
+	ctx := context.Background()
+	const entries = 4_096
+	for index := range entries {
+		key := Key{Namespace: "churn", UpdateID: int64(index + 1)}
+		if claimed, err := store.Claim(ctx, key, time.Hour); err != nil || !claimed {
+			t.Fatalf("claim=%v err=%v", claimed, err)
+		}
+	}
+	if retained := retainedMemoryEntries(store); retained != entries {
+		t.Fatalf("retained entries=%d, want %d", retained, entries)
+	}
+	for index := range entries {
+		key := Key{Namespace: "churn", UpdateID: int64(index + 1)}
+		if err := store.Release(ctx, key); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if store.Len() != 0 {
+		t.Fatalf("len=%d, want 0", store.Len())
+	}
+	assertAllocatedShardMaps(t, store, 0)
+}
+
+func TestMemoryDuplicateClaimIsAllocationFree(t *testing.T) {
+	store := NewMemory()
+	ctx := context.Background()
+	key := Key{Namespace: "steady", UpdateID: 1}
+	if claimed, err := store.Claim(ctx, key, time.Hour); err != nil || !claimed {
+		t.Fatalf("claim=%v err=%v", claimed, err)
+	}
+	allocations := testing.AllocsPerRun(1_000, func() {
+		if claimed, err := store.Claim(ctx, key, time.Hour); err != nil || claimed {
+			panic("duplicate claim mismatch")
+		}
+	})
+	if allocations != 0 {
+		t.Fatalf("duplicate-claim allocations=%v", allocations)
+	}
+}
+
+func assertAllocatedShardMaps(t *testing.T, store *Memory, want int) {
+	t.Helper()
+	allocated := 0
+	for index := range store.shards {
+		if store.shards[index].claims != nil {
+			allocated++
+		}
+	}
+	if allocated != want {
+		t.Fatalf("allocated shard maps=%d, want %d", allocated, want)
+	}
+}
+
+func retainedMemoryEntries(store *Memory) int {
+	retained := 0
+	for index := range store.shards {
+		retained += len(store.shards[index].claims)
+	}
+	return retained
+}
+
+func BenchmarkMemoryConstruction(b *testing.B) {
+	b.ReportAllocs()
+	for b.Loop() {
+		store := NewMemory()
+		runtime.KeepAlive(store)
 	}
 }
 

@@ -3,6 +3,7 @@ package framework
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -43,6 +44,40 @@ func TestRouterDirectCommandAndMiddleware(t *testing.T) {
 	want := []string{"before", "hello", "after"}
 	if fmt.Sprint(sequence) != fmt.Sprint(want) {
 		t.Fatalf("sequence = %v, want %v", sequence, want)
+	}
+}
+
+func BenchmarkRouterConstruction(b *testing.B) {
+	b.ReportAllocs()
+	for b.Loop() {
+		router := NewRouter()
+		runtime.KeepAlive(router)
+	}
+}
+
+func TestRouterMapsAreAllocatedOnDemand(t *testing.T) {
+	router := NewRouter()
+	if router.startup.rawCommands != nil || router.startup.rawCallbacks != nil {
+		t.Fatal("empty router eagerly allocated route maps")
+	}
+
+	router.Command("start", func(*Context) error { return nil })
+	if router.startup.rawCommands == nil {
+		t.Fatal("command map was not initialized")
+	}
+	if router.startup.rawCallbacks != nil {
+		t.Fatal("unused callback map was allocated")
+	}
+
+	if err := router.Handle(NewContext(context.Background(), nil, messageUpdate("/start"), "")); err != nil {
+		t.Fatal(err)
+	}
+	table := router.table.Load()
+	if table == nil || table.commands == nil {
+		t.Fatal("command snapshot was not compiled")
+	}
+	if table.callbacks != nil {
+		t.Fatal("unused callback snapshot was allocated")
 	}
 }
 

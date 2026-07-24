@@ -61,16 +61,7 @@ type Router struct {
 
 // NewRouter creates an empty router.
 func NewRouter() *Router {
-	r := &Router{}
-	initial := &routeTable{
-		rawCommands:  make(map[string][]routeDef),
-		rawCallbacks: make(map[string][]routeDef),
-		commands:     make(map[string][]compiledRoute),
-		callbacks:    make(map[string][]compiledRoute),
-	}
-	r.table.Store(initial)
-	r.startup = cloneRouteTable(initial)
-	return r
+	return &Router{startup: new(routeTable)}
 }
 
 // Command registers an exact slash command. A later direct registration for
@@ -81,6 +72,9 @@ func (r *Router) Command(command string, handler Handler) {
 		return
 	}
 	r.mutate(func(table *routeTable) {
+		if table.rawCommands == nil {
+			table.rawCommands = make(map[string][]routeDef)
+		}
 		table.rawCommands[command] = []routeDef{{handler: handler}}
 	})
 }
@@ -91,6 +85,9 @@ func (r *Router) Callback(data string, handler Handler) {
 		return
 	}
 	r.mutate(func(table *routeTable) {
+		if table.rawCallbacks == nil {
+			table.rawCallbacks = make(map[string][]routeDef)
+		}
 		table.rawCallbacks[data] = []routeDef{{handler: handler}}
 	})
 }
@@ -185,6 +182,9 @@ func (r *Router) addCommand(command string, route routeDef) {
 		return
 	}
 	r.mutate(func(table *routeTable) {
+		if table.rawCommands == nil {
+			table.rawCommands = make(map[string][]routeDef)
+		}
 		table.rawCommands[command] = append(table.rawCommands[command], route)
 	})
 }
@@ -194,6 +194,9 @@ func (r *Router) addCallback(data string, route routeDef) {
 		return
 	}
 	r.mutate(func(table *routeTable) {
+		if table.rawCallbacks == nil {
+			table.rawCallbacks = make(map[string][]routeDef)
+		}
 		table.rawCallbacks[data] = append(table.rawCallbacks[data], route)
 	})
 }
@@ -285,6 +288,9 @@ func compileCallbackPrefixes(routes []prefixRouteDef, global []Middleware) *comp
 }
 
 func compileRouteMap(source map[string][]routeDef, global []Middleware) map[string][]compiledRoute {
+	if len(source) == 0 {
+		return nil
+	}
 	target := make(map[string][]compiledRoute, len(source))
 	for key, routes := range source {
 		target[key] = compileRoutes(routes, global)
@@ -311,7 +317,7 @@ func compileRoute(route routeDef, global []Middleware) compiledRoute {
 
 func cloneRouteTable(source *routeTable) *routeTable {
 	if source == nil {
-		return &routeTable{rawCommands: make(map[string][]routeDef), rawCallbacks: make(map[string][]routeDef)}
+		return new(routeTable)
 	}
 	target := &routeTable{
 		rawCommands:         cloneRouteMap(source.rawCommands),
@@ -325,6 +331,9 @@ func cloneRouteTable(source *routeTable) *routeTable {
 }
 
 func cloneRouteMap(source map[string][]routeDef) map[string][]routeDef {
+	if len(source) == 0 {
+		return nil
+	}
 	target := make(map[string][]routeDef, len(source))
 	for key, routes := range source {
 		target[key] = append([]routeDef(nil), routes...)

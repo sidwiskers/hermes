@@ -3,6 +3,7 @@ package session
 import (
 	"context"
 	"errors"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -233,6 +234,118 @@ func TestMemoryHonorsCancellation(t *testing.T) {
 	cancel()
 	if err := store.Save(ctx, Key{UserID: 1}, 1); !errors.Is(err, context.Canceled) {
 		t.Fatalf("save error=%v", err)
+	}
+}
+
+func TestMemoryConcurrentBoundNeverExceeded(t *testing.T) {
+	store := NewMemoryWithConfig[int](MemoryConfig{MaxEntries: 8})
+	var group sync.WaitGroup
+	for index := range 64 {
+		group.Add(1)
+		go func() {
+			defer group.Done()
+			err := store.Save(context.Background(), Key{UserID: int64(index + 1)}, index)
+			if err != nil && !errors.Is(err, ErrCapacity) {
+				t.Errorf("save: %v", err)
+			}
+		}()
+	}
+	group.Wait()
+	if store.Len() != 8 {
+		t.Fatalf("len=%d, want 8", store.Len())
+	}
+	if retained := retainedMemoryEntries(store); retained != store.Len() {
+		t.Fatalf("retained entries=%d, counter=%d", retained, store.Len())
+	}
+}
+
+func TestMemoryShardMapsAreLazyAndReleased(t *testing.T) {
+	store := NewMemory[int](0)
+	assertAllocatedShardMaps(t, store, 0)
+
+	key := Key{UserID: 1}
+	if err := store.Save(context.Background(), key, 42); err != nil {
+		t.Fatal(err)
+	}
+	assertAllocatedShardMaps(t, store, 1)
+
+	if err := store.Delete(context.Background(), key); err != nil {
+		t.Fatal(err)
+	}
+	assertAllocatedShardMaps(t, store, 0)
+}
+
+func TestMemoryReleasesShardMapsAfterChurn(t *testing.T) {
+	store := NewMemory[int](0)
+	ctx := context.Background()
+	const entries = 4_096
+	for index := range entries {
+		key := Key{ChatID: int64(index + 1), UserID: int64(index*17 + 1)}
+		if err := store.Save(ctx, key, index); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if retained := retainedMemoryEntries(store); retained != entries {
+		t.Fatalf("retained entries=%d, want %d", retained, entries)
+	}
+	for index := range entries {
+		key := Key{ChatID: int64(index + 1), UserID: int64(index*17 + 1)}
+		if err := store.Delete(ctx, key); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if store.Len() != 0 {
+		t.Fatalf("len=%d, want 0", store.Len())
+	}
+	assertAllocatedShardMaps(t, store, 0)
+}
+
+func TestMemorySteadyStateIsAllocationFree(t *testing.T) {
+	store := NewMemory[int](0)
+	ctx := context.Background()
+	key := Key{Namespace: "steady", UserID: 1}
+	if err := store.Save(ctx, key, 1); err != nil {
+		t.Fatal(err)
+	}
+	allocations := testing.AllocsPerRun(1_000, func() {
+		if err := store.Save(ctx, key, 2); err != nil {
+			panic(err)
+		}
+		if value, exists, err := store.Load(ctx, key); err != nil || !exists || value != 2 {
+			panic("steady-state session mismatch")
+		}
+	})
+	if allocations != 0 {
+		t.Fatalf("steady-state allocations=%v", allocations)
+	}
+}
+
+func assertAllocatedShardMaps[T any](t *testing.T, store *Memory[T], want int) {
+	t.Helper()
+	allocated := 0
+	for index := range store.shards {
+		if store.shards[index].entries != nil {
+			allocated++
+		}
+	}
+	if allocated != want {
+		t.Fatalf("allocated shard maps=%d, want %d", allocated, want)
+	}
+}
+
+func retainedMemoryEntries[T any](store *Memory[T]) int {
+	retained := 0
+	for index := range store.shards {
+		retained += len(store.shards[index].entries)
+	}
+	return retained
+}
+
+func BenchmarkMemoryConstruction(b *testing.B) {
+	b.ReportAllocs()
+	for b.Loop() {
+		store := NewMemory[int](0)
+		runtime.KeepAlive(store)
 	}
 }
 

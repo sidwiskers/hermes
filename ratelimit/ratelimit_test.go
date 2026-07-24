@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"math"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -121,9 +122,153 @@ func TestConcurrentBoundNeverExceeded(t *testing.T) {
 		}()
 	}
 	group.Wait()
-	if limiter.Len() > 8 {
-		t.Fatalf("len=%d", limiter.Len())
+	if limiter.Len() != 8 {
+		t.Fatalf("len=%d, want 8", limiter.Len())
 	}
+	if retained := retainedLimiterEntries(limiter); retained != limiter.Len() {
+		t.Fatalf("retained entries=%d, counter=%d", retained, limiter.Len())
+	}
+}
+
+func TestLimiterShardMapsAreLazyAndReleased(t *testing.T) {
+	limiter, err := New(1, time.Second, WithIdleTTL(time.Minute))
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertAllocatedShardMaps(t, limiter, 0)
+
+	now := time.Unix(100, 0)
+	limiter.now = func() time.Time { return now }
+	if _, err := limiter.Allow(Key{UserID: 1}); err != nil {
+		t.Fatal(err)
+	}
+	assertAllocatedShardMaps(t, limiter, 1)
+
+	now = now.Add(time.Minute)
+	if removed := limiter.Sweep(); removed != 1 {
+		t.Fatalf("removed=%d, want 1", removed)
+	}
+	assertAllocatedShardMaps(t, limiter, 0)
+}
+
+func TestLimiterReleasesShardMapsAfterChurn(t *testing.T) {
+	limiter, err := New(1, time.Second, WithMaxKeys(0), WithIdleTTL(time.Minute))
+	if err != nil {
+		t.Fatal(err)
+	}
+	now := time.Unix(100, 0)
+	limiter.now = func() time.Time { return now }
+	const entries = 4_096
+	for index := range entries {
+		if _, err := limiter.Allow(Key{
+			Namespace: "churn",
+			UserID:    int64(index + 1),
+		}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if retained := retainedLimiterEntries(limiter); retained != entries {
+		t.Fatalf("retained entries=%d, want %d", retained, entries)
+	}
+	now = now.Add(time.Minute)
+	if removed := limiter.Sweep(); removed != entries {
+		t.Fatalf("removed=%d, want %d", removed, entries)
+	}
+	if limiter.Len() != 0 {
+		t.Fatalf("len=%d, want 0", limiter.Len())
+	}
+	assertAllocatedShardMaps(t, limiter, 0)
+}
+
+func TestLimiterExistingKeyIsAllocationFree(t *testing.T) {
+	limiter, err := New(1, time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	now := time.Unix(100, 0)
+	limiter.now = func() time.Time { return now }
+	key := Key{Namespace: "steady", UserID: 1}
+	if _, err := limiter.Allow(key); err != nil {
+		t.Fatal(err)
+	}
+	allocations := testing.AllocsPerRun(1_000, func() {
+		if _, err := limiter.Allow(key); err != nil {
+			panic(err)
+		}
+	})
+	if allocations != 0 {
+		t.Fatalf("existing-key allocations=%v", allocations)
+	}
+}
+
+func assertAllocatedShardMaps(t *testing.T, limiter *Limiter, want int) {
+	t.Helper()
+	allocated := 0
+	for index := range limiter.shards {
+		if limiter.shards[index].buckets != nil {
+			allocated++
+		}
+	}
+	if allocated != want {
+		t.Fatalf("allocated shard maps=%d, want %d", allocated, want)
+	}
+}
+
+func retainedLimiterEntries(limiter *Limiter) int {
+	retained := 0
+	for index := range limiter.shards {
+		retained += len(limiter.shards[index].buckets)
+	}
+	return retained
+}
+
+func BenchmarkLimiterConstruction(b *testing.B) {
+	b.ReportAllocs()
+	for b.Loop() {
+		limiter, err := New(1, time.Second)
+		if err != nil {
+			b.Fatal(err)
+		}
+		runtime.KeepAlive(limiter)
+	}
+}
+
+func BenchmarkLimiterPopulate1000(b *testing.B) {
+	now := time.Unix(100, 0)
+	b.ReportAllocs()
+	for b.Loop() {
+		limiter, err := New(1, time.Second, WithMaxKeys(0))
+		if err != nil {
+			b.Fatal(err)
+		}
+		limiter.now = func() time.Time { return now }
+		for index := range 1_000 {
+			if _, err := limiter.Allow(Key{UserID: int64(index + 1)}); err != nil {
+				b.Fatal(err)
+			}
+		}
+		runtime.KeepAlive(limiter)
+	}
+}
+
+func BenchmarkLimiterDistinctKeysParallel(b *testing.B) {
+	limiter, err := New(1, time.Second, WithMaxKeys(0))
+	if err != nil {
+		b.Fatal(err)
+	}
+	now := time.Unix(100, 0)
+	limiter.now = func() time.Time { return now }
+	var sequence atomic.Int64
+	b.ReportAllocs()
+	b.RunParallel(func(worker *testing.PB) {
+		for worker.Next() {
+			key := Key{UserID: sequence.Add(1)}
+			if _, err := limiter.Allow(key); err != nil {
+				b.Error(err)
+				return
+			}
+		}
+	})
 }
 
 func TestByKeyPoliciesAndInvalidConfig(t *testing.T) {

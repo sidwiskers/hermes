@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Performance and scalability
+
+- Made session, deduplication, rate-limit, router, and FSM maps demand-driven,
+  eliminating up to 64 eager allocations per component while keeping
+  steady-state key operations allocation-free.
+- Release empty store shards after fill-and-drain workloads so transient key
+  cardinality does not permanently pin map backing storage.
+- Replaced globally locked key-capacity admission with exact atomic
+  reservations, preserving strict bounds while allowing unrelated shards to
+  admit new keys concurrently.
+- Reduced each live rate-limit bucket by one redundant timestamp, cutting
+  allocated bytes by 24% in the checked-in 1,000-identity benchmark.
+- Reused bounded webhook body buffers without retaining oversized requests and
+  expanded the soak report with peak heap, live-object, stack, per-request
+  allocation, and GC telemetry.
+
 ### Compatibility and maintenance
 
 - Lowered the consumer language floor to Go 1.25 while retaining Go 1.26.5 as

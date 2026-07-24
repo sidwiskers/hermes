@@ -41,7 +41,6 @@ type Memory[T any] struct {
 	ttl        time.Duration
 	maxEntries int64
 	entries    atomic.Int64
-	capacityMu sync.Mutex
 	now        func() time.Time
 }
 
@@ -62,9 +61,6 @@ func NewMemoryWithConfig[T any](config MemoryConfig) *Memory[T] {
 	}
 	shardCount = nextPowerOfTwo(shardCount)
 	shards := make([]memoryShard[T], shardCount)
-	for index := range shards {
-		shards[index].entries = make(map[Key]memoryEntry[T])
-	}
 	maxEntries := config.MaxEntries
 	if maxEntries < 0 {
 		maxEntries = 0
@@ -99,6 +95,9 @@ func (m *Memory[T]) Load(ctx context.Context, key Key) (T, bool, error) {
 		if exists && current.expiresAt.Equal(entry.expiresAt) {
 			delete(shard.entries, key)
 			m.entries.Add(-1)
+			if len(shard.entries) == 0 {
+				shard.entries = nil
+			}
 		}
 		shard.mu.Unlock()
 		return zero, false, nil
@@ -127,13 +126,13 @@ func (m *Memory[T]) Save(ctx context.Context, key Key, value T) error {
 		return nil
 	}
 
-	m.capacityMu.Lock()
-	defer m.capacityMu.Unlock()
-	if m.maxEntries > 0 && m.entries.Load() >= m.maxEntries {
+	if !m.reserveEntry() {
 		return ErrCapacity
 	}
+	if shard.entries == nil {
+		shard.entries = make(map[Key]memoryEntry[T])
+	}
 	shard.entries[key] = entry
-	m.entries.Add(1)
 	return nil
 }
 
@@ -150,6 +149,9 @@ func (m *Memory[T]) Delete(ctx context.Context, key Key) error {
 	if _, ok := shard.entries[key]; ok {
 		delete(shard.entries, key)
 		m.entries.Add(-1)
+		if len(shard.entries) == 0 {
+			shard.entries = nil
+		}
 	}
 	shard.mu.Unlock()
 	return nil
@@ -184,6 +186,9 @@ func (m *Memory[T]) Sweep() int {
 		if shardRemoved != 0 {
 			m.entries.Add(-int64(shardRemoved))
 			removed += shardRemoved
+			if len(shard.entries) == 0 {
+				shard.entries = nil
+			}
 		}
 		shard.mu.Unlock()
 	}
@@ -210,6 +215,22 @@ func (m *Memory[T]) Cleanup(ctx context.Context, interval time.Duration) error {
 
 func (m *Memory[T]) shard(key Key) *memoryShard[T] {
 	return &m.shards[hashKey(key)&uint64(len(m.shards)-1)]
+}
+
+func (m *Memory[T]) reserveEntry() bool {
+	if m.maxEntries == 0 {
+		m.entries.Add(1)
+		return true
+	}
+	for {
+		current := m.entries.Load()
+		if current >= m.maxEntries {
+			return false
+		}
+		if m.entries.CompareAndSwap(current, current+1) {
+			return true
+		}
+	}
 }
 
 func contextError(ctx context.Context) error {

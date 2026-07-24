@@ -72,10 +72,24 @@ type report struct {
 	ResponseLatency     map[string]uint64 `json:"response_latency_buckets"`
 	Metrics             observe.Snapshot  `json:"metrics"`
 	StartHeapBytes      uint64            `json:"start_heap_bytes"`
+	PreFinalGCHeapBytes uint64            `json:"pre_final_gc_heap_bytes"`
 	EndHeapBytes        uint64            `json:"end_heap_bytes"`
 	HeapDeltaBytes      int64             `json:"heap_delta_bytes"`
+	PeakHeapBytes       uint64            `json:"peak_heap_bytes"`
+	StartHeapObjects    uint64            `json:"start_heap_objects"`
+	EndHeapObjects      uint64            `json:"end_heap_objects"`
+	HeapObjectsDelta    int64             `json:"heap_objects_delta"`
+	StartStackBytes     uint64            `json:"start_stack_bytes"`
+	EndStackBytes       uint64            `json:"end_stack_bytes"`
+	StackDeltaBytes     int64             `json:"stack_delta_bytes"`
+	PeakStackBytes      uint64            `json:"peak_stack_bytes"`
 	Mallocs             uint64            `json:"mallocs"`
+	Frees               uint64            `json:"frees"`
 	TotalAllocatedBytes uint64            `json:"total_allocated_bytes"`
+	BytesPerRequest     float64           `json:"allocated_bytes_per_request"`
+	MallocsPerRequest   float64           `json:"mallocs_per_request"`
+	GCCycles            uint32            `json:"gc_cycles"`
+	GCPauseNanos        uint64            `json:"gc_pause_nanoseconds"`
 	StartGoroutines     int               `json:"start_goroutines"`
 	EndGoroutines       int               `json:"end_goroutines"`
 	PeakGoroutines      int64             `json:"peak_goroutines"`
@@ -124,6 +138,9 @@ func main() {
 	startGoroutines := runtime.NumGoroutine()
 	var peakGoroutines atomic.Int64
 	peakGoroutines.Store(int64(startGoroutines))
+	var peakHeapBytes, peakStackBytes atomic.Uint64
+	peakHeapBytes.Store(startMemory.HeapAlloc)
+	peakStackBytes.Store(startMemory.StackInuse)
 
 	ctx, cancel := context.WithTimeout(context.Background(), *duration)
 	defer cancel()
@@ -169,11 +186,11 @@ func main() {
 				return
 			case <-ticker.C:
 				current := int64(runtime.NumGoroutine())
-				for peak := peakGoroutines.Load(); current > peak; peak = peakGoroutines.Load() {
-					if peakGoroutines.CompareAndSwap(peak, current) {
-						break
-					}
-				}
+				raiseInt64Peak(&peakGoroutines, current)
+				var memory runtime.MemStats
+				runtime.ReadMemStats(&memory)
+				raiseUint64Peak(&peakHeapBytes, memory.HeapAlloc)
+				raiseUint64Peak(&peakStackBytes, memory.StackInuse)
 			}
 		}
 	}()
@@ -181,9 +198,16 @@ func main() {
 	bot.Wait()
 	elapsed := time.Since(started)
 
+	var preFinalGC runtime.MemStats
+	runtime.ReadMemStats(&preFinalGC)
+	raiseUint64Peak(&peakHeapBytes, preFinalGC.HeapAlloc)
+	raiseUint64Peak(&peakStackBytes, preFinalGC.StackInuse)
 	runtime.GC()
 	var endMemory runtime.MemStats
 	runtime.ReadMemStats(&endMemory)
+	requestCount := requests.Load()
+	allocatedBytes := preFinalGC.TotalAlloc - startMemory.TotalAlloc
+	mallocs := preFinalGC.Mallocs - startMemory.Mallocs
 	result := report{
 		Timestamp:           time.Now().UTC(),
 		GoVersion:           runtime.Version(),
@@ -201,10 +225,24 @@ func main() {
 		ResponseLatency:     latencies.snapshot(),
 		Metrics:             metrics.Snapshot(),
 		StartHeapBytes:      startMemory.HeapAlloc,
+		PreFinalGCHeapBytes: preFinalGC.HeapAlloc,
 		EndHeapBytes:        endMemory.HeapAlloc,
 		HeapDeltaBytes:      int64(endMemory.HeapAlloc) - int64(startMemory.HeapAlloc),
-		Mallocs:             endMemory.Mallocs - startMemory.Mallocs,
-		TotalAllocatedBytes: endMemory.TotalAlloc - startMemory.TotalAlloc,
+		PeakHeapBytes:       peakHeapBytes.Load(),
+		StartHeapObjects:    startMemory.HeapObjects,
+		EndHeapObjects:      endMemory.HeapObjects,
+		HeapObjectsDelta:    int64(endMemory.HeapObjects) - int64(startMemory.HeapObjects),
+		StartStackBytes:     startMemory.StackInuse,
+		EndStackBytes:       endMemory.StackInuse,
+		StackDeltaBytes:     int64(endMemory.StackInuse) - int64(startMemory.StackInuse),
+		PeakStackBytes:      peakStackBytes.Load(),
+		Mallocs:             mallocs,
+		Frees:               preFinalGC.Frees - startMemory.Frees,
+		TotalAllocatedBytes: allocatedBytes,
+		BytesPerRequest:     ratio(allocatedBytes, requestCount),
+		MallocsPerRequest:   ratio(mallocs, requestCount),
+		GCCycles:            preFinalGC.NumGC - startMemory.NumGC,
+		GCPauseNanos:        preFinalGC.PauseTotalNs - startMemory.PauseTotalNs,
 		StartGoroutines:     startGoroutines,
 		EndGoroutines:       runtime.NumGoroutine(),
 		PeakGoroutines:      peakGoroutines.Load(),
@@ -218,4 +256,27 @@ func main() {
 	if result.Unexpected != 0 || !result.Drained {
 		log.Fatal("soak invariant failed")
 	}
+}
+
+func raiseInt64Peak(peak *atomic.Int64, current int64) {
+	for previous := peak.Load(); current > previous; previous = peak.Load() {
+		if peak.CompareAndSwap(previous, current) {
+			return
+		}
+	}
+}
+
+func raiseUint64Peak(peak *atomic.Uint64, current uint64) {
+	for previous := peak.Load(); current > previous; previous = peak.Load() {
+		if peak.CompareAndSwap(previous, current) {
+			return
+		}
+	}
+}
+
+func ratio(value, count uint64) float64 {
+	if count == 0 {
+		return 0
+	}
+	return float64(value) / float64(count)
 }
