@@ -105,11 +105,11 @@ func (b *Bot) handleWebhookReply(
 	if b == nil || b.Client == nil || b.dispatcher == nil {
 		return reply, ErrClientRequired
 	}
-	release, ok := b.dispatcher.Reserve(ctx, false)
+	reservation, ok := b.dispatcher.Reserve(ctx, false)
 	if !ok {
 		return reply, ErrQueueFull
 	}
-	defer release()
+	defer reservation.Release()
 
 	handlerCtx := b.acquireContext(ctx, update)
 	defer b.releaseContext(handlerCtx)

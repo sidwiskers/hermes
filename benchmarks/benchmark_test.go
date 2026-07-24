@@ -3,6 +3,7 @@ package benchmarks_test
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -35,6 +36,22 @@ var updateBatchJSON = func() []byte {
 type roundTripFunc func(*http.Request) (*http.Response, error)
 
 func (fn roundTripFunc) RoundTrip(request *http.Request) (*http.Response, error) { return fn(request) }
+
+type singleBatchSource struct {
+	updates []telegram.Update
+	served  bool
+}
+
+func (s *singleBatchSource) GetUpdates(
+	context.Context,
+	api.GetUpdatesParams,
+) ([]telegram.Update, error) {
+	if s.served {
+		panic("polling benchmark requested a second batch")
+	}
+	s.served = true
+	return s.updates, nil
+}
 
 func response(body string) *http.Response {
 	return &http.Response{
@@ -114,6 +131,30 @@ func BenchmarkWebhookDecode(b *testing.B) {
 	}
 }
 
+func BenchmarkPollingBatch100(b *testing.B) {
+	updates := make([]telegram.Update, 100)
+	for index := range updates {
+		updates[index].UpdateID = int64(index + 1)
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for index := 0; index < b.N; index++ {
+		source := singleBatchSource{updates: updates}
+		err := runtimecore.Poll(
+			context.Background(),
+			&source,
+			func(_ context.Context, update *telegram.Update, _ bool) bool {
+				return update.UpdateID != int64(len(updates))
+			},
+			nil,
+			runtimecore.PollOptions{},
+		)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
 func routerBenchmarkFixture(routeCount, middlewareDepth int, pooling bool) (*hermes.Bot, *hermes.Update) {
 	options := []hermes.Option{hermes.WithBotUsername("bench_bot"), hermes.WithContextPooling(pooling)}
 	bot := hermes.New("TOKEN", options...)
@@ -162,6 +203,17 @@ func BenchmarkRouterExact1000(b *testing.B) {
 
 func BenchmarkRouterMiddleware10(b *testing.B) {
 	bot, update := routerBenchmarkFixture(1, 10, true)
+	runRouterBenchmark(b, bot, update)
+}
+
+func BenchmarkRouterCallbackPrefix1000(b *testing.B) {
+	bot := hermes.New("TOKEN", hermes.WithContextPooling(true))
+	for index := 0; index < 1_000; index++ {
+		bot.CallbackPrefix(fmt.Sprintf("item:%03d:", index), func(*hermes.Context) error { return nil })
+	}
+	update := &hermes.Update{
+		CallbackQuery: &hermes.CallbackQuery{Data: "item:999:value"},
+	}
 	runRouterBenchmark(b, bot, update)
 }
 

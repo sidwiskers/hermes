@@ -1,0 +1,38 @@
+Hermes callback-prefix benchmark
+date: 2026-07-24
+go: go version go1.26.5 linux/amd64
+gomaxprocs: 1
+count: 10
+benchtime: 1s
+cpu: INTEL(R) XEON(R) PLATINUM 8573C
+base_commit: cc636e2f7b604aee8d1eb1c2047a9671d92001a2
+
+[base: linear immutable prefix scan]
+BenchmarkBaselineCallbackPrefix1000 	  492925	      2552 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBaselineCallbackPrefix1000 	  464881	      2619 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBaselineCallbackPrefix1000 	  485124	      2658 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBaselineCallbackPrefix1000 	  484694	      2575 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBaselineCallbackPrefix1000 	  496087	      2589 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBaselineCallbackPrefix1000 	  450459	      2463 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBaselineCallbackPrefix1000 	  469971	      2607 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBaselineCallbackPrefix1000 	  486859	      2457 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBaselineCallbackPrefix1000 	  513952	      2467 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBaselineCallbackPrefix1000 	  485533	      2477 ns/op	       0 B/op	       0 allocs/op
+
+[head: immutable length-indexed prefix map]
+BenchmarkRouterCallbackPrefix1000 	55361166	        22.65 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterCallbackPrefix1000 	53137340	        23.57 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterCallbackPrefix1000 	55170734	        22.99 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterCallbackPrefix1000 	53162996	        22.51 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterCallbackPrefix1000 	51858728	        22.29 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterCallbackPrefix1000 	54109188	        23.35 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterCallbackPrefix1000 	52239198	        22.53 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterCallbackPrefix1000 	54668931	        22.16 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterCallbackPrefix1000 	51951129	        22.17 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRouterCallbackPrefix1000 	55411866	        22.87 ns/op	       0 B/op	       0 allocs/op
+
+median_base_ns: 2563.5
+median_head_ns: 22.59
+median_speedup: 113.5x
+allocations_base: 0
+allocations_head: 0

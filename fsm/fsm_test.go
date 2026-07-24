@@ -3,6 +3,7 @@ package fsm
 import (
 	"context"
 	"errors"
+	"sync"
 	"testing"
 
 	"github.com/sidwiskers/hermes/framework"
@@ -150,6 +151,81 @@ func TestMachineInitialFilterSetAndReset(t *testing.T) {
 	}
 	if store.Len() != 0 {
 		t.Fatal("reset did not delete session")
+	}
+}
+
+func TestMachineRuleReadsAreAllocationFreeAndRaceSafe(t *testing.T) {
+	store := session.NewMemory[Snapshot[testState, testData]](0)
+	machine := New(session.New(store, session.ByUser), stateStart)
+	if err := machine.Add(Rule[testState, testData]{From: stateStart, Event: "advance", To: stateDone}); err != nil {
+		t.Fatal(err)
+	}
+	if err := machine.AddAny("advance", stateName, nil, nil); err != nil {
+		t.Fatal(err)
+	}
+
+	allocations := testing.AllocsPerRun(1_000, func() {
+		exact, fallback := machine.rulesFor(stateStart, "advance")
+		if len(exact) != 1 || len(fallback) != 1 {
+			panic("rule snapshot changed")
+		}
+	})
+	if allocations != 0 {
+		t.Fatalf("rule lookup allocations = %v", allocations)
+	}
+
+	var group sync.WaitGroup
+	for worker := 0; worker < 8; worker++ {
+		group.Add(1)
+		go func() {
+			defer group.Done()
+			for range 100 {
+				exact, fallback := machine.rulesFor(stateStart, "advance")
+				if len(exact) == 0 || len(fallback) == 0 {
+					t.Error("concurrent rule lookup returned an incomplete snapshot")
+					return
+				}
+			}
+		}()
+	}
+	group.Add(1)
+	go func() {
+		defer group.Done()
+		for range 100 {
+			if err := machine.Add(Rule[testState, testData]{
+				From:  stateStart,
+				Event: "advance",
+				To:    stateDone,
+				Guard: func(*framework.Context, Snapshot[testState, testData]) bool { return false },
+			}); err != nil {
+				t.Error(err)
+				return
+			}
+		}
+	}()
+	group.Wait()
+}
+
+func BenchmarkMachineRuleLookup(b *testing.B) {
+	store := session.NewMemory[Snapshot[testState, testData]](0)
+	machine := New(session.New(store, session.ByUser), stateStart)
+	if err := machine.Add(Rule[testState, testData]{From: stateStart, Event: "advance", To: stateDone}); err != nil {
+		b.Fatal(err)
+	}
+	if err := machine.AddAny("advance", stateName, nil, nil); err != nil {
+		b.Fatal(err)
+	}
+	exact, fallback := machine.rulesFor(stateStart, "advance")
+	if len(exact) != 1 || len(fallback) != 1 {
+		b.Fatal("rule fixture did not compile")
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for b.Loop() {
+		exact, fallback := machine.rulesFor(stateStart, "advance")
+		if len(exact) != 1 || len(fallback) != 1 {
+			b.Fatal("rule snapshot changed")
+		}
 	}
 }
 

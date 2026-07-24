@@ -23,10 +23,16 @@ returns; `c.Clone()` creates a context value that can be retained.
 ## Polling
 
 - Long-poll cancellation returns promptly and drains accepted handlers.
+- Accepted polling handlers are detached from intake cancellation, matching
+  queued webhook delivery; stopping intake does not abort work that was
+  already admitted.
 - Transient failures use bounded exponential backoff.
 - Telegram `retry_after` values are honored without duration overflow.
 - Stale or duplicate update IDs below the active offset are not dispatched
   again.
+- If Telegram returns a non-empty batch entirely below the requested positive
+  offset, polling treats it as Telegram's documented post-idle random
+  `update_id` epoch and resumes instead of rejecting the new epoch forever.
 - Invalid sources and dispatch functions return stable sentinel errors instead
   of panicking.
 
@@ -65,6 +71,9 @@ side effects still require application-level idempotency.
 
 - `session.Manager` serializes a complete handler transaction per session key,
   preventing in-process read-modify-write loss.
+- Active session keys use independent pooled locks. Unrelated sessions never
+  serialize because of lock-striping collisions, even while handlers are held
+  open for remote I/O.
 - Session mutations roll back on handler error by default. Store load/commit
   failures are wrapped and remain inspectable.
 - `fsm.Machine` changes state only after its selected guard and action succeed;

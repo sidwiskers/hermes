@@ -1,0 +1,73 @@
+Hermes runtime hot-path benchmark
+date: 2026-07-24
+go: go version go1.26.5 linux/amd64
+gomaxprocs: 1
+count: 5
+benchtime: 1s
+cpu: INTEL(R) XEON(R) PLATINUM 8573C
+base_commit: cc636e2f7b604aee8d1eb1c2047a9671d92001a2
+
+[base: polling copies each update before dispatch]
+BenchmarkBaselinePollingBatch100 	  142179	      8622 ns/op	   24032 B/op	     101 allocs/op
+BenchmarkBaselinePollingBatch100 	  142849	      9025 ns/op	   24032 B/op	     101 allocs/op
+BenchmarkBaselinePollingBatch100 	  129760	      9131 ns/op	   24032 B/op	     101 allocs/op
+BenchmarkBaselinePollingBatch100 	  134953	      8786 ns/op	   24032 B/op	     101 allocs/op
+BenchmarkBaselinePollingBatch100 	  139933	      9270 ns/op	   24032 B/op	     101 allocs/op
+
+[head: polling dispatches stable slice-element pointers]
+BenchmarkPollingBatch100 	 4383808	       286.3 ns/op	      48 B/op	       2 allocs/op
+BenchmarkPollingBatch100 	 4224469	       295.1 ns/op	      48 B/op	       2 allocs/op
+BenchmarkPollingBatch100 	 4145319	       289.0 ns/op	      48 B/op	       2 allocs/op
+BenchmarkPollingBatch100 	 4231863	       283.4 ns/op	      48 B/op	       2 allocs/op
+BenchmarkPollingBatch100 	 4276100	       281.8 ns/op	      48 B/op	       2 allocs/op
+
+polling_median_base_ns: 9025
+polling_median_head_ns: 286.3
+polling_median_speedup: 31.5x
+polling_bytes_base: 24032
+polling_bytes_head: 48
+polling_allocations_base: 101
+polling_allocations_head: 2
+
+[base: streaming webhook decoder]
+BenchmarkWebhookDecode/fast         	  127162	      9280 ns/op	    9880 B/op	      41 allocs/op
+BenchmarkWebhookDecode/fast         	  130248	      9182 ns/op	    9880 B/op	      41 allocs/op
+BenchmarkWebhookDecode/fast         	  128502	      9112 ns/op	    9880 B/op	      41 allocs/op
+BenchmarkWebhookDecode/fast         	  132226	      9412 ns/op	    9880 B/op	      41 allocs/op
+BenchmarkWebhookDecode/fast         	  130004	      9225 ns/op	    9880 B/op	      41 allocs/op
+
+[head: bounded read plus shared update decoder]
+BenchmarkWebhookDecode/fast         	  134362	      8792 ns/op	    8120 B/op	      37 allocs/op
+BenchmarkWebhookDecode/fast         	  136692	      8939 ns/op	    8120 B/op	      37 allocs/op
+BenchmarkWebhookDecode/fast         	  136446	      8917 ns/op	    8120 B/op	      37 allocs/op
+BenchmarkWebhookDecode/fast         	  134671	      8943 ns/op	    8120 B/op	      37 allocs/op
+BenchmarkWebhookDecode/fast         	  137492	      8788 ns/op	    8120 B/op	      37 allocs/op
+
+webhook_median_base_ns: 9225
+webhook_median_head_ns: 8917
+webhook_bytes_base: 9880
+webhook_bytes_head: 8120
+webhook_allocations_base: 41
+webhook_allocations_head: 37
+
+[base: mutex-protected FSM rule merge]
+BenchmarkBaselineMachineRuleLookup 	 8268217	       166.7 ns/op	     128 B/op	       1 allocs/op
+BenchmarkBaselineMachineRuleLookup 	 7188744	       170.2 ns/op	     128 B/op	       1 allocs/op
+BenchmarkBaselineMachineRuleLookup 	 7183724	       172.4 ns/op	     128 B/op	       1 allocs/op
+BenchmarkBaselineMachineRuleLookup 	 7152962	       163.7 ns/op	     128 B/op	       1 allocs/op
+BenchmarkBaselineMachineRuleLookup 	11804948	        91.91 ns/op	     128 B/op	       1 allocs/op
+
+[head: immutable atomic FSM rule snapshots]
+BenchmarkMachineRuleLookup 	29051727	        40.38 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMachineRuleLookup 	30331713	        41.21 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMachineRuleLookup 	27609316	        42.32 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMachineRuleLookup 	28123998	        40.79 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMachineRuleLookup 	30187852	        39.99 ns/op	       0 B/op	       0 allocs/op
+
+fsm_median_base_ns: 166.7
+fsm_median_head_ns: 40.79
+fsm_median_speedup: 4.1x
+fsm_bytes_base: 128
+fsm_bytes_head: 0
+fsm_allocations_base: 1
+fsm_allocations_head: 0

@@ -38,13 +38,15 @@ jobs:
         run: |
           GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzDecodeUpdate$' -fuzztime 2s ./types
           GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzCommandParsing$' -fuzztime 2s ./framework
+          GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzCallbackPrefixIndex$' -fuzztime 2s ./framework
           GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzTelegramEnvelopeDecode$' -fuzztime 2s ./api
           GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzMethodValidation$' -fuzztime 2s ./api
           GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzMultipartHeaderValidation$' -fuzztime 2s ./api
+          GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzCleanTelegramFilePath$' -fuzztime 2s ./api
           GOMAXPROCS=2 go test -run '^$' -parallel=2 -fuzz '^FuzzInt64CallbackRoundTrip$' -fuzztime 2s .
 
       - name: Benchmark smoke test
-        run: go test -run '^$' -bench 'BenchmarkRouterExact1$' -benchtime 100ms ./benchmarks
+        run: go test -run '^$' -bench 'BenchmarkRouter(Exact1|CallbackPrefix1000)$' -benchtime 100ms ./benchmarks
 
       - name: Compile examples
         run: go test ./examples/...

@@ -145,6 +145,60 @@ func TestManagerDifferentKeysCanOverlap(t *testing.T) {
 	close(release)
 }
 
+func TestManagerDifferentCollidingKeysCanOverlap(t *testing.T) {
+	store := NewMemory[int](0)
+	first, second := collidingKeys()
+	manager := New[int](store, func(c *framework.Context) (Key, bool) {
+		return Key{UserID: c.Sender().ID}, true
+	})
+	started := make(chan struct{}, 2)
+	release := make(chan struct{})
+	handler := manager.Middleware()(func(*framework.Context) error {
+		started <- struct{}{}
+		<-release
+		return nil
+	})
+
+	for _, key := range []Key{first, second} {
+		go func() { _ = handler(testContext(0, key.UserID)) }()
+	}
+	for range 2 {
+		select {
+		case <-started:
+		case <-time.After(time.Second):
+			t.Fatalf("distinct colliding keys were serialized: %v and %v", first, second)
+		}
+	}
+	close(release)
+}
+
+func TestKeyedLockSteadyStateIsAllocationFree(t *testing.T) {
+	var locks keyedLocks
+	key := Key{Namespace: "allocation", ChatID: 1, UserID: 2}
+	lock := locks.acquire(key)
+	lock.release()
+
+	allocations := testing.AllocsPerRun(1_000, func() {
+		lock := locks.acquire(key)
+		lock.release()
+	})
+	if allocations != 0 {
+		t.Fatalf("keyed lock allocations = %v", allocations)
+	}
+}
+
+func collidingKeys() (Key, Key) {
+	seen := make(map[uint64]Key, 64)
+	for userID := int64(1); ; userID++ {
+		key := Key{UserID: userID}
+		bucket := hashKey(key) & 63
+		if previous, ok := seen[bucket]; ok {
+			return previous, key
+		}
+		seen[bucket] = key
+	}
+}
+
 func TestMemoryExpiryCapacityAndSweep(t *testing.T) {
 	now := time.Unix(100, 0)
 	store := NewMemoryWithConfig[int](MemoryConfig{TTL: time.Minute, MaxEntries: 2, Shards: 3})

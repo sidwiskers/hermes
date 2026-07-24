@@ -230,19 +230,21 @@ func TestServeWebhookValidatesInputs(t *testing.T) {
 func TestServeWebhookDrainsOnListenFailure(t *testing.T) {
 	t.Parallel()
 
-	waited := false
-	err := ServeWebhook(
-		context.Background(),
-		"127.0.0.1:not-a-port",
-		"/hook",
-		http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}),
-		func() { waited = true },
-	)
-	if err == nil {
-		t.Fatal("expected listen error")
-	}
-	if !waited {
-		t.Fatal("dispatcher was not drained")
+	for _, ctx := range []context.Context{context.Background(), nil} {
+		waited := false
+		err := ServeWebhook(
+			ctx,
+			"127.0.0.1:not-a-port",
+			"/hook",
+			http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}),
+			func() { waited = true },
+		)
+		if err == nil {
+			t.Fatal("expected listen error")
+		}
+		if !waited {
+			t.Fatal("dispatcher was not drained")
+		}
 	}
 }
 

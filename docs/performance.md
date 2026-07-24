@@ -10,6 +10,7 @@ The benchmark laboratory measures:
 
 - update decoding from one shared JSON fixture;
 - exact command routing with 1 and 1,000 registered routes;
+- callback-prefix routing with 1,000 registered prefixes;
 - ten pass-through middleware layers;
 - complete `sendMessage` request and response processing with no network;
 - stripped size of an equivalent minimal program;
@@ -79,6 +80,13 @@ It is useful for detecting queue, concurrency, leak, and shutdown regressions;
 it is not presented as production latency evidence because request generation
 and the server run in the same process.
 
+The current systems pass adds a
+[`30-second 1,000-route record`](../benchmarks/results/2026-07-24-go1.26.5-soak-30s.json):
+4,080,713 requests, 976,764 accepted updates, controlled overload for every
+rejected request, zero unexpected responses or handler failures, exact
+64-update peak concurrency, full drain, and goroutines returned to the starting
+count.
+
 ## Design consequences
 
 Exact commands and callbacks use immutable map-backed route snapshots. Route
@@ -86,6 +94,28 @@ definitions are accumulated and compiled on first dispatch, avoiding quadratic
 snapshot rebuilding during startup. Handler contexts are borrowed from a
 `sync.Pool`; call `c.Clone()` before retaining a context after its handler, or
 disable pooling with `hermes.WithContextPooling(false)`.
+
+Callback-prefix routes use a length-indexed immutable map. Dispatch checks at
+most one map entry for each registered prefix length, longest first. Because
+Telegram callback data is bounded, lookup work is bounded by callback-data
+length rather than total route count, while preserving filtered-route fallback
+within each prefix. A paired ten-sample run on the same host reduced the
+1,000-prefix router median from 2,563.5 ns to 22.59 ns (113.5x) without adding
+an allocation. The complete samples and environment are
+[`checked in`](../benchmarks/results/2026-07-24-go1.26.5-callback-prefix.txt).
+
+Polling dispatches pointers to decoded batch elements instead of copying every
+update into a separately escaping value. In a paired 100-update batch
+benchmark, that reduced the median from 9,025 ns and 101 allocations to 286.3
+ns and two allocations. The webhook fast path now shares the bounded byte
+decoder with raw-preserving mode; paired samples reduced allocated memory from
+9,880 B / 41 allocations to 8,120 B / 37 allocations. The complete runtime
+samples are [`checked in`](../benchmarks/results/2026-07-24-go1.26.5-runtime-hot-paths.txt).
+
+FSM rule reads use immutable atomic snapshots instead of merging slices under
+an `RWMutex` on every trigger. Paired samples reduced the lookup median from
+166.7 ns and 128 B to 40.79 ns and zero allocation while registration remains
+race-safe.
 
 The update decoder similarly pools only its outer envelope, removing one heap
 escape without sharing returned message data. Raw preservation remains disabled

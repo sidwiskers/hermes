@@ -87,16 +87,16 @@ stopping the public receiver or ending the release session.
 using ephemeral `sendChatAction` calls. It creates no messages and requires an
 observed Telegram 429 response with a positive `retry_after`.
 
-## Manual stable-release gates
+## Manual release gates
 
-Before a 1.0 tag, all of the following require recorded evidence:
+Before a release, all of the following require recorded evidence:
 
 - refresh the official Telegram schema and review the generated diff;
 - exercise polling, webhook authentication, uploads, retry-after handling, and
   graceful shutdown with a dedicated live test bot;
 - run a production soak and review latency, allocation, error, retry, queue
   saturation, and shutdown telemetry;
-- review every exported name and the migration notes from the last pre-1.0 tag;
+- review every exported name and the migration notes from the preceding release;
 - review token redaction, dependency inventory, license, security policy, and
   changelog;
 - reproduce and archive the competitor benchmark and stripped binary results.
@@ -107,7 +107,7 @@ Run the checked-in queued-webhook/runtime harness before and during a candidate
 release review:
 
 ```bash
-go run ./cmd/hermessoak -duration 30m -concurrency 128 -workers 64
+go run ./cmd/hermessoak -duration 30m -max-concurrent 128 -workers 64
 ```
 
 It emits a JSON record containing accepted and controlled-overload counts,

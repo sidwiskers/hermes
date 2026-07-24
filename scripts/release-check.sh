@@ -16,7 +16,7 @@ go run ./internal/cmd/botapi-audit
 go test -count=1 ./examples/...
 bash -n ./integration/webhookprobe/run-quick-tunnel.sh
 go test -tags=integration -run '^$' ./integration/...
-go test -run '^$' -bench '^BenchmarkRouterExact1$' -benchtime 100ms ./benchmarks
+go test -run '^$' -bench 'BenchmarkRouter(Exact1|CallbackPrefix1000)$' -benchtime 100ms ./benchmarks
 
 for target in windows/amd64 darwin/amd64 darwin/arm64 linux/arm64; do
 	goos="${target%/*}"
