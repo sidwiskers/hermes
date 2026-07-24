@@ -1,20 +1,25 @@
 package runtime
 
 import (
+	"bytes"
 	"context"
 	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	telegram "github.com/sidwiskers/hermes/types"
 )
 
 const SecretHeader = "X-Telegram-Bot-Api-Secret-Token"
+
+const maxPooledWebhookBodyCapacity = 64 << 10
+
+var webhookBodyPool = sync.Pool{New: func() any { return new(bytes.Buffer) }}
 
 var (
 	ErrQueueFull              = errors.New("hermes: update queue is full")
@@ -132,7 +137,10 @@ func decodeWebhook(
 	}
 	body := http.MaxBytesReader(writer, request.Body, maxBody)
 	defer body.Close()
-	data, err := io.ReadAll(body)
+	buffer := webhookBodyPool.Get().(*bytes.Buffer)
+	buffer.Reset()
+	defer releaseWebhookBody(buffer)
+	_, err := buffer.ReadFrom(body)
 	if err != nil {
 		var maxBytesErr *http.MaxBytesError
 		if errors.As(err, &maxBytesErr) {
@@ -142,6 +150,7 @@ func decodeWebhook(
 		http.Error(writer, "invalid update", http.StatusBadRequest)
 		return nil, false
 	}
+	data := buffer.Bytes()
 	if len(data) == 0 {
 		http.Error(writer, "empty update", http.StatusBadRequest)
 		return nil, false
@@ -152,6 +161,14 @@ func decodeWebhook(
 		return nil, false
 	}
 	return &update, true
+}
+
+func releaseWebhookBody(buffer *bytes.Buffer) {
+	if buffer == nil || buffer.Cap() > maxPooledWebhookBodyCapacity {
+		return
+	}
+	buffer.Reset()
+	webhookBodyPool.Put(buffer)
 }
 
 func encodeWebhookReply(reply WebhookReply) ([]byte, error) {

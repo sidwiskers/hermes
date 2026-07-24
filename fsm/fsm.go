@@ -88,10 +88,7 @@ func New[S comparable, D any](sessions *session.Manager[Snapshot[S, D]], initial
 		sessions: sessions,
 		initial:  initial,
 	}
-	machine.startup = &transitionTable[S, D]{
-		rules: make(map[transitionKey[S]][]Rule[S, D]),
-		any:   make(map[string][]Rule[S, D]),
-	}
+	machine.startup = new(transitionTable[S, D])
 	return machine
 }
 
@@ -116,11 +113,17 @@ func (m *Machine[S, D]) Add(rule Rule[S, D]) error {
 	m.mu.Lock()
 	key := transitionKey[S]{state: rule.From, event: rule.Event}
 	if !m.started.Load() {
+		if m.startup.rules == nil {
+			m.startup.rules = make(map[transitionKey[S]][]Rule[S, D])
+		}
 		m.startup.rules[key] = append(m.startup.rules[key], rule)
 		m.mu.Unlock()
 		return nil
 	}
 	next := cloneTransitionTable(m.table.Load())
+	if next.rules == nil {
+		next.rules = make(map[transitionKey[S]][]Rule[S, D])
+	}
 	next.rules[key] = append(append([]Rule[S, D](nil), next.rules[key]...), rule)
 	m.table.Store(next)
 	m.mu.Unlock()
@@ -139,11 +142,17 @@ func (m *Machine[S, D]) AddAny(event string, to S, guard Guard[S, D], action Act
 	rule := Rule[S, D]{Event: event, To: to, Guard: guard, Action: action}
 	m.mu.Lock()
 	if !m.started.Load() {
+		if m.startup.any == nil {
+			m.startup.any = make(map[string][]Rule[S, D])
+		}
 		m.startup.any[event] = append(m.startup.any[event], rule)
 		m.mu.Unlock()
 		return nil
 	}
 	next := cloneTransitionTable(m.table.Load())
+	if next.any == nil {
+		next.any = make(map[string][]Rule[S, D])
+	}
 	next.any[event] = append(append([]Rule[S, D](nil), next.any[event]...), rule)
 	m.table.Store(next)
 	m.mu.Unlock()
@@ -298,10 +307,7 @@ func (m *Machine[S, D]) ensureStarted() {
 	if !m.started.Load() {
 		table := m.startup
 		if table == nil {
-			table = &transitionTable[S, D]{
-				rules: make(map[transitionKey[S]][]Rule[S, D]),
-				any:   make(map[string][]Rule[S, D]),
-			}
+			table = new(transitionTable[S, D])
 		}
 		m.table.Store(table)
 		m.startup = nil
@@ -311,18 +317,21 @@ func (m *Machine[S, D]) ensureStarted() {
 }
 
 func cloneTransitionTable[S comparable, D any](source *transitionTable[S, D]) *transitionTable[S, D] {
-	target := &transitionTable[S, D]{
-		rules: make(map[transitionKey[S]][]Rule[S, D]),
-		any:   make(map[string][]Rule[S, D]),
-	}
+	target := new(transitionTable[S, D])
 	if source == nil {
 		return target
 	}
-	for key, rules := range source.rules {
-		target.rules[key] = rules
+	if len(source.rules) != 0 {
+		target.rules = make(map[transitionKey[S]][]Rule[S, D], len(source.rules))
+		for key, rules := range source.rules {
+			target.rules[key] = rules
+		}
 	}
-	for event, rules := range source.any {
-		target.any[event] = rules
+	if len(source.any) != 0 {
+		target.any = make(map[string][]Rule[S, D], len(source.any))
+		for event, rules := range source.any {
+			target.any[event] = rules
+		}
 	}
 	return target
 }

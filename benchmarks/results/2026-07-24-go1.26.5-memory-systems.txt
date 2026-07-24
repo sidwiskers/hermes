@@ -1,0 +1,80 @@
+Hermes memory-systems paired benchmark record
+Date: 2026-07-24
+Host: linux/amd64, Intel Xeon Platinum 8573C
+Go: go1.26.5, GOTOOLCHAIN=local
+Baseline: d124a7892121430b5034974792b73186bcd232d6 (merged main)
+Candidate: agent/hermes-memory-systems working tree
+
+Runs were sequential. Constructor, population, webhook, and dispatch samples
+used GOMAXPROCS=1. The distinct-key contention samples used GOMAXPROCS=8.
+Every value below is emitted by Go's benchmark harness; ns/op columns list all
+samples followed by their median.
+
+Constructor benchmarks
+
+workload                         before ns/op                 after ns/op                  before B/allocs   after B/allocs
+session memory                   1378 1325 1325 1265 1270    193.9 192.4 190.0 191.6 191.8 2752 / 34         1216 / 2
+dedupe memory                    2375 2307 2347 2304 2307    185.6 183.9 194.8 200.7 195.5 4288 / 66         1200 / 2
+rate limiter                     2324 2300 2280 2322 2408    187.8 182.9 185.0 183.7 188.8 4288 / 66         1216 / 2
+router                           351.9 349.9 351.9 354.2 354.8 3.219 3.582 4.277 3.933 3.642 640 / 9          0 / 0
+FSM machine                      89.00 89.85 88.57 85.68 85.51 27.93 26.06 21.80 21.11 21.81 112 / 3         16 / 1
+
+median summary
+session memory                   1325.0 -> 191.8 ns/op       2752 -> 1216 B/op       34 -> 2 allocs/op
+dedupe memory                    2307.0 -> 194.8 ns/op       4288 -> 1200 B/op       66 -> 2 allocs/op
+rate limiter                     2322.0 -> 185.0 ns/op       4288 -> 1216 B/op       66 -> 2 allocs/op
+router                           351.9 -> 3.642 ns/op         640 -> 0 B/op           9 -> 0 allocs/op
+FSM machine                      88.57 -> 21.80 ns/op         112 -> 16 B/op          3 -> 1 allocs/op
+
+Webhook body reuse
+
+workload                         before ns/op                      after ns/op                       before B/allocs   after B/allocs
+fast                             6206 6114 6294 6447 6437         6485 6266 6408 6336 6357          7960 / 32         7449 / 31
+preserve raw                     6262 6226 6264 6280 6365         6501 6350 6619 6151 6219          8104 / 33         7593 / 32
+
+The pooled body removes one 512-byte growth allocation. Timing is neutral
+within run noise; this change is an allocation and GC-pressure improvement,
+not a latency claim. Bodies whose buffers exceed 64 KiB are never returned to
+the pool.
+
+Populated rate limiter, 1,000 distinct identities
+
+before ns/op:
+215882 774215 220611 224019 259356 225690 215544
+median: 224019 ns/op, 352992 B/op, 451 allocs/op
+
+after ns/op:
+181136 190633 188888 187620 190484 208049 185018
+median: 188888 ns/op, 266976 B/op, 451 allocs/op
+
+Removing a timestamp that was always identical to the bucket's last-check time
+reduces allocated bytes by 24.4% in this workload and improves median populate
+time by 15.7%, without changing token refill or idle-expiry semantics.
+
+Parallel distinct-key admission, GOMAXPROCS=8
+
+before ns/op:
+670.7 641.6 731.7 743.0 680.0 674.5 670.5
+median: 674.5 ns/op
+
+after ns/op:
+205.9 205.6 196.7 174.8 206.6 256.6 231.2
+median: 205.9 ns/op
+
+Replacing the global admission mutex with an exact atomic capacity reservation
+improves the median by 3.28x. Concurrent tests prove all three stores stop at
+their exact configured bound, and the race detector passes.
+
+Irreducible or deliberately retained boundaries
+
+Dispatcher asynchronous queue-and-drain:
+559.6 539.7 514.6 512.2 510.1 506.8 504.1 ns/op
+median: 512.2 ns/op, 48 B/op, 1 alloc/op
+
+Changing closure shape did not alter this allocation. Removing it would require
+long-lived worker goroutines and a new shutdown/lifetime contract, which was
+rejected as an idle-memory and behavioral tradeoff.
+
+Built-in metrics middleware:
+153.3 148.7 148.9 147.4 138.1 136.5 135.1 ns/op
+median: 147.4 ns/op, 0 B/op, 0 allocs/op

@@ -31,7 +31,6 @@ type Memory struct {
 	shards     []memoryShard
 	maxEntries int64
 	entries    atomic.Int64
-	capacityMu sync.Mutex
 	now        func() time.Time
 }
 
@@ -55,9 +54,6 @@ func NewMemory(options ...MemoryConfig) *Memory {
 	}
 	config.Shards = nextPowerOfTwo(config.Shards)
 	shards := make([]memoryShard, config.Shards)
-	for index := range shards {
-		shards[index].claims = make(map[Key]time.Time)
-	}
 	return &Memory{
 		shards:     shards,
 		maxEntries: int64(config.MaxEntries),
@@ -91,14 +87,14 @@ func (m *Memory) Claim(ctx context.Context, key Key, ttl time.Duration) (bool, e
 		return true, nil
 	}
 
-	m.capacityMu.Lock()
-	defer m.capacityMu.Unlock()
-	if m.maxEntries > 0 && m.entries.Load() >= m.maxEntries {
+	if !m.reserveEntry() {
 		shard.mu.Unlock()
 		return false, ErrCapacity
 	}
+	if shard.claims == nil {
+		shard.claims = make(map[Key]time.Time)
+	}
 	shard.claims[key] = now.Add(ttl)
-	m.entries.Add(1)
 	shard.mu.Unlock()
 	return true, nil
 }
@@ -118,6 +114,9 @@ func (m *Memory) Release(ctx context.Context, key Key) error {
 	if _, exists := shard.claims[key]; exists {
 		delete(shard.claims, key)
 		m.entries.Add(-1)
+		if len(shard.claims) == 0 {
+			shard.claims = nil
+		}
 	}
 	shard.mu.Unlock()
 	return nil
@@ -151,6 +150,9 @@ func (m *Memory) Sweep() int {
 		if shardRemoved != 0 {
 			m.entries.Add(-int64(shardRemoved))
 			removed += shardRemoved
+			if len(shard.claims) == 0 {
+				shard.claims = nil
+			}
 		}
 		shard.mu.Unlock()
 	}
@@ -159,6 +161,22 @@ func (m *Memory) Sweep() int {
 
 func (m *Memory) shard(key Key) *memoryShard {
 	return &m.shards[hashKey(key)&uint64(len(m.shards)-1)]
+}
+
+func (m *Memory) reserveEntry() bool {
+	if m.maxEntries == 0 {
+		m.entries.Add(1)
+		return true
+	}
+	for {
+		current := m.entries.Load()
+		if current >= m.maxEntries {
+			return false
+		}
+		if m.entries.CompareAndSwap(current, current+1) {
+			return true
+		}
+	}
 }
 
 func hashKey(key Key) uint64 {

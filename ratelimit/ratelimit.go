@@ -106,7 +106,6 @@ func WithRejected(rejected RejectFunc) Option {
 type bucket struct {
 	tokens float64
 	last   time.Time
-	seen   time.Time
 }
 
 type shard struct {
@@ -125,7 +124,6 @@ type Limiter struct {
 	onRejected RejectFunc
 	shards     [64]shard
 	entries    atomic.Int64
-	capacityMu sync.Mutex
 	now        func() time.Time
 }
 
@@ -163,9 +161,6 @@ func New(limit int, period time.Duration, options ...Option) (*Limiter, error) {
 		key:        config.key,
 		onRejected: config.onRejected,
 		now:        time.Now,
-	}
-	for index := range limiter.shards {
-		limiter.shards[index].buckets = make(map[Key]bucket)
 	}
 	return limiter, nil
 }
@@ -234,7 +229,7 @@ func (l *Limiter) Sweep() int {
 		shardRemoved := 0
 		shard.mu.Lock()
 		for key, bucket := range shard.buckets {
-			if !bucket.seen.After(deadline) {
+			if !bucket.last.After(deadline) {
 				delete(shard.buckets, key)
 				shardRemoved++
 			}
@@ -242,6 +237,9 @@ func (l *Limiter) Sweep() int {
 		if shardRemoved != 0 {
 			l.entries.Add(-int64(shardRemoved))
 			removed += shardRemoved
+			if len(shard.buckets) == 0 {
+				shard.buckets = nil
+			}
 		}
 		shard.mu.Unlock()
 	}
@@ -253,23 +251,21 @@ func (l *Limiter) allowAt(key Key, now time.Time) (Decision, error) {
 	shard.mu.Lock()
 	current, exists := shard.buckets[key]
 	if !exists {
-		l.capacityMu.Lock()
-		if l.maxKeys > 0 && l.entries.Load() >= l.maxKeys {
-			l.capacityMu.Unlock()
+		if !l.reserveEntry() {
 			shard.mu.Unlock()
 			return Decision{}, ErrCapacity
 		}
-		current = bucket{tokens: float64(l.burst), last: now, seen: now}
+		current = bucket{tokens: float64(l.burst), last: now}
+		if shard.buckets == nil {
+			shard.buckets = make(map[Key]bucket)
+		}
 		shard.buckets[key] = current
-		l.entries.Add(1)
-		l.capacityMu.Unlock()
 	}
 
 	if elapsed := now.Sub(current.last); elapsed > 0 {
 		current.tokens = min(float64(l.burst), current.tokens+elapsed.Seconds()*l.rate)
 	}
 	current.last = now
-	current.seen = now
 	decision := Decision{}
 	if current.tokens >= 1 {
 		current.tokens--
@@ -281,6 +277,22 @@ func (l *Limiter) allowAt(key Key, now time.Time) (Decision, error) {
 	shard.buckets[key] = current
 	shard.mu.Unlock()
 	return decision, nil
+}
+
+func (l *Limiter) reserveEntry() bool {
+	if l.maxKeys == 0 {
+		l.entries.Add(1)
+		return true
+	}
+	for {
+		current := l.entries.Load()
+		if current >= l.maxKeys {
+			return false
+		}
+		if l.entries.CompareAndSwap(current, current+1) {
+			return true
+		}
+	}
 }
 
 func retryDuration(seconds float64) time.Duration {

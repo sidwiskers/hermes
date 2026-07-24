@@ -87,6 +87,53 @@ rejected request, zero unexpected responses or handler failures, exact
 64-update peak concurrency, full drain, and goroutines returned to the starting
 count.
 
+## Memory and scaling systems pass
+
+The in-process session, deduplication, and rate-limit stores allocate shard
+maps on first use instead of constructing 160 empty maps eagerly. A shard
+releases its map backing storage when its last retained entry is deleted or
+swept, so a completed traffic spike does not permanently pin the map's peak
+capacity. Router and FSM tables follow the same demand-driven construction
+policy. Existing-key operations remain allocation-free.
+
+Paired constructor medians on an Intel Xeon Platinum 8573C with Go 1.26.5 and
+`GOMAXPROCS=1` were:
+
+| Component | Before | After |
+| --- | ---: | ---: |
+| Session memory | 1,325 ns, 2,752 B, 34 allocs | 191.8 ns, 1,216 B, 2 allocs |
+| Deduplication memory | 2,307 ns, 4,288 B, 66 allocs | 194.8 ns, 1,200 B, 2 allocs |
+| Rate limiter | 2,322 ns, 4,288 B, 66 allocs | 185.0 ns, 1,216 B, 2 allocs |
+| Router | 351.9 ns, 640 B, 9 allocs | 3.642 ns, 0 B, 0 allocs |
+| FSM machine | 88.57 ns, 112 B, 3 allocs | 21.80 ns, 16 B, 1 alloc |
+
+Strict capacity admission no longer serializes unrelated shards behind a
+global mutex. An atomic reservation keeps the configured bound exact. In an
+eight-thread distinct-key benchmark, the median fell from 674.5 ns to 205.9 ns.
+Concurrent bound tests for all three stores, 4,096-entry fill-and-drain tests,
+counter-versus-map invariants, and the race detector cover the change.
+
+Rate-limit buckets previously stored two timestamps that were assigned the
+same value on every check. Keeping one timestamp preserves refill and
+idle-expiry behavior while a 1,000-identity population benchmark falls from
+352,992 B to 266,976 B and from 224.0 µs to 188.9 µs median. The webhook
+receiver now reuses ordinary body buffers up to 64 KiB, removing one allocation
+and approximately 512 B per request without pooling oversized bodies or
+weakening the request-size guard.
+
+The complete samples, environment, negative result for asynchronous dispatcher
+allocation, and explicit measurement limits are in the
+[`memory-systems record`](../benchmarks/results/2026-07-24-go1.26.5-memory-systems.txt).
+The matching
+[`30-second soak`](../benchmarks/results/2026-07-24-go1.26.5-memory-soak-30s.json)
+processed 4,598,583 requests with zero unexpected responses or handler
+failures, reached exactly the configured 64-update concurrency bound, fully
+drained, and returned goroutines to the starting count. Against the preceding
+same-host, same-shape record, allocated bytes per request fell 5.5% and mallocs
+per request fell 2.1%. Request throughput was 12.7% higher in this synthetic
+run, but that timing remains sensitive to shared-host scheduling and is not a
+production throughput claim.
+
 ## Design consequences
 
 Exact commands and callbacks use immutable map-backed route snapshots. Route
