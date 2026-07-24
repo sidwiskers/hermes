@@ -221,9 +221,14 @@ func (b *Client) doResult(request *http.Request, method string, kind CallKind) (
 	defer response.Body.Close()
 
 	limit := b.responseLimit
+	readLimit := limit
+	const maxInt64 = int64(1<<63 - 1)
+	if readLimit < maxInt64 {
+		readLimit++
+	}
 	buffer := acquireTransportBuffer()
 	defer releaseTransportBuffer(buffer)
-	if _, err := buffer.ReadFrom(io.LimitReader(response.Body, limit+1)); err != nil {
+	if _, err := buffer.ReadFrom(io.LimitReader(response.Body, readLimit)); err != nil {
 		return nil, b.transportError(method, "read response", err)
 	}
 	data := buffer.Bytes()

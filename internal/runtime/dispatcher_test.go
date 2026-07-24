@@ -72,7 +72,7 @@ func TestDispatcherRejectsAlreadyCanceledContext(t *testing.T) {
 	if dispatcher.Queue(ctx, &telegram.Update{UpdateID: 1}, false) {
 		t.Fatal("non-blocking queue accepted a canceled context")
 	}
-	if release, ok := dispatcher.Reserve(ctx, true); ok || release != nil {
+	if reservation, ok := dispatcher.Reserve(ctx, true); ok || reservation.dispatcher != nil {
 		t.Fatal("blocking reserve accepted a canceled context")
 	}
 	dispatcher.Wait()
@@ -119,5 +119,81 @@ func TestDispatcherWaitIncludesConcurrentQueue(t *testing.T) {
 	case <-drained:
 	case <-time.After(time.Second):
 		t.Fatal("Wait did not return after drain")
+	}
+}
+
+func TestDispatcherWaitIncludesPendingReservation(t *testing.T) {
+	t.Parallel()
+
+	started := make(chan struct{})
+	finishFirst := make(chan struct{})
+	dispatcher := NewDispatcher(1, func(context.Context, *telegram.Update) {
+		close(started)
+		<-finishFirst
+	})
+	if !dispatcher.Queue(context.Background(), &telegram.Update{UpdateID: 1}, false) {
+		t.Fatal("first update was rejected")
+	}
+	<-started
+
+	reserved := make(chan Reservation, 1)
+	go func() {
+		reservation, ok := dispatcher.Reserve(context.Background(), true)
+		if !ok {
+			reserved <- Reservation{}
+			return
+		}
+		reserved <- reservation
+	}()
+
+	deadline := time.Now().Add(time.Second)
+	for {
+		dispatcher.mu.Lock()
+		pending := dispatcher.pending
+		dispatcher.mu.Unlock()
+		if pending == 1 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("second reservation did not become pending")
+		}
+		time.Sleep(time.Millisecond)
+	}
+
+	drained := make(chan struct{})
+	go func() {
+		dispatcher.Wait()
+		close(drained)
+	}()
+	close(finishFirst)
+
+	reservation := <-reserved
+	if reservation.dispatcher == nil {
+		t.Fatal("second reservation failed")
+	}
+	select {
+	case <-drained:
+		t.Fatal("Wait returned while a reservation was active")
+	default:
+	}
+	reservation.Release()
+	select {
+	case <-drained:
+	case <-time.After(time.Second):
+		t.Fatal("Wait did not return after pending reservation was released")
+	}
+}
+
+func TestDispatcherReservationSteadyStateIsAllocationFree(t *testing.T) {
+	dispatcher := NewDispatcher(1, func(context.Context, *telegram.Update) {})
+	allocations := testing.AllocsPerRun(1_000, func() {
+		reservation, ok := dispatcher.Reserve(context.Background(), false)
+		if !ok {
+			panic("reservation failed")
+		}
+		reservation.Release()
+	})
+	if allocations != 0 {
+		t.Fatalf("reservation allocations = %v", allocations)
 	}
 }

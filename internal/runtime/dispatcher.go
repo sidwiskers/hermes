@@ -16,7 +16,20 @@ type Dispatcher struct {
 	mu      sync.Mutex
 	drained *sync.Cond
 	active  int
+	pending int
 	handler UpdateHandler
+}
+
+// Reservation owns one Dispatcher slot until Release is called.
+type Reservation struct {
+	dispatcher *Dispatcher
+}
+
+// Release returns the reserved slot.
+func (r Reservation) Release() {
+	if r.dispatcher != nil {
+		r.dispatcher.done()
+	}
 }
 
 func NewDispatcher(limit int, handler UpdateHandler) *Dispatcher {
@@ -36,12 +49,12 @@ func (d *Dispatcher) Queue(ctx context.Context, update *telegram.Update, wait bo
 	if d == nil || d.handler == nil {
 		return false
 	}
-	release, ok := d.Reserve(ctx, wait)
+	reservation, ok := d.Reserve(ctx, wait)
 	if !ok {
 		return false
 	}
 	go func() {
-		defer release()
+		defer reservation.Release()
 		d.handler(ctx, update)
 	}()
 	return true
@@ -50,34 +63,49 @@ func (d *Dispatcher) Queue(ctx context.Context, update *telegram.Update, wait bo
 // Reserve acquires one dispatch slot and accounts for it in Wait. Internal
 // synchronous update sources use it to share the same global concurrency
 // bound as queued polling and webhook updates.
-func (d *Dispatcher) Reserve(ctx context.Context, wait bool) (release func(), ok bool) {
+func (d *Dispatcher) Reserve(ctx context.Context, wait bool) (reservation Reservation, ok bool) {
 	if d == nil {
-		return nil, false
+		return Reservation{}, false
 	}
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	if ctx.Err() != nil {
-		return nil, false
+		return Reservation{}, false
 	}
+
+	d.mu.Lock()
+	d.pending++
+	d.mu.Unlock()
+
+	acquired := false
 	if wait {
 		select {
 		case d.slots <- struct{}{}:
+			acquired = true
 		case <-ctx.Done():
-			return nil, false
 		}
 	} else {
 		select {
 		case d.slots <- struct{}{}:
+			acquired = true
 		default:
-			return nil, false
 		}
 	}
 
 	d.mu.Lock()
-	d.active++
+	d.pending--
+	if acquired {
+		d.active++
+	}
+	if d.active == 0 && d.pending == 0 {
+		d.drained.Broadcast()
+	}
 	d.mu.Unlock()
-	return d.done, true
+	if !acquired {
+		return Reservation{}, false
+	}
+	return Reservation{dispatcher: d}, true
 }
 
 // Wait blocks until the dispatcher has no active handlers.
@@ -86,7 +114,7 @@ func (d *Dispatcher) Wait() {
 		return
 	}
 	d.mu.Lock()
-	for d.active != 0 {
+	for d.active != 0 || d.pending != 0 {
 		d.drained.Wait()
 	}
 	d.mu.Unlock()
@@ -96,7 +124,7 @@ func (d *Dispatcher) done() {
 	<-d.slots
 	d.mu.Lock()
 	d.active--
-	if d.active == 0 {
+	if d.active == 0 && d.pending == 0 {
 		d.drained.Broadcast()
 	}
 	d.mu.Unlock()

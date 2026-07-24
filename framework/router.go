@@ -27,13 +27,11 @@ type compiledRoute struct {
 type prefixRouteDef struct {
 	prefix string
 	route  routeDef
-	order  uint64
 }
 
-type compiledPrefixRoute struct {
-	prefix string
-	route  compiledRoute
-	order  uint64
+type compiledPrefixTable struct {
+	routes  map[string][]compiledRoute
+	lengths []int
 }
 
 type routeTable struct {
@@ -43,11 +41,10 @@ type routeTable struct {
 	rawFilters          []routeDef
 	rawFallback         Handler
 	middleware          []Middleware
-	nextOrder           uint64
 
 	commands         map[string][]compiledRoute
 	callbacks        map[string][]compiledRoute
-	callbackPrefixes []compiledPrefixRoute
+	callbackPrefixes *compiledPrefixTable
 	filters          []compiledRoute
 	fallback         Handler
 }
@@ -111,11 +108,9 @@ func (r *Router) CallbackPrefix(prefix string, handler Handler) {
 				filtered = append(filtered, item)
 			}
 		}
-		table.nextOrder++
 		table.rawCallbackPrefixes = append(filtered, prefixRouteDef{
 			prefix: prefix,
 			route:  routeDef{handler: handler},
-			order:  table.nextOrder,
 		})
 	})
 }
@@ -170,10 +165,8 @@ func (r *Router) Handle(c *Context) error {
 		if handler := matchRoutes(table.callbacks[c.Callback.Data], c); handler != nil {
 			return handler(c)
 		}
-		for _, route := range table.callbackPrefixes {
-			if strings.HasPrefix(c.Callback.Data, route.prefix) && routeMatches(route.route, c) {
-				return route.route.handler(c)
-			}
+		if handler := matchCallbackPrefix(table.callbackPrefixes, c.Callback.Data, c); handler != nil {
+			return handler(c)
 		}
 	}
 
@@ -210,11 +203,9 @@ func (r *Router) addCallbackPrefix(prefix string, route routeDef) {
 		return
 	}
 	r.mutate(func(table *routeTable) {
-		table.nextOrder++
 		table.rawCallbackPrefixes = append(table.rawCallbackPrefixes, prefixRouteDef{
 			prefix: prefix,
 			route:  route,
-			order:  table.nextOrder,
 		})
 	})
 }
@@ -269,24 +260,28 @@ func (t *routeTable) rebuild() {
 	t.commands = compileRouteMap(t.rawCommands, t.middleware)
 	t.callbacks = compileRouteMap(t.rawCallbacks, t.middleware)
 	t.filters = compileRoutes(t.rawFilters, t.middleware)
-
-	t.callbackPrefixes = make([]compiledPrefixRoute, 0, len(t.rawCallbackPrefixes))
-	for _, route := range t.rawCallbackPrefixes {
-		t.callbackPrefixes = append(t.callbackPrefixes, compiledPrefixRoute{
-			prefix: route.prefix,
-			route:  compileRoute(route.route, t.middleware),
-			order:  route.order,
-		})
-	}
-	sort.SliceStable(t.callbackPrefixes, func(i, j int) bool {
-		left, right := t.callbackPrefixes[i], t.callbackPrefixes[j]
-		if len(left.prefix) != len(right.prefix) {
-			return len(left.prefix) > len(right.prefix)
-		}
-		return left.order < right.order
-	})
-
+	t.callbackPrefixes = compileCallbackPrefixes(t.rawCallbackPrefixes, t.middleware)
 	t.fallback = wrap(t.rawFallback, t.middleware)
+}
+
+func compileCallbackPrefixes(routes []prefixRouteDef, global []Middleware) *compiledPrefixTable {
+	if len(routes) == 0 {
+		return nil
+	}
+	table := &compiledPrefixTable{routes: make(map[string][]compiledRoute, len(routes))}
+	lengths := make(map[int]struct{})
+	for _, route := range routes {
+		table.routes[route.prefix] = append(
+			table.routes[route.prefix],
+			compileRoute(route.route, global),
+		)
+		if _, exists := lengths[len(route.prefix)]; !exists {
+			lengths[len(route.prefix)] = struct{}{}
+			table.lengths = append(table.lengths, len(route.prefix))
+		}
+	}
+	sort.Sort(sort.Reverse(sort.IntSlice(table.lengths)))
+	return table
 }
 
 func compileRouteMap(source map[string][]routeDef, global []Middleware) map[string][]compiledRoute {
@@ -325,7 +320,6 @@ func cloneRouteTable(source *routeTable) *routeTable {
 		rawFilters:          append([]routeDef(nil), source.rawFilters...),
 		rawFallback:         source.rawFallback,
 		middleware:          append([]Middleware(nil), source.middleware...),
-		nextOrder:           source.nextOrder,
 	}
 	return target
 }
@@ -342,6 +336,21 @@ func matchRoutes(routes []compiledRoute, c *Context) Handler {
 	for _, route := range routes {
 		if routeMatches(route, c) {
 			return route.handler
+		}
+	}
+	return nil
+}
+
+func matchCallbackPrefix(table *compiledPrefixTable, data string, c *Context) Handler {
+	if table == nil {
+		return nil
+	}
+	for _, length := range table.lengths {
+		if length > len(data) {
+			continue
+		}
+		if handler := matchRoutes(table.routes[data[:length]], c); handler != nil {
+			return handler
 		}
 	}
 	return nil

@@ -77,6 +77,44 @@ func TestRouterSnapshotConcurrentReadsAndWrites(t *testing.T) {
 	}
 }
 
+func TestCallbackPrefixIndexPreservesFilteredFallbacks(t *testing.T) {
+	t.Parallel()
+
+	router := NewRouter()
+	called := ""
+	router.CallbackPrefix("item:", func(*Context) error {
+		called = "short"
+		return nil
+	})
+	blocked := router.Group(func(*Context) bool { return false })
+	blocked.CallbackPrefix("item:admin:", func(*Context) error {
+		called = "blocked"
+		return nil
+	})
+	ctx := NewContext(context.Background(), nil, &telegram.Update{
+		CallbackQuery: &telegram.CallbackQuery{Data: "item:admin:42"},
+	}, "")
+	if err := router.Handle(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if called != "short" {
+		t.Fatalf("filtered longer prefix selected %q", called)
+	}
+
+	called = ""
+	allowed := router.Group(func(*Context) bool { return true })
+	allowed.CallbackPrefix("item:admin:", func(*Context) error {
+		called = "long"
+		return nil
+	})
+	if err := router.Handle(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if called != "long" {
+		t.Fatalf("same-prefix filtered route selected %q", called)
+	}
+}
+
 func BenchmarkRouterExactCommand(b *testing.B) {
 	router := NewRouter()
 	router.Command("start", func(*Context) error { return nil })
@@ -122,6 +160,44 @@ func BenchmarkRouterMiddlewareDepth10(b *testing.B) {
 		if err := router.Handle(ctx); err != nil {
 			b.Fatal(err)
 		}
+	}
+}
+
+func BenchmarkRouterCallbackPrefix1000(b *testing.B) {
+	router := NewRouter()
+	for index := 0; index < 1_000; index++ {
+		router.CallbackPrefix(fmt.Sprintf("item:%03d:", index), func(*Context) error { return nil })
+	}
+	ctx := NewContext(context.Background(), nil, &telegram.Update{
+		CallbackQuery: &telegram.CallbackQuery{Data: "item:999:value"},
+	}, "")
+	b.ReportAllocs()
+	b.ResetTimer()
+	for index := 0; index < b.N; index++ {
+		if err := router.Handle(ctx); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func TestCallbackPrefixIndexSteadyStateIsAllocationFree(t *testing.T) {
+	router := NewRouter()
+	for index := 0; index < 1_000; index++ {
+		router.CallbackPrefix(fmt.Sprintf("item:%03d:", index), func(*Context) error { return nil })
+	}
+	ctx := NewContext(context.Background(), nil, &telegram.Update{
+		CallbackQuery: &telegram.CallbackQuery{Data: "item:999:value"},
+	}, "")
+	if err := router.Handle(ctx); err != nil {
+		t.Fatal(err)
+	}
+	allocations := testing.AllocsPerRun(1_000, func() {
+		if err := router.Handle(ctx); err != nil {
+			panic(err)
+		}
+	})
+	if allocations != 0 {
+		t.Fatalf("callback-prefix dispatch allocations = %v", allocations)
 	}
 }
 

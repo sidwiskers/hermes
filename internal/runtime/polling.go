@@ -64,9 +64,15 @@ func Poll(
 	if dispatch == nil {
 		return ErrDispatchRequired
 	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	options = options.normalized()
 	offset := options.Offset
+	var lastAccepted int64
+	haveLastAccepted := false
 	backoff := options.MinBackoff
+	handlerContext := context.WithoutCancel(ctx)
 	if wait != nil {
 		defer wait()
 	}
@@ -97,17 +103,45 @@ func Poll(
 		}
 
 		backoff = options.MinBackoff
+		if pollingOffsetReset(updates, offset) {
+			offset = updates[0].UpdateID
+			haveLastAccepted = false
+		}
 		for index := range updates {
-			update := updates[index]
-			if update.UpdateID < offset {
+			update := &updates[index]
+			if update.UpdateID < offset ||
+				haveLastAccepted && update.UpdateID <= lastAccepted {
 				continue
 			}
-			offset = update.UpdateID + 1
-			if !dispatch(ctx, &update, true) {
+			lastAccepted = update.UpdateID
+			haveLastAccepted = true
+			const maximumUpdateID = int64(1<<63 - 1)
+			if update.UpdateID < maximumUpdateID {
+				offset = update.UpdateID + 1
+			} else {
+				offset = maximumUpdateID
+			}
+			if !dispatch(handlerContext, update, true) {
 				return nil
 			}
 		}
 	}
+}
+
+// Telegram may choose a new random update_id after at least a week without
+// updates. A non-empty response entirely below the requested positive offset
+// starts that new identifier epoch rather than being an indefinitely stale
+// batch.
+func pollingOffsetReset(updates []telegram.Update, offset int64) bool {
+	if len(updates) == 0 || offset <= 0 || updates[0].UpdateID <= 0 {
+		return false
+	}
+	for index := range updates {
+		if updates[index].UpdateID >= offset {
+			return false
+		}
+	}
+	return true
 }
 
 func nextBackoff(current, maximum time.Duration) time.Duration {

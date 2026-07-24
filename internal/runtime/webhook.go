@@ -132,47 +132,24 @@ func decodeWebhook(
 	}
 	body := http.MaxBytesReader(writer, request.Body, maxBody)
 	defer body.Close()
-	var update telegram.Update
-	if options.PreserveRawUpdate {
-		data, err := io.ReadAll(body)
-		if err != nil {
-			var maxBytesErr *http.MaxBytesError
-			if errors.As(err, &maxBytesErr) {
-				http.Error(writer, "update too large", http.StatusRequestEntityTooLarge)
-				return nil, false
-			}
-			http.Error(writer, "invalid update", http.StatusBadRequest)
+	data, err := io.ReadAll(body)
+	if err != nil {
+		var maxBytesErr *http.MaxBytesError
+		if errors.As(err, &maxBytesErr) {
+			http.Error(writer, "update too large", http.StatusRequestEntityTooLarge)
 			return nil, false
 		}
-		if len(data) == 0 {
-			http.Error(writer, "empty update", http.StatusBadRequest)
-			return nil, false
-		}
-		decoded, err := telegram.DecodeUpdate(data, true)
-		if err != nil {
-			http.Error(writer, "invalid update", http.StatusBadRequest)
-			return nil, false
-		}
-		update = decoded
-	} else {
-		decoder := json.NewDecoder(body)
-		if err := decoder.Decode(&update); err != nil {
-			if errors.Is(err, io.EOF) {
-				http.Error(writer, "empty update", http.StatusBadRequest)
-				return nil, false
-			}
-			var maxBytesErr *http.MaxBytesError
-			if errors.As(err, &maxBytesErr) {
-				http.Error(writer, "update too large", http.StatusRequestEntityTooLarge)
-				return nil, false
-			}
-			http.Error(writer, "invalid update", http.StatusBadRequest)
-			return nil, false
-		}
-		if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
-			http.Error(writer, "invalid trailing data", http.StatusBadRequest)
-			return nil, false
-		}
+		http.Error(writer, "invalid update", http.StatusBadRequest)
+		return nil, false
+	}
+	if len(data) == 0 {
+		http.Error(writer, "empty update", http.StatusBadRequest)
+		return nil, false
+	}
+	update, err := telegram.DecodeUpdate(data, options.PreserveRawUpdate)
+	if err != nil {
+		http.Error(writer, "invalid update", http.StatusBadRequest)
+		return nil, false
 	}
 	return &update, true
 }
@@ -226,6 +203,9 @@ func ServeWebhook(
 ) error {
 	if handler == nil {
 		return ErrWebhookHandlerRequired
+	}
+	if ctx == nil {
+		ctx = context.Background()
 	}
 	if path == "" {
 		path = "/telegram"

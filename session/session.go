@@ -114,6 +114,65 @@ type binding[T any] struct {
 // addresses are permitted to compare equal.
 type contextKey struct{ _ byte }
 
+type keyLock struct {
+	mu   sync.Mutex
+	refs int
+}
+
+type keyLockShard struct {
+	mu    sync.Mutex
+	locks map[Key]*keyLock
+}
+
+// keyedLocks serializes equal keys without making unrelated keys wait behind
+// a fixed set of long-held striped locks. Shards protect only the short map
+// lookup; each active key owns an independent mutex.
+type keyedLocks struct {
+	shards [64]keyLockShard
+	pool   sync.Pool
+}
+
+type keyLockHandle struct {
+	owner *keyedLocks
+	shard *keyLockShard
+	key   Key
+	lock  *keyLock
+}
+
+func (l *keyedLocks) acquire(key Key) keyLockHandle {
+	shard := &l.shards[hashKey(key)&uint64(len(l.shards)-1)]
+	shard.mu.Lock()
+	if shard.locks == nil {
+		shard.locks = make(map[Key]*keyLock)
+	}
+	lock := shard.locks[key]
+	if lock == nil {
+		lock, _ = l.pool.Get().(*keyLock)
+		if lock == nil {
+			lock = new(keyLock)
+		}
+		lock.refs = 0
+		shard.locks[key] = lock
+	}
+	lock.refs++
+	shard.mu.Unlock()
+
+	lock.mu.Lock()
+	return keyLockHandle{owner: l, shard: shard, key: key, lock: lock}
+}
+
+func (h keyLockHandle) release() {
+	h.lock.mu.Unlock()
+
+	h.shard.mu.Lock()
+	h.lock.refs--
+	if h.lock.refs == 0 {
+		delete(h.shard.locks, h.key)
+		h.owner.pool.Put(h.lock)
+	}
+	h.shard.mu.Unlock()
+}
+
 // Manager binds one typed Store and key policy to Hermes middleware.
 // Updates sharing a key are serialized across the complete downstream handler
 // to prevent lost updates in read-modify-write workflows.
@@ -123,7 +182,7 @@ type Manager[T any] struct {
 	namespace     string
 	commitOnError bool
 	contextKey    *contextKey
-	locks         [64]sync.Mutex
+	locks         keyedLocks
 }
 
 // New creates a typed session manager. ByChatUser is a practical default when
@@ -169,9 +228,8 @@ func (m *Manager[T]) Middleware() framework.Middleware {
 				return next(c)
 			}
 
-			lock := &m.locks[hashKey(key)&uint64(len(m.locks)-1)]
-			lock.Lock()
-			defer lock.Unlock()
+			lock := m.locks.acquire(key)
+			defer lock.release()
 
 			ctx := context.Background()
 			if c != nil && c.Context != nil {

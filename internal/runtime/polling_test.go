@@ -128,6 +128,93 @@ func TestPollSkipsStaleAndDuplicateUpdates(t *testing.T) {
 	}
 }
 
+func TestPollRecoversAfterTelegramUpdateIDReset(t *testing.T) {
+	t.Parallel()
+
+	source := &scriptedSource{results: [][]telegram.Update{
+		{{UpdateID: 25}, {UpdateID: 26}},
+		{{UpdateID: 27}},
+	}}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	var got []int64
+	err := Poll(ctx, source, func(_ context.Context, update *telegram.Update, _ bool) bool {
+		got = append(got, update.UpdateID)
+		if len(got) == 3 {
+			cancel()
+		}
+		return true
+	}, nil, PollOptions{Offset: 1_000})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 3 || got[0] != 25 || got[1] != 26 || got[2] != 27 {
+		t.Fatalf("updates after identifier reset = %v", got)
+	}
+	source.mu.Lock()
+	defer source.mu.Unlock()
+	if len(source.calls) < 2 || source.calls[0].Offset != 1_000 || source.calls[1].Offset != 27 {
+		t.Fatalf("poll offsets after identifier reset = %#v", source.calls)
+	}
+}
+
+func TestPollMaximumUpdateIDDoesNotOverflowOrRepeat(t *testing.T) {
+	t.Parallel()
+
+	const maximumUpdateID = int64(1<<63 - 1)
+	source := &scriptedSource{results: [][]telegram.Update{{
+		{UpdateID: maximumUpdateID},
+		{UpdateID: maximumUpdateID},
+	}}}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	var got []int64
+	err := Poll(ctx, source, func(_ context.Context, update *telegram.Update, _ bool) bool {
+		got = append(got, update.UpdateID)
+		cancel()
+		return true
+	}, nil, PollOptions{Offset: maximumUpdateID})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 || got[0] != maximumUpdateID {
+		t.Fatalf("maximum update ID dispatches = %v", got)
+	}
+	source.mu.Lock()
+	defer source.mu.Unlock()
+	if len(source.calls) < 2 || source.calls[1].Offset != maximumUpdateID {
+		t.Fatalf("maximum update ID offset overflowed: %#v", source.calls)
+	}
+}
+
+func TestPollAcceptedHandlerContextSurvivesIntakeCancellation(t *testing.T) {
+	t.Parallel()
+
+	source := &scriptedSource{results: [][]telegram.Update{{{UpdateID: 1}}}}
+	type contextKey struct{}
+	base := context.WithValue(context.Background(), contextKey{}, "preserved")
+	ctx, cancel := context.WithCancel(base)
+	defer cancel()
+
+	var handlerErr error
+	var value any
+	err := Poll(ctx, source, func(handlerCtx context.Context, _ *telegram.Update, _ bool) bool {
+		cancel()
+		handlerErr = handlerCtx.Err()
+		value = handlerCtx.Value(contextKey{})
+		return false
+	}, nil, PollOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if handlerErr != nil {
+		t.Fatalf("accepted handler context was canceled: %v", handlerErr)
+	}
+	if value != "preserved" {
+		t.Fatalf("handler context value = %v", value)
+	}
+}
+
 func TestPollValidatesDependencies(t *testing.T) {
 	t.Parallel()
 
@@ -137,6 +224,16 @@ func TestPollValidatesDependencies(t *testing.T) {
 	}
 	if err := Poll(context.Background(), &scriptedSource{}, nil, nil, PollOptions{}); !errors.Is(err, ErrDispatchRequired) {
 		t.Fatalf("dispatch error = %v", err)
+	}
+
+	source := &scriptedSource{results: [][]telegram.Update{{{UpdateID: 1}}}}
+	if err := Poll(nil, source, func(ctx context.Context, _ *telegram.Update, _ bool) bool {
+		if ctx == nil {
+			t.Fatal("nil polling context reached dispatch")
+		}
+		return false
+	}, nil, PollOptions{}); err != nil {
+		t.Fatalf("nil context normalization: %v", err)
 	}
 }
 

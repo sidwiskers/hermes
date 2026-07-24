@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"sync/atomic"
 
 	"github.com/sidwiskers/hermes/framework"
 	"github.com/sidwiskers/hermes/session"
@@ -63,6 +64,11 @@ type transitionKey[S comparable] struct {
 	event string
 }
 
+type transitionTable[S comparable, D any] struct {
+	rules map[transitionKey[S]][]Rule[S, D]
+	any   map[string][]Rule[S, D]
+}
+
 // Machine is a typed, concurrency-safe transition table backed by sessions.
 // Registration and dispatch may run concurrently; rules with the same state
 // and event are evaluated in registration order.
@@ -70,19 +76,23 @@ type Machine[S comparable, D any] struct {
 	sessions *session.Manager[Snapshot[S, D]]
 	initial  S
 
-	mu    sync.RWMutex
-	rules map[transitionKey[S]][]Rule[S, D]
-	any   map[string][]Rule[S, D]
+	mu      sync.Mutex
+	table   atomic.Pointer[transitionTable[S, D]]
+	startup *transitionTable[S, D]
+	started atomic.Bool
 }
 
 // New creates a machine whose missing sessions begin at initial.
 func New[S comparable, D any](sessions *session.Manager[Snapshot[S, D]], initial S) *Machine[S, D] {
-	return &Machine[S, D]{
+	machine := &Machine[S, D]{
 		sessions: sessions,
 		initial:  initial,
-		rules:    make(map[transitionKey[S]][]Rule[S, D]),
-		any:      make(map[string][]Rule[S, D]),
 	}
+	machine.startup = &transitionTable[S, D]{
+		rules: make(map[transitionKey[S]][]Rule[S, D]),
+		any:   make(map[string][]Rule[S, D]),
+	}
+	return machine
 }
 
 // Middleware installs the machine's session manager.
@@ -105,7 +115,14 @@ func (m *Machine[S, D]) Add(rule Rule[S, D]) error {
 	}
 	m.mu.Lock()
 	key := transitionKey[S]{state: rule.From, event: rule.Event}
-	m.rules[key] = append(m.rules[key], rule)
+	if !m.started.Load() {
+		m.startup.rules[key] = append(m.startup.rules[key], rule)
+		m.mu.Unlock()
+		return nil
+	}
+	next := cloneTransitionTable(m.table.Load())
+	next.rules[key] = append(append([]Rule[S, D](nil), next.rules[key]...), rule)
+	m.table.Store(next)
 	m.mu.Unlock()
 	return nil
 }
@@ -121,7 +138,14 @@ func (m *Machine[S, D]) AddAny(event string, to S, guard Guard[S, D], action Act
 	}
 	rule := Rule[S, D]{Event: event, To: to, Guard: guard, Action: action}
 	m.mu.Lock()
-	m.any[event] = append(m.any[event], rule)
+	if !m.started.Load() {
+		m.startup.any[event] = append(m.startup.any[event], rule)
+		m.mu.Unlock()
+		return nil
+	}
+	next := cloneTransitionTable(m.table.Load())
+	next.any[event] = append(append([]Rule[S, D](nil), next.any[event]...), rule)
+	m.table.Store(next)
 	m.mu.Unlock()
 	return nil
 }
@@ -186,7 +210,21 @@ func (m *Machine[S, D]) Trigger(c *framework.Context, event string) error {
 	if err != nil {
 		return err
 	}
-	rules := m.rulesFor(current.State, event)
+	exact, fallback := m.rulesFor(current.State, event)
+	if matched, err := m.tryRules(c, current, exact); matched {
+		return err
+	}
+	if matched, err := m.tryRules(c, current, fallback); matched {
+		return err
+	}
+	return &TransitionError[S]{State: current.State, Event: event}
+}
+
+func (m *Machine[S, D]) tryRules(
+	c *framework.Context,
+	current Snapshot[S, D],
+	rules []Rule[S, D],
+) (bool, error) {
 	for _, rule := range rules {
 		if rule.Guard != nil && !rule.Guard(c, current) {
 			continue
@@ -194,13 +232,13 @@ func (m *Machine[S, D]) Trigger(c *framework.Context, event string) error {
 		next := current
 		if rule.Action != nil {
 			if err := rule.Action(c, &next.Data); err != nil {
-				return err
+				return true, err
 			}
 		}
 		next.State = rule.To
-		return m.sessions.Set(c, next)
+		return true, m.sessions.Set(c, next)
 	}
-	return &TransitionError[S]{State: current.State, Event: event}
+	return false, nil
 }
 
 // Handle returns a handler that triggers event.
@@ -240,13 +278,51 @@ func (m *Machine[S, D]) In(states ...S) framework.Filter {
 	}
 }
 
-func (m *Machine[S, D]) rulesFor(state S, event string) []Rule[S, D] {
-	m.mu.RLock()
-	exact := m.rules[transitionKey[S]{state: state, event: event}]
-	fallback := m.any[event]
-	rules := make([]Rule[S, D], 0, len(exact)+len(fallback))
-	rules = append(rules, exact...)
-	rules = append(rules, fallback...)
-	m.mu.RUnlock()
-	return rules
+func (m *Machine[S, D]) rulesFor(state S, event string) (exact, fallback []Rule[S, D]) {
+	if m == nil {
+		return nil, nil
+	}
+	m.ensureStarted()
+	table := m.table.Load()
+	if table == nil {
+		return nil, nil
+	}
+	return table.rules[transitionKey[S]{state: state, event: event}], table.any[event]
+}
+
+func (m *Machine[S, D]) ensureStarted() {
+	if m == nil || m.started.Load() {
+		return
+	}
+	m.mu.Lock()
+	if !m.started.Load() {
+		table := m.startup
+		if table == nil {
+			table = &transitionTable[S, D]{
+				rules: make(map[transitionKey[S]][]Rule[S, D]),
+				any:   make(map[string][]Rule[S, D]),
+			}
+		}
+		m.table.Store(table)
+		m.startup = nil
+		m.started.Store(true)
+	}
+	m.mu.Unlock()
+}
+
+func cloneTransitionTable[S comparable, D any](source *transitionTable[S, D]) *transitionTable[S, D] {
+	target := &transitionTable[S, D]{
+		rules: make(map[transitionKey[S]][]Rule[S, D]),
+		any:   make(map[string][]Rule[S, D]),
+	}
+	if source == nil {
+		return target
+	}
+	for key, rules := range source.rules {
+		target.rules[key] = rules
+	}
+	for event, rules := range source.any {
+		target.any[event] = rules
+	}
+	return target
 }

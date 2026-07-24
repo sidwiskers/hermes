@@ -34,7 +34,19 @@ func TestDownloadRejectsTraversal(t *testing.T) {
 	t.Parallel()
 
 	bot := New("TOKEN")
-	if _, err := bot.OpenFile(context.Background(), "../token"); err == nil {
-		t.Fatal("expected invalid path error")
+	for _, value := range []string{
+		"../token",
+		"%2e%2e/token",
+		"%2E%2E/token",
+		"%2fabsolute",
+		"documents/file?query=1",
+		"documents/file#fragment",
+		"documents/%5csecret",
+		"documents/%00secret",
+		"%2e",
+	} {
+		if _, err := bot.OpenFile(context.Background(), value); err == nil {
+			t.Fatalf("path %q was accepted", value)
+		}
 	}
 }

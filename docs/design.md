@@ -54,7 +54,9 @@ Route registration uses copy-on-write snapshots:
 - post-start writes are serialized and rebuild a complete immutable route table;
 - reads use one atomic pointer load;
 - exact commands and callbacks use map lookup;
-- callback prefixes are pre-sorted by specificity;
+- callback prefixes are grouped by byte length and resolved with direct map
+  lookups from longest to shortest, so dispatch cost is independent of the
+  number of registered prefixes;
 - filtered routes preserve registration order;
 - nested groups are flattened into route filters and middleware during registration;
 - middleware chains are compiled during registration, not dispatch.

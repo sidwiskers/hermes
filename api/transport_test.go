@@ -96,6 +96,25 @@ func TestResponseLimit(t *testing.T) {
 	}
 }
 
+func TestMaximumResponseLimitDoesNotOverflow(t *testing.T) {
+	t.Parallel()
+
+	client := New(
+		"TOKEN",
+		WithResponseLimit(1<<63-1),
+		WithHTTPClient(&http.Client{Transport: roundTripFunc(func(*http.Request) (*http.Response, error) {
+			return testResponse(http.StatusOK, `{"ok":true,"result":true}`), nil
+		})}),
+	)
+	var result bool
+	if err := client.Call(context.Background(), "getMe", nil, &result); err != nil {
+		t.Fatal(err)
+	}
+	if !result {
+		t.Fatal("successful result was not decoded")
+	}
+}
+
 func TestInvalidMethodRejected(t *testing.T) {
 	t.Parallel()
 

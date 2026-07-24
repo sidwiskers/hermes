@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"path"
 	"strings"
 	"sync"
@@ -115,14 +116,36 @@ func (b *Client) fileURL(filePath string) string {
 
 func cleanTelegramFilePath(value string) (string, error) {
 	value = strings.TrimSpace(strings.TrimPrefix(value, "/"))
-	if value == "" || strings.Contains(value, "\\") {
+	if value == "" || strings.ContainsAny(value, "\\?#") || hasControlByte(value) {
 		return "", fmt.Errorf("hermes: invalid Telegram file path")
 	}
 	clean := path.Clean(value)
 	if clean == "." || clean == ".." || strings.HasPrefix(clean, "../") {
 		return "", fmt.Errorf("hermes: invalid Telegram file path")
 	}
+	decoded, err := url.PathUnescape(clean)
+	if err != nil {
+		return "", fmt.Errorf("hermes: invalid Telegram file path")
+	}
+	decodedClean := path.Clean(decoded)
+	if strings.Contains(decoded, "\\") ||
+		hasControlByte(decoded) ||
+		strings.HasPrefix(decoded, "/") ||
+		decodedClean == "." ||
+		decodedClean == ".." ||
+		strings.HasPrefix(decodedClean, "../") {
+		return "", fmt.Errorf("hermes: invalid Telegram file path")
+	}
 	return clean, nil
+}
+
+func hasControlByte(value string) bool {
+	for index := 0; index < len(value); index++ {
+		if value[index] < 0x20 || value[index] == 0x7f {
+			return true
+		}
+	}
+	return false
 }
 
 type observedDownload struct {
