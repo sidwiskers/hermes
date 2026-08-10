@@ -29,6 +29,19 @@ type Request struct {
 	Form    map[string]string
 	Files   map[string]File
 	RawBody []byte
+	stepID  uint64
+}
+
+func (r *Recorder) requestsForStep(stepID uint64) []Request {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	result := make([]Request, 0)
+	for _, request := range r.requests {
+		if request.stepID == stepID {
+			result = append(result, request)
+		}
+	}
+	return result
 }
 
 // Response describes one queued Telegram-style response.
@@ -38,13 +51,20 @@ type Response struct {
 	ErrorCode   int
 	Description string
 	Parameters  *hermes.ResponseParameters
+	Err         error
 }
+
+// Responder creates a response for a request when no explicitly queued
+// response is available. It is useful for stateful test transports such as
+// Lab's virtual Bot API.
+type Responder func(Request) Response
 
 // Recorder implements http.RoundTripper and records requests in arrival order.
 type Recorder struct {
 	mu        sync.Mutex
 	requests  []Request
 	responses []Response
+	responder Responder
 }
 
 // New creates a framework bot and its in-memory request recorder.
@@ -78,6 +98,15 @@ func (r *Recorder) Enqueue(response Response) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.responses = append(r.responses, response)
+}
+
+// SetResponder replaces the fallback response function. Passing nil restores
+// the default successful true response. Explicitly queued responses always
+// take precedence.
+func (r *Recorder) SetResponder(responder Responder) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.responder = responder
 }
 
 // Requests returns a snapshot of every request received so far.
@@ -117,11 +146,19 @@ func (r *Recorder) RoundTrip(request *http.Request) (*http.Response, error) {
 	r.mu.Lock()
 	r.requests = append(r.requests, recorded)
 	response := Response{StatusCode: http.StatusOK, Result: true}
+	responder := r.responder
 	if len(r.responses) != 0 {
 		response = r.responses[0]
 		r.responses = r.responses[1:]
+		responder = nil
 	}
 	r.mu.Unlock()
+	if responder != nil {
+		response = responder(recorded)
+	}
+	if response.Err != nil {
+		return nil, response.Err
+	}
 
 	status := response.StatusCode
 	if status == 0 {
@@ -166,6 +203,7 @@ func decodeRequest(request *http.Request) (Request, error) {
 		Form:   make(map[string]string),
 		Files:  make(map[string]File),
 	}
+	result.stepID, _ = request.Context().Value(labStepContextKey{}).(uint64)
 	if request.Body == nil {
 		return result, nil
 	}

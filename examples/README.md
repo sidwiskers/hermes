@@ -1,6 +1,7 @@
 # Hermes examples
 
-Every example is a complete `main` package and is compiled in CI.
+Every example is compiled in CI. Runtime examples are complete `main`
+packages; the Lab example is a directly runnable Go test.
 
 | Directory | Focus |
 | --- | --- |
@@ -14,6 +15,7 @@ Every example is a complete `main` package and is compiled in CI.
 | `payments` | Telegram Stars invoices and pre-checkout approval |
 | `stateful` | Typed sessions and finite-state conversations |
 | `production` | Deduplication, rate limiting, observability, and owned cleanup |
+| `lab` | Deterministic conversation, callback, and Bot API assertions without Telegram |
 
 Export `BOT_TOKEN` before running an example. Individual examples document any
 additional environment variables they require.

@@ -42,7 +42,7 @@ func FuzzCallbackPrefixIndex(f *testing.F) {
 			})
 		}
 
-		table := compileCallbackPrefixes(routes, nil)
+		table := compileCallbackPrefixes(routes)
 		ctx := NewContext(context.Background(), nil, &telegram.Update{
 			CallbackQuery: &telegram.CallbackQuery{Data: data},
 		}, "")

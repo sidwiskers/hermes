@@ -47,6 +47,7 @@ type routeTable struct {
 	callbackPrefixes *compiledPrefixTable
 	filters          []compiledRoute
 	fallback         Handler
+	handler          Handler
 }
 
 // Router performs concurrency-safe command, callback, prefix, and filter
@@ -120,7 +121,9 @@ func (r *Router) On(filter Filter, handler Handler) {
 	r.addRoute(routeDef{filter: filter, handler: handler})
 }
 
-// Use appends global middleware in declaration order.
+// Use appends global middleware in declaration order. Global middleware wraps
+// route selection as well as the selected handler, so filters can observe
+// context values installed by middleware.
 func (r *Router) Use(middleware ...Middleware) {
 	r.mutate(func(table *routeTable) {
 		for _, item := range middleware {
@@ -151,27 +154,30 @@ func (r *Router) Handle(c *Context) error {
 	if table == nil {
 		return nil
 	}
+	return table.handler(c)
+}
 
+func (t *routeTable) route(c *Context) error {
 	if command := c.Command(); command != "" {
-		if handler := matchRoutes(table.commands[command], c); handler != nil {
+		if handler := matchRoutes(t.commands[command], c); handler != nil {
 			return handler(c)
 		}
 	}
 
 	if c.Callback != nil {
-		if handler := matchRoutes(table.callbacks[c.Callback.Data], c); handler != nil {
+		if handler := matchRoutes(t.callbacks[c.Callback.Data], c); handler != nil {
 			return handler(c)
 		}
-		if handler := matchCallbackPrefix(table.callbackPrefixes, c.Callback.Data, c); handler != nil {
+		if handler := matchCallbackPrefix(t.callbackPrefixes, c.Callback.Data, c); handler != nil {
 			return handler(c)
 		}
 	}
 
-	if handler := matchRoutes(table.filters, c); handler != nil {
+	if handler := matchRoutes(t.filters, c); handler != nil {
 		return handler(c)
 	}
-	if table.fallback != nil {
-		return table.fallback(c)
+	if t.fallback != nil {
+		return t.fallback(c)
 	}
 	return nil
 }
@@ -260,14 +266,15 @@ func (r *Router) ensureStarted() {
 }
 
 func (t *routeTable) rebuild() {
-	t.commands = compileRouteMap(t.rawCommands, t.middleware)
-	t.callbacks = compileRouteMap(t.rawCallbacks, t.middleware)
-	t.filters = compileRoutes(t.rawFilters, t.middleware)
-	t.callbackPrefixes = compileCallbackPrefixes(t.rawCallbackPrefixes, t.middleware)
-	t.fallback = wrap(t.rawFallback, t.middleware)
+	t.commands = compileRouteMap(t.rawCommands)
+	t.callbacks = compileRouteMap(t.rawCallbacks)
+	t.filters = compileRoutes(t.rawFilters)
+	t.callbackPrefixes = compileCallbackPrefixes(t.rawCallbackPrefixes)
+	t.fallback = t.rawFallback
+	t.handler = wrap(t.route, t.middleware)
 }
 
-func compileCallbackPrefixes(routes []prefixRouteDef, global []Middleware) *compiledPrefixTable {
+func compileCallbackPrefixes(routes []prefixRouteDef) *compiledPrefixTable {
 	if len(routes) == 0 {
 		return nil
 	}
@@ -276,7 +283,7 @@ func compileCallbackPrefixes(routes []prefixRouteDef, global []Middleware) *comp
 	for _, route := range routes {
 		table.routes[route.prefix] = append(
 			table.routes[route.prefix],
-			compileRoute(route.route, global),
+			compileRoute(route.route),
 		)
 		if _, exists := lengths[len(route.prefix)]; !exists {
 			lengths[len(route.prefix)] = struct{}{}
@@ -287,32 +294,29 @@ func compileCallbackPrefixes(routes []prefixRouteDef, global []Middleware) *comp
 	return table
 }
 
-func compileRouteMap(source map[string][]routeDef, global []Middleware) map[string][]compiledRoute {
+func compileRouteMap(source map[string][]routeDef) map[string][]compiledRoute {
 	if len(source) == 0 {
 		return nil
 	}
 	target := make(map[string][]compiledRoute, len(source))
 	for key, routes := range source {
-		target[key] = compileRoutes(routes, global)
+		target[key] = compileRoutes(routes)
 	}
 	return target
 }
 
-func compileRoutes(routes []routeDef, global []Middleware) []compiledRoute {
+func compileRoutes(routes []routeDef) []compiledRoute {
 	result := make([]compiledRoute, 0, len(routes))
 	for _, route := range routes {
 		if route.handler != nil {
-			result = append(result, compileRoute(route, global))
+			result = append(result, compileRoute(route))
 		}
 	}
 	return result
 }
 
-func compileRoute(route routeDef, global []Middleware) compiledRoute {
-	chain := make([]Middleware, 0, len(global)+len(route.middleware))
-	chain = append(chain, global...)
-	chain = append(chain, route.middleware...)
-	return compiledRoute{filter: route.filter, handler: wrap(route.handler, chain)}
+func compileRoute(route routeDef) compiledRoute {
+	return compiledRoute{filter: route.filter, handler: wrap(route.handler, route.middleware)}
 }
 
 func cloneRouteTable(source *routeTable) *routeTable {

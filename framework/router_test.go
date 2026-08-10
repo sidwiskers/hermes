@@ -47,6 +47,36 @@ func TestRouterDirectCommandAndMiddleware(t *testing.T) {
 	}
 }
 
+func TestGlobalMiddlewareWrapsRouteSelection(t *testing.T) {
+	t.Parallel()
+
+	type contextKey struct{}
+	router := NewRouter()
+	router.Use(func(next Handler) Handler {
+		return func(c *Context) error {
+			cloned := *c
+			cloned.Context = context.WithValue(c.Context, contextKey{}, "bound")
+			return next(&cloned)
+		}
+	})
+	called := false
+	router.On(func(c *Context) bool {
+		value, _ := c.Context.Value(contextKey{}).(string)
+		return value == "bound"
+	}, func(*Context) error {
+		called = true
+		return nil
+	})
+
+	ctx := NewContext(context.Background(), nil, messageUpdate("hello"), "")
+	if err := router.Handle(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if !called {
+		t.Fatal("filtered route could not observe global middleware context")
+	}
+}
+
 func BenchmarkRouterConstruction(b *testing.B) {
 	b.ReportAllocs()
 	for b.Loop() {
