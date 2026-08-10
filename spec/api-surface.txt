@@ -1898,6 +1898,61 @@ func WithEffect(effectID string) SendOption
 func WithKeyboard(keyboard InlineKeyboardMarkup) SendOption
 func WithMarkup(markup ReplyMarkup) SendOption
 
+package github.com/sidwiskers/hermes/fleet
+var ErrBotRequired error
+var ErrDuplicateBot error
+var ErrDuplicateName error
+var ErrDuplicateWebhookPath error
+var ErrFleetRequired error
+var ErrNameRequired error
+var ErrNoBots error
+var ErrNoBotsRunning error
+var ErrRunning error
+var ErrSourceStopped error
+var ErrWebhookAddressRequired error
+var ErrWebhookPath error
+type ErrorHandler func(*Failure)
+type Failure struct{Bot string; Phase Phase; Err error}
+method (*Failure) Error() string
+method (*Failure) Unwrap() error
+type FailurePolicy uint8
+type Fleet struct{}
+method (*Fleet) Len() int
+method (*Fleet) Mount(name string, bot *github.com/sidwiskers/hermes.Bot, options ...MountOption) error
+method (*Fleet) NewBot(token string, options ...github.com/sidwiskers/hermes.Option) *github.com/sidwiskers/hermes.Bot
+method (*Fleet) Run(ctx context.Context) error
+method (*Fleet) Status() []Status
+method (*Fleet) WebhookAddress() string
+const IsolateFailures FailurePolicy = 0
+type Mode string
+const ModePolling Mode = "polling"
+const ModeWebhook Mode = "webhook"
+const ModeWebhookReplies Mode = "webhook_replies"
+type MountOption func(*mountConfig)
+func New(options ...Option) *Fleet
+type Option func(*config)
+type Phase string
+const PhasePolling Phase = "polling"
+const PhasePrepare Phase = "prepare"
+const PhaseShutdown Phase = "shutdown"
+const PhaseWebhookServer Phase = "webhook_server"
+type State string
+const StateFailed State = "failed"
+const StatePreparing State = "preparing"
+const StateRegistered State = "registered"
+const StateRunning State = "running"
+const StateStopped State = "stopped"
+type Status struct{Name string; Mode Mode; State State; LastError error}
+const StopAllOnFailure FailurePolicy = 1
+func WithBotMaxConcurrentUpdates(limit int) Option
+func WithErrorHandler(handler ErrorHandler) Option
+func WithFailurePolicy(policy FailurePolicy) Option
+func WithHTTPClient(client *net/http.Client) Option
+func WithPolling(options github.com/sidwiskers/hermes.PollOptions) MountOption
+func WithWebhook(path string, options github.com/sidwiskers/hermes.WebhookOptions) MountOption
+func WithWebhookAddress(address string) Option
+func WithWebhookReplies(path string, options github.com/sidwiskers/hermes.WebhookOptions) MountOption
+
 package github.com/sidwiskers/hermes/fsm
 type Action[S comparable, D any] func(*github.com/sidwiskers/hermes/framework.Context, *D) error
 var ErrEventRequired error

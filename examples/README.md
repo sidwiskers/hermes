@@ -15,6 +15,7 @@ packages; the Lab example is a directly runnable Go test.
 | `payments` | Telegram Stars invoices and pre-checkout approval |
 | `stateful` | Typed sessions and finite-state conversations |
 | `production` | Deduplication, rate limiting, observability, and owned cleanup |
+| `fleet` | Several independent Hermes bots in one process and one lifecycle |
 | `lab` | Deterministic conversation, callback, and Bot API assertions without Telegram |
 
 Export `BOT_TOKEN` before running an example. Individual examples document any

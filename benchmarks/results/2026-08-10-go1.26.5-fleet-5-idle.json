@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-08-10T10:29:01Z",
+  "go_version": "go1.26.5",
+  "goos": "linux",
+  "goarch": "amd64",
+  "cpu": "Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz",
+  "workload": "idle webhook bots with independent Hermes routers and dispatchers",
+  "bots": 5,
+  "samples": 5,
+  "fleet_median": {
+    "processes": 1,
+    "bots": 5,
+    "rss_bytes": 9379840,
+    "pss_bytes": 5432320,
+    "goroutines": 3,
+    "file_descriptors": 8
+  },
+  "separate_median": {
+    "processes": 5,
+    "bots": 5,
+    "rss_bytes": 46665728,
+    "pss_bytes": 17264640,
+    "goroutines": 15,
+    "file_descriptors": 40
+  },
+  "median_savings": {
+    "rss_bytes": 37285888,
+    "rss_percent": 79.89993855876415,
+    "pss_bytes": 11832320,
+    "pss_percent": 68.5349940688019,
+    "goroutines": 12,
+    "file_descriptors": 32
+  }
+}

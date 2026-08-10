@@ -23,6 +23,7 @@ var publicPackages = []string{
 	"github.com/sidwiskers/hermes/api",
 	"github.com/sidwiskers/hermes/dedupe",
 	"github.com/sidwiskers/hermes/framework",
+	"github.com/sidwiskers/hermes/fleet",
 	"github.com/sidwiskers/hermes/fsm",
 	"github.com/sidwiskers/hermes/observe",
 	"github.com/sidwiskers/hermes/ratelimit",

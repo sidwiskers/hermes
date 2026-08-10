@@ -10,7 +10,7 @@ instead of being placed in cosmetic subdirectories.
 | --- | --- |
 | `/` | Public `hermes` facade and conventional project metadata |
 | `api/`, `types/`, `framework/` | Low-level protocol, schemas, and routing primitives |
-| `session/`, `fsm/`, `dedupe/`, `ratelimit/`, `observe/` | Optional production capabilities |
+| `session/`, `fsm/`, `dedupe/`, `ratelimit/`, `observe/`, `fleet/` | Optional production capabilities |
 | `testkit/` | Public Hermes Lab and low-level network-free testing support |
 | `internal/runtime/` | Private polling, webhook, and dispatch engine |
 | `internal/botapi/`, `internal/cmd/` | Private schema maintenance libraries and commands |
@@ -62,6 +62,15 @@ HTTP transport records and answers the same JSON or multipart requests that a
 real client would send. The package is concurrency-safe, standard-library-only,
 and absent from applications that do not import it.
 
+### `fleet`
+
+An optional public multi-bot host. Fleet composes ordinary root `Bot` values;
+it does not add hooks to the root facade or internal runtime. It coordinates
+parallel preparation, polling sources, one exact-path webhook server, failure
+status, and graceful shutdown. Bots retain independent routing, middleware,
+state, and bounded dispatchers. The package uses only the standard library and
+is absent from applications that do not import it.
+
 This dependency direction is intentional:
 
 | Package | Allowed Hermes imports |
@@ -76,6 +85,7 @@ This dependency direction is intentional:
 | `dedupe` | `framework` |
 | `ratelimit` | `framework`, `session` |
 | `observe` | `api`, `framework` |
+| `fleet` | root `hermes` |
 | `testkit` | root `hermes`, `api` |
 
 No lower layer imports the root facade, so there are no package cycles and each layer can be tested independently. Runtime lifecycle remains internal; the framework package is public because its types are part of the root API.

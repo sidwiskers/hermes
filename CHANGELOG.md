@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.2.0 - 2026-08-10
+
+### Hermes Fleet
+
+- Added the optional `fleet` package for hosting several independent Hermes
+  bots in one Go process with one coordinated lifecycle.
+- Added shared-client bot construction, mixed polling and webhook mounts, one
+  exact-path webhook server, queued and synchronous reply modes, stable status,
+  and graceful handler draining.
+- Isolated ordinary bot preparation and source failures by default, with an
+  explicit fail-fast policy for applications whose bots must stop together.
+- Kept tokens, routing, middleware, state, and bounded dispatchers independent;
+  existing single-bot APIs and execution paths are unchanged.
+- Added race-tested lifecycle coverage, a runnable example, a complete guide,
+  and reproducible five-bot RSS, PSS, goroutine, and file-descriptor evidence.
+
 ## 1.1.0 - 2026-08-10
 
 ### Hermes Lab

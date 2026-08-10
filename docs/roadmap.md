@@ -22,6 +22,9 @@ The foundation is designed to expand, not be replaced.
 - Hermes Lab with deterministic virtual users and chats, stateful Bot API
   emulation, update replay, failure injection, and readable per-step
   expectations, plus the low-level `testkit` request recorder.
+- Optional Hermes Fleet hosting for several independent bots in one process,
+  with shared HTTP resources, exact-path webhook multiplexing, isolated source
+  failures, lifecycle status, and coordinated graceful shutdown.
 - Typed photo/live-photo/video/audio/document albums with streamed multi-file attachments and attachment parity checks.
 - Polls, dice, reactions, moderation, permissions, members, invite links, and common chat administration.
 - Typed entry points for all 185 methods in Bot API 10.2.
@@ -66,6 +69,8 @@ The foundation is designed to expand, not be replaced.
   lifecycle hooks, and fixed-cardinality lock-free metrics.
 - Deterministic exported-API manifests, credential scanning, dependency
   inventory, and official Go vulnerability analysis in release gates.
+- Reproducible median RSS, PSS, goroutine, and file-descriptor evidence for a
+  five-bot Fleet against five one-bot processes.
 
 ## Next compatibility expansion
 
