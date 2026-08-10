@@ -4,7 +4,7 @@ Hermes measures compatibility against deterministic inventories derived from
 Telegram's official Bot API documentation and the compiled Go packages. Each
 release pins its audited Bot API version in `spec/bot-api.json` and its exported
 Go declarations in `spec/api-surface.txt`. The Bot API manifest shipped with
-Hermes 1.0.2 records Bot API 10.2 and contains:
+Hermes 1.1.0 records Bot API 10.2 and contains:
 
 | Surface | Official count | Missing in Hermes |
 | --- | ---: | ---: |

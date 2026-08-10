@@ -1140,7 +1140,7 @@ const DefaultBaseURL untyped string = "https://api.telegram.org"
 func DefaultCommandScope() BotCommandScopeDefault
 func DefaultMenuButton() MenuButton
 const DefaultResponseLimit untyped int = 33554432
-const DefaultUserAgent untyped string = "hermes-go/1.0.2"
+const DefaultUserAgent untyped string = "hermes-go/1.1.0"
 type DeleteAllMessageReactionsParams struct{ChatID any `json:"chat_id"`; UserID int64 `json:"user_id,omitempty"`; ActorChatID int64 `json:"actor_chat_id,omitempty"`}
 type DeleteBusinessMessagesParams struct{BusinessConnectionID string `json:"business_connection_id"`; MessageIDs []int `json:"message_ids"`}
 type DeleteEphemeralMessageParams struct{ChatID any `json:"chat_id"`; ReceiverUserID int64 `json:"receiver_user_id"`; EphemeralMessageID int `json:"ephemeral_message_id"`}

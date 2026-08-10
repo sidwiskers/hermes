@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.2 - 2026-08-10
+## 1.1.0 - 2026-08-10
 
 ### Hermes Lab
 
@@ -21,7 +21,7 @@
 - Kept production routing and middleware semantics unchanged; Hermes Lab is
   absent from applications that do not import `testkit`.
 - Added regression coverage for legacy route-matching and middleware order.
-- Updated the default user agent and release documentation for Hermes 1.0.2.
+- Updated the default user agent and release documentation for Hermes 1.1.0.
 - Regenerated and reviewed the deterministic exported-API manifest.
 
 ## 1.0.1 - 2026-07-25
