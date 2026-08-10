@@ -126,7 +126,7 @@ variables are documented in [`docs/releasing.md`](docs/releasing.md).
 
 ## Project status
 
-Hermes 1.0.0 is the stable release. Its typed API is audited against the Bot API
+Hermes 1.0.2 is the stable release. Its typed API is audited against the Bot API
 version recorded in `spec/bot-api.json`, with zero known static parity gaps at
 release time. It also provides permanent raw escape hatches, streamed
 uploads/downloads, bounded update dispatch, race-tested routing, retry-safe

@@ -3,6 +3,7 @@ package testkit
 import (
 	"context"
 	"errors"
+	"net/http"
 	"strings"
 	"sync"
 	"testing"
@@ -37,7 +38,14 @@ func TestLabRunsStatefulConversation(t *testing.T) {
 	lab.Bot.Command("profile", flow.Then("begin", func(c *hermes.Context) error {
 		return c.Send("What should I call you?")
 	}))
-	lab.Bot.On(flow.In(profileWaiting), func(c *hermes.Context) error {
+	lab.Bot.OnUpdate(func(c *hermes.Context) error {
+		state, err := flow.State(c)
+		if err != nil {
+			return err
+		}
+		if state != profileWaiting {
+			return nil
+		}
 		name := strings.TrimSpace(c.Text())
 		if name == "" {
 			return c.Send("Please send a name.")
@@ -287,11 +295,11 @@ func TestLabExpectationsAndMultipart(t *testing.T) {
 
 func TestRecorderResponderAndTransportError(t *testing.T) {
 	client, recorder := NewClient()
-	recorder.SetResponder(func(request Request) Response {
+	recorder.SetResponder(func(request Request) (Response, error) {
 		if request.Method != "getMe" {
 			t.Fatalf("method = %q", request.Method)
 		}
-		return successful(hermes.User{ID: 1, IsBot: true, FirstName: "Lab"})
+		return successful(hermes.User{ID: 1, IsBot: true, FirstName: "Lab"}), nil
 	})
 	user, err := client.GetMe(context.Background())
 	if err != nil || user.ID != 1 {
@@ -305,11 +313,17 @@ func TestRecorderResponderAndTransportError(t *testing.T) {
 	}
 
 	failure := errors.New("transport failed")
-	recorder.Enqueue(Response{Err: failure})
+	recorder.EnqueueError(failure)
 	_, err = client.GetMe(context.Background())
 	if !errors.Is(err, failure) {
 		t.Fatalf("error = %v", err)
 	}
+}
+
+func TestRecorderStructShapesRemainCompatible(t *testing.T) {
+	t.Parallel()
+	_ = Request{"sendMessage", nil, nil, nil, nil, nil}
+	_ = Response{http.StatusOK, true, 0, "", nil}
 }
 
 func TestLabMediaResponses(t *testing.T) {

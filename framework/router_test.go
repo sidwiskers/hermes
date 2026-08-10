@@ -47,33 +47,30 @@ func TestRouterDirectCommandAndMiddleware(t *testing.T) {
 	}
 }
 
-func TestGlobalMiddlewareWrapsRouteSelection(t *testing.T) {
+func TestRouterMiddlewareRunsOnlyAfterMatch(t *testing.T) {
 	t.Parallel()
 
-	type contextKey struct{}
 	router := NewRouter()
+	calls := 0
 	router.Use(func(next Handler) Handler {
 		return func(c *Context) error {
-			cloned := *c
-			cloned.Context = context.WithValue(c.Context, contextKey{}, "bound")
-			return next(&cloned)
+			calls++
+			return next(c)
 		}
 	})
-	called := false
-	router.On(func(c *Context) bool {
-		value, _ := c.Context.Value(contextKey{}).(string)
-		return value == "bound"
-	}, func(*Context) error {
-		called = true
-		return nil
-	})
+	router.On(TextEquals("target"), func(*Context) error { return nil })
 
-	ctx := NewContext(context.Background(), nil, messageUpdate("hello"), "")
-	if err := router.Handle(ctx); err != nil {
+	if err := router.Handle(NewContext(context.Background(), nil, messageUpdate("other"), "")); err != nil {
 		t.Fatal(err)
 	}
-	if !called {
-		t.Fatal("filtered route could not observe global middleware context")
+	if calls != 0 {
+		t.Fatalf("middleware calls for unmatched update = %d, want 0", calls)
+	}
+	if err := router.Handle(NewContext(context.Background(), nil, messageUpdate("target"), "")); err != nil {
+		t.Fatal(err)
+	}
+	if calls != 1 {
+		t.Fatalf("middleware calls after matching update = %d, want 1", calls)
 	}
 }
 

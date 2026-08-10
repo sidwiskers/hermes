@@ -270,8 +270,11 @@ func (m *Machine[S, D]) Then(event string, next framework.Handler) framework.Han
 	}
 }
 
-// In returns a filter matching any supplied current state. It returns false
-// when used outside the machine middleware.
+// In returns a filter matching any supplied current state. Use it only with a
+// Context already bound by the machine middleware, such as from inside a
+// handler or middleware; otherwise it returns false. Standard Router filters
+// run before route middleware, so state-driven fallback routes should inspect
+// State from an OnUpdate handler instead.
 func (m *Machine[S, D]) In(states ...S) framework.Filter {
 	set := make(map[S]struct{}, len(states))
 	for _, state := range states {

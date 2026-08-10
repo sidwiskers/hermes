@@ -23,7 +23,7 @@ type LabAPI struct {
 	chats    map[int64]hermes.Chat
 	users    map[int64]hermes.User
 	messages map[int64][]hermes.Message
-	planned  map[string][]Response
+	planned  map[string][]roundTripResult
 }
 
 func newLabAPI(recorder *Recorder) *LabAPI {
@@ -38,7 +38,7 @@ func newLabAPI(recorder *Recorder) *LabAPI {
 		chats:    make(map[int64]hermes.Chat),
 		users:    make(map[int64]hermes.User),
 		messages: make(map[int64][]hermes.Message),
-		planned:  make(map[string][]Response),
+		planned:  make(map[string][]roundTripResult),
 	}
 }
 
@@ -56,7 +56,7 @@ func (a *LabAPI) Bot() hermes.User {
 // RespondNext queues a successful result for the next matching method call.
 // It overrides automatic emulation for that call only.
 func (a *LabAPI) RespondNext(method string, result any) {
-	a.enqueue(method, Response{StatusCode: http.StatusOK, Result: result})
+	a.enqueue(method, roundTripResult{response: Response{StatusCode: http.StatusOK, Result: result}})
 }
 
 // FailNext queues a Telegram API error for the next matching method call.
@@ -64,12 +64,12 @@ func (a *LabAPI) FailNext(method string, code int, description string, parameter
 	if code <= 0 {
 		code = http.StatusBadRequest
 	}
-	a.enqueue(method, Response{
+	a.enqueue(method, roundTripResult{response: Response{
 		StatusCode:  code,
 		ErrorCode:   code,
 		Description: description,
 		Parameters:  parameters,
-	})
+	}})
 }
 
 // RateLimitNext queues a Telegram 429 response. Fractions of a second are
@@ -95,7 +95,7 @@ func (a *LabAPI) TransportErrorNext(method string, err error) {
 	if err == nil {
 		err = errors.New("Hermes Lab transport failure")
 	}
-	a.enqueue(method, Response{Err: err})
+	a.enqueue(method, roundTripResult{err: err})
 }
 
 // Messages returns a snapshot of virtual bot messages retained in a chat.
@@ -124,13 +124,13 @@ func (a *LabAPI) LastMessage(chatID int64) (hermes.Message, bool) {
 	return messages[len(messages)-1], true
 }
 
-func (a *LabAPI) enqueue(method string, response Response) {
+func (a *LabAPI) enqueue(method string, result roundTripResult) {
 	if a == nil {
 		return
 	}
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	a.planned[method] = append(a.planned[method], response)
+	a.planned[method] = append(a.planned[method], result)
 }
 
 func (a *LabAPI) register(user hermes.User, chat hermes.Chat) {
@@ -150,51 +150,51 @@ func (a *LabAPI) reset() {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	a.messages = make(map[int64][]hermes.Message)
-	a.planned = make(map[string][]Response)
+	a.planned = make(map[string][]roundTripResult)
 }
 
-func (a *LabAPI) respond(request Request) Response {
-	if response, ok := a.takePlanned(request.Method); ok {
-		return response
+func (a *LabAPI) respond(request Request) (Response, error) {
+	if result, ok := a.takePlanned(request.Method); ok {
+		return result.response, result.err
 	}
 
 	switch request.Method {
 	case "getMe":
-		return successful(a.Bot())
+		return successful(a.Bot()), nil
 	case "sendMessage", "sendPhoto", "sendAnimation", "sendAudio", "sendDocument",
 		"sendSticker", "sendVideo", "sendVideoNote", "sendVoice", "sendContact",
 		"sendLocation", "sendVenue", "sendPoll", "sendDice", "sendGame",
 		"sendInvoice", "sendPaidMedia", "sendChecklist", "sendLivePhoto",
 		"sendRichMessage", "forwardMessage":
-		return successful(a.emulateSend(request))
+		return successful(a.emulateSend(request)), nil
 	case "sendMediaGroup":
 		count := mediaCount(request)
 		messages := make([]hermes.Message, count)
 		for index := range messages {
 			messages[index] = a.emulateSend(request)
 		}
-		return successful(messages)
+		return successful(messages), nil
 	case "copyMessage":
 		message := a.emulateSend(request)
-		return successful(map[string]int{"message_id": message.MessageID})
+		return successful(map[string]int{"message_id": message.MessageID}), nil
 	case "editMessageText", "editMessageCaption", "editMessageReplyMarkup", "editMessageMedia",
 		"editMessageLiveLocation", "stopMessageLiveLocation", "editMessageChecklist":
-		return a.emulateEdit(request)
+		return a.emulateEdit(request), nil
 	case "deleteMessage":
-		return a.emulateDelete(request)
+		return a.emulateDelete(request), nil
 	case "deleteMessages":
-		return a.emulateDeleteMany(request)
+		return a.emulateDeleteMany(request), nil
 	default:
-		return successful(true)
+		return successful(true), nil
 	}
 }
 
-func (a *LabAPI) takePlanned(method string) (Response, bool) {
+func (a *LabAPI) takePlanned(method string) (roundTripResult, bool) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	responses := a.planned[method]
 	if len(responses) == 0 {
-		return Response{}, false
+		return roundTripResult{}, false
 	}
 	response := responses[0]
 	if len(responses) == 1 {

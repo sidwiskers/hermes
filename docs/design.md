@@ -95,9 +95,6 @@ Route registration uses copy-on-write snapshots:
   number of registered prefixes;
 - filtered routes preserve registration order;
 - nested groups are flattened into route filters and middleware during registration;
-- global middleware is compiled around route selection and the selected
-  handler, allowing context-bound filters such as FSM state checks;
-- group middleware remains compiled around its selected handler;
 - middleware chains are compiled during registration, not dispatch.
 
 This favors the real workload: routing millions of updates after a small number of startup registrations.

@@ -3,6 +3,7 @@ package testkit
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"mime"
@@ -29,6 +30,10 @@ type Request struct {
 	Form    map[string]string
 	Files   map[string]File
 	RawBody []byte
+}
+
+type recordedRequest struct {
+	request Request
 	stepID  uint64
 }
 
@@ -36,9 +41,9 @@ func (r *Recorder) requestsForStep(stepID uint64) []Request {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	result := make([]Request, 0)
-	for _, request := range r.requests {
-		if request.stepID == stepID {
-			result = append(result, request)
+	for _, recorded := range r.requests {
+		if recorded.stepID == stepID {
+			result = append(result, recorded.request)
 		}
 	}
 	return result
@@ -51,19 +56,23 @@ type Response struct {
 	ErrorCode   int
 	Description string
 	Parameters  *hermes.ResponseParameters
-	Err         error
 }
 
 // Responder creates a response for a request when no explicitly queued
 // response is available. It is useful for stateful test transports such as
 // Lab's virtual Bot API.
-type Responder func(Request) Response
+type Responder func(Request) (Response, error)
+
+type roundTripResult struct {
+	response Response
+	err      error
+}
 
 // Recorder implements http.RoundTripper and records requests in arrival order.
 type Recorder struct {
 	mu        sync.Mutex
-	requests  []Request
-	responses []Response
+	requests  []recordedRequest
+	responses []roundTripResult
 	responder Responder
 }
 
@@ -97,7 +106,18 @@ func (r *Recorder) Fail(code int, description string, parameters *hermes.Respons
 func (r *Recorder) Enqueue(response Response) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.responses = append(r.responses, response)
+	r.responses = append(r.responses, roundTripResult{response: response})
+}
+
+// EnqueueError queues a transport failure. Failures are consumed in the same
+// FIFO order as responses and occur before an HTTP response is available.
+func (r *Recorder) EnqueueError(err error) {
+	if err == nil {
+		err = errors.New("hermes/testkit: transport failure")
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.responses = append(r.responses, roundTripResult{err: err})
 }
 
 // SetResponder replaces the fallback response function. Passing nil restores
@@ -114,7 +134,9 @@ func (r *Recorder) Requests() []Request {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	result := make([]Request, len(r.requests))
-	copy(result, r.requests)
+	for index, recorded := range r.requests {
+		result[index] = recorded.request
+	}
 	return result
 }
 
@@ -125,7 +147,7 @@ func (r *Recorder) Last() (Request, bool) {
 	if len(r.requests) == 0 {
 		return Request{}, false
 	}
-	return r.requests[len(r.requests)-1], true
+	return r.requests[len(r.requests)-1].request, true
 }
 
 // Reset removes all captured requests and queued responses.
@@ -143,22 +165,24 @@ func (r *Recorder) RoundTrip(request *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
+	stepID, _ := request.Context().Value(labStepContextKey{}).(uint64)
 	r.mu.Lock()
-	r.requests = append(r.requests, recorded)
-	response := Response{StatusCode: http.StatusOK, Result: true}
+	r.requests = append(r.requests, recordedRequest{request: recorded, stepID: stepID})
+	result := roundTripResult{response: Response{StatusCode: http.StatusOK, Result: true}}
 	responder := r.responder
 	if len(r.responses) != 0 {
-		response = r.responses[0]
+		result = r.responses[0]
 		r.responses = r.responses[1:]
 		responder = nil
 	}
 	r.mu.Unlock()
 	if responder != nil {
-		response = responder(recorded)
+		result.response, result.err = responder(recorded)
 	}
-	if response.Err != nil {
-		return nil, response.Err
+	if result.err != nil {
+		return nil, result.err
 	}
+	response := result.response
 
 	status := response.StatusCode
 	if status == 0 {
@@ -203,7 +227,6 @@ func decodeRequest(request *http.Request) (Request, error) {
 		Form:   make(map[string]string),
 		Files:  make(map[string]File),
 	}
-	result.stepID, _ = request.Context().Value(labStepContextKey{}).(uint64)
 	if request.Body == nil {
 		return result, nil
 	}
