@@ -2498,3 +2498,163 @@ type RichBlockMap struct{Type string `json:"type"`; Location Location `json:"loc
 type RichBlockMathematicalExpression struct{Type string `json:"type"`; Expression string `json:"expression"`}
 type RichBlockParagraph struct{Type string `json:"type"`; Text RichText `json:"text"`}
 type RichBlockPhoto struct{Type string `json:"type"`; Photo []PhotoSize `json:"photo"`; HasSpoiler bool `json:"has_spoiler,omitempty"`; Caption *RichBlockCaption `json:"caption,omitempty"`}
+type RichBlockPreformatted struct{Type string `json:"type"`; Text RichText `json:"text"`; Language string `json:"language,omitempty"`}
+type RichBlockPullQuotation struct{Type string `json:"type"`; Text RichText `json:"text"`; Credit *RichText `json:"credit,omitempty"`}
+type RichBlockSectionHeading struct{Type string `json:"type"`; Text RichText `json:"text"`; Size int `json:"size"`}
+type RichBlockSlideshow struct{Type string `json:"type"`; Blocks []RichBlock `json:"blocks"`; Caption *RichBlockCaption `json:"caption,omitempty"`}
+type RichBlockTable struct{Type string `json:"type"`; Cells [][]RichBlockTableCell `json:"cells"`; IsBordered bool `json:"is_bordered,omitempty"`; IsStriped bool `json:"is_striped,omitempty"`; Caption *RichText `json:"caption,omitempty"`}
+type RichBlockTableCell struct{Text RichText `json:"text,omitempty"`; IsHeader bool `json:"is_header,omitempty"`; Colspan int `json:"colspan,omitempty"`; Rowspan int `json:"rowspan,omitempty"`; Align string `json:"align"`; VAlign string `json:"valign"`}
+type RichBlockThinking struct{Type string `json:"type"`; Text RichText `json:"text"`}
+type RichBlockVideo struct{Type string `json:"type"`; Video Video `json:"video"`; HasSpoiler bool `json:"has_spoiler,omitempty"`; Caption *RichBlockCaption `json:"caption,omitempty"`}
+type RichBlockVoiceNote struct{Type string `json:"type"`; VoiceNote Voice `json:"voice_note"`; Caption *RichBlockCaption `json:"caption,omitempty"`}
+type RichMessage struct{Blocks []RichBlock `json:"blocks"`; IsRTL bool `json:"is_rtl,omitempty"`}
+type RichText = any
+type RichTextAnchor struct{Name string `json:"name"`}
+method (RichTextAnchor) MarshalJSON() ([]byte, error)
+type RichTextAnchorLink struct{Text RichText `json:"text"`; AnchorName string `json:"anchor_name"`}
+method (RichTextAnchorLink) MarshalJSON() ([]byte, error)
+type RichTextBankCardNumber struct{Text RichText `json:"text"`; BankCardNumber string `json:"bank_card_number"`}
+method (RichTextBankCardNumber) MarshalJSON() ([]byte, error)
+type RichTextBold struct{Text RichText `json:"text"`}
+method (RichTextBold) MarshalJSON() ([]byte, error)
+type RichTextBotCommand struct{Text RichText `json:"text"`; BotCommand string `json:"bot_command"`}
+method (RichTextBotCommand) MarshalJSON() ([]byte, error)
+type RichTextCashtag struct{Text RichText `json:"text"`; Cashtag string `json:"cashtag"`}
+method (RichTextCashtag) MarshalJSON() ([]byte, error)
+type RichTextCode struct{Text RichText `json:"text"`}
+method (RichTextCode) MarshalJSON() ([]byte, error)
+type RichTextCustomEmoji struct{CustomEmojiID string `json:"custom_emoji_id"`; AlternativeText string `json:"alternative_text"`}
+method (RichTextCustomEmoji) MarshalJSON() ([]byte, error)
+type RichTextDateTime struct{Text RichText `json:"text"`; UnixTime int64 `json:"unix_time"`; DateTimeFormat string `json:"date_time_format"`}
+method (RichTextDateTime) MarshalJSON() ([]byte, error)
+type RichTextEmailAddress struct{Text RichText `json:"text"`; EmailAddress string `json:"email_address"`}
+method (RichTextEmailAddress) MarshalJSON() ([]byte, error)
+type RichTextHashtag struct{Text RichText `json:"text"`; Hashtag string `json:"hashtag"`}
+method (RichTextHashtag) MarshalJSON() ([]byte, error)
+type RichTextItalic struct{Text RichText `json:"text"`}
+method (RichTextItalic) MarshalJSON() ([]byte, error)
+type RichTextMarked struct{Text RichText `json:"text"`}
+method (RichTextMarked) MarshalJSON() ([]byte, error)
+type RichTextMathematicalExpression struct{Expression string `json:"expression"`}
+method (RichTextMathematicalExpression) MarshalJSON() ([]byte, error)
+type RichTextMention struct{Text RichText `json:"text"`; Username string `json:"username"`}
+method (RichTextMention) MarshalJSON() ([]byte, error)
+type RichTextPhoneNumber struct{Text RichText `json:"text"`; PhoneNumber string `json:"phone_number"`}
+method (RichTextPhoneNumber) MarshalJSON() ([]byte, error)
+type RichTextReference struct{Text RichText `json:"text"`; Name string `json:"name"`}
+method (RichTextReference) MarshalJSON() ([]byte, error)
+type RichTextReferenceLink struct{Text RichText `json:"text"`; ReferenceName string `json:"reference_name"`}
+method (RichTextReferenceLink) MarshalJSON() ([]byte, error)
+type RichTextSpoiler struct{Text RichText `json:"text"`}
+method (RichTextSpoiler) MarshalJSON() ([]byte, error)
+type RichTextStrikethrough struct{Text RichText `json:"text"`}
+method (RichTextStrikethrough) MarshalJSON() ([]byte, error)
+type RichTextSubscript struct{Text RichText `json:"text"`}
+method (RichTextSubscript) MarshalJSON() ([]byte, error)
+type RichTextSuperscript struct{Text RichText `json:"text"`}
+method (RichTextSuperscript) MarshalJSON() ([]byte, error)
+type RichTextTextMention struct{Text RichText `json:"text"`; User User `json:"user"`}
+method (RichTextTextMention) MarshalJSON() ([]byte, error)
+type RichTextURL struct{Text RichText `json:"text"`; URL string `json:"url"`}
+method (RichTextURL) MarshalJSON() ([]byte, error)
+type RichTextUnderline struct{Text RichText `json:"text"`}
+method (RichTextUnderline) MarshalJSON() ([]byte, error)
+func Row(buttons ...InlineKeyboardButton) []InlineKeyboardButton
+type SentGuestMessage struct{InlineMessageID string `json:"inline_message_id"`}
+type SentWebAppMessage struct{InlineMessageID string `json:"inline_message_id,omitempty"`}
+type SharedUser struct{UserID int64 `json:"user_id"`; FirstName string `json:"first_name,omitempty"`; LastName string `json:"last_name,omitempty"`; Username string `json:"username,omitempty"`; Photo []PhotoSize `json:"photo,omitempty"`}
+type ShippingAddress struct{CountryCode string `json:"country_code"`; State string `json:"state"`; City string `json:"city"`; StreetLine1 string `json:"street_line1"`; StreetLine2 string `json:"street_line2"`; PostCode string `json:"post_code"`}
+type ShippingOption struct{ID string `json:"id"`; Title string `json:"title"`; Prices []LabeledPrice `json:"prices"`}
+type ShippingQuery struct{ID string `json:"id"`; From User `json:"from"`; InvoicePayload string `json:"invoice_payload"`; ShippingAddress ShippingAddress `json:"shipping_address"`}
+type StarAmount struct{Amount int `json:"amount"`; NanostarAmount int `json:"nanostar_amount,omitempty"`}
+type StarTransaction struct{ID string `json:"id"`; Amount int `json:"amount"`; NanostarAmount int `json:"nanostar_amount,omitempty"`; Date int64 `json:"date"`; Source *TransactionPartner `json:"source,omitempty"`; Receiver *TransactionPartner `json:"receiver,omitempty"`}
+type StarTransactions struct{Transactions []StarTransaction `json:"transactions"`}
+type Sticker struct{FileID string `json:"file_id"`; FileUniqueID string `json:"file_unique_id"`; Type string `json:"type"`; Width int `json:"width"`; Height int `json:"height"`; IsAnimated bool `json:"is_animated"`; IsVideo bool `json:"is_video"`; Thumbnail *PhotoSize `json:"thumbnail,omitempty"`; Emoji string `json:"emoji,omitempty"`; SetName string `json:"set_name,omitempty"`; PremiumAnimation *File `json:"premium_animation,omitempty"`; MaskPosition *MaskPosition `json:"mask_position,omitempty"`; CustomEmojiID string `json:"custom_emoji_id,omitempty"`; NeedsRepainting bool `json:"needs_repainting,omitempty"`; FileSize int64 `json:"file_size,omitempty"`}
+type StickerSet struct{Name string `json:"name"`; Title string `json:"title"`; StickerType string `json:"sticker_type"`; Stickers []Sticker `json:"stickers"`; Thumbnail *PhotoSize `json:"thumbnail,omitempty"`}
+type Story struct{Chat Chat `json:"chat"`; ID int `json:"id"`}
+type StoryAreaTypeLink struct{Type string `json:"type"`; URL string `json:"url"`}
+type StoryAreaTypeLocation struct{Type string `json:"type"`; Latitude float64 `json:"latitude"`; Longitude float64 `json:"longitude"`; Address *LocationAddress `json:"address,omitempty"`}
+type StoryAreaTypeSuggestedReaction struct{Type string `json:"type"`; ReactionType ReactionType `json:"reaction_type"`; IsDark bool `json:"is_dark,omitempty"`; IsFlipped bool `json:"is_flipped,omitempty"`}
+type StoryAreaTypeUniqueGift struct{Type string `json:"type"`; Name string `json:"name"`}
+type StoryAreaTypeWeather struct{Type string `json:"type"`; Temperature float64 `json:"temperature"`; Emoji string `json:"emoji"`; BackgroundColor int `json:"background_color"`}
+type SuccessfulPayment struct{Currency string `json:"currency"`; TotalAmount int `json:"total_amount"`; InvoicePayload string `json:"invoice_payload"`; SubscriptionExpirationDate int64 `json:"subscription_expiration_date,omitempty"`; IsRecurring bool `json:"is_recurring,omitempty"`; IsFirstRecurring bool `json:"is_first_recurring,omitempty"`; ShippingOptionID string `json:"shipping_option_id,omitempty"`; OrderInfo *OrderInfo `json:"order_info,omitempty"`; TelegramPaymentChargeID string `json:"telegram_payment_charge_id"`; ProviderPaymentChargeID string `json:"provider_payment_charge_id"`}
+type SuggestedPostApprovalFailed struct{SuggestedPostMessage *Message `json:"suggested_post_message,omitempty"`; Price SuggestedPostPrice `json:"price"`}
+type SuggestedPostApproved struct{SuggestedPostMessage *Message `json:"suggested_post_message,omitempty"`; Price *SuggestedPostPrice `json:"price,omitempty"`; SendDate int64 `json:"send_date"`}
+type SuggestedPostDeclined struct{SuggestedPostMessage *Message `json:"suggested_post_message,omitempty"`; Comment string `json:"comment,omitempty"`}
+type SuggestedPostInfo struct{State string `json:"state"`; Price *SuggestedPostPrice `json:"price,omitempty"`; SendDate int64 `json:"send_date,omitempty"`}
+type SuggestedPostPaid struct{SuggestedPostMessage *Message `json:"suggested_post_message,omitempty"`; Currency string `json:"currency"`; Amount int `json:"amount,omitempty"`; StarAmount *StarAmount `json:"star_amount,omitempty"`}
+type SuggestedPostParameters struct{Price *SuggestedPostPrice `json:"price,omitempty"`; SendDate int64 `json:"send_date,omitempty"`}
+type SuggestedPostPrice struct{Currency string `json:"currency"`; Amount int `json:"amount"`}
+type SuggestedPostRefunded struct{SuggestedPostMessage *Message `json:"suggested_post_message,omitempty"`; Reason string `json:"reason"`}
+type SwitchInlineQueryChosenChat struct{Query string `json:"query,omitempty"`; AllowUserChats bool `json:"allow_user_chats,omitempty"`; AllowBotChats bool `json:"allow_bot_chats,omitempty"`; AllowGroupChats bool `json:"allow_group_chats,omitempty"`; AllowChannelChats bool `json:"allow_channel_chats,omitempty"`}
+type TextQuote struct{Text string `json:"text"`; Entities []MessageEntity `json:"entities,omitempty"`; Position int `json:"position"`; IsManual bool `json:"is_manual,omitempty"`}
+type TransactionPartner struct{Type string `json:"type"`; TransactionType string `json:"transaction_type,omitempty"`; User *User `json:"user,omitempty"`; Chat *Chat `json:"chat,omitempty"`; Affiliate *AffiliateInfo `json:"affiliate,omitempty"`; InvoicePayload string `json:"invoice_payload,omitempty"`; SubscriptionPeriod int `json:"subscription_period,omitempty"`; PaidMedia []PaidMedia `json:"paid_media,omitempty"`; PaidMediaPayload string `json:"paid_media_payload,omitempty"`; Gift *Gift `json:"gift,omitempty"`; PremiumSubscriptionDuration int `json:"premium_subscription_duration,omitempty"`; SponsorUser *User `json:"sponsor_user,omitempty"`; CommissionPerMille int `json:"commission_per_mille,omitempty"`; WithdrawalState *RevenueWithdrawalState `json:"withdrawal_state,omitempty"`; RequestCount int `json:"request_count,omitempty"`}
+type TransactionPartnerAffiliateProgram struct{Type string `json:"type"`; SponsorUser *User `json:"sponsor_user,omitempty"`; CommissionPerMille int `json:"commission_per_mille"`}
+type TransactionPartnerChat struct{Type string `json:"type"`; Chat Chat `json:"chat"`; Gift *Gift `json:"gift,omitempty"`}
+type TransactionPartnerFragment struct{Type string `json:"type"`; WithdrawalState *RevenueWithdrawalState `json:"withdrawal_state,omitempty"`}
+type TransactionPartnerOther struct{Type string `json:"type"`}
+type TransactionPartnerTelegramAds struct{Type string `json:"type"`}
+type TransactionPartnerTelegramApi struct{Type string `json:"type"`; RequestCount int `json:"request_count"`}
+type TransactionPartnerUser struct{Type string `json:"type"`; TransactionType string `json:"transaction_type"`; User User `json:"user"`; Affiliate *AffiliateInfo `json:"affiliate,omitempty"`; InvoicePayload string `json:"invoice_payload,omitempty"`; SubscriptionPeriod int `json:"subscription_period,omitempty"`; PaidMedia []PaidMedia `json:"paid_media,omitempty"`; PaidMediaPayload string `json:"paid_media_payload,omitempty"`; Gift *Gift `json:"gift,omitempty"`; PremiumSubscriptionDuration int `json:"premium_subscription_duration,omitempty"`}
+func URLButton(text string, url string) InlineKeyboardButton
+func UnavailableMessage(message *InaccessibleMessage) *MaybeInaccessibleMessage
+type UniqueGift struct{GiftID string `json:"gift_id"`; BaseName string `json:"base_name"`; Name string `json:"name"`; Number int `json:"number"`; Model UniqueGiftModel `json:"model"`; Symbol UniqueGiftSymbol `json:"symbol"`; Backdrop UniqueGiftBackdrop `json:"backdrop"`; IsPremium bool `json:"is_premium,omitempty"`; IsBurned bool `json:"is_burned,omitempty"`; IsFromBlockchain bool `json:"is_from_blockchain,omitempty"`; Colors *UniqueGiftColors `json:"colors,omitempty"`; PublisherChat *Chat `json:"publisher_chat,omitempty"`}
+type UniqueGiftBackdrop struct{Name string `json:"name"`; Colors UniqueGiftBackdropColors `json:"colors"`; RarityPerMille int `json:"rarity_per_mille"`}
+type UniqueGiftBackdropColors struct{CenterColor int `json:"center_color"`; EdgeColor int `json:"edge_color"`; SymbolColor int `json:"symbol_color"`; TextColor int `json:"text_color"`}
+type UniqueGiftColors struct{ModelCustomEmojiID string `json:"model_custom_emoji_id"`; SymbolCustomEmojiID string `json:"symbol_custom_emoji_id"`; LightThemeMainColor int `json:"light_theme_main_color"`; LightThemeOtherColors []int `json:"light_theme_other_colors"`; DarkThemeMainColor int `json:"dark_theme_main_color"`; DarkThemeOtherColors []int `json:"dark_theme_other_colors"`}
+type UniqueGiftInfo struct{Gift UniqueGift `json:"gift"`; Origin string `json:"origin"`; LastResaleCurrency string `json:"last_resale_currency,omitempty"`; LastResaleAmount int `json:"last_resale_amount,omitempty"`; OwnedGiftID string `json:"owned_gift_id,omitempty"`; TransferStarCount int `json:"transfer_star_count,omitempty"`; NextTransferDate int64 `json:"next_transfer_date,omitempty"`}
+type UniqueGiftModel struct{Name string `json:"name"`; Sticker Sticker `json:"sticker"`; RarityPerMille int `json:"rarity_per_mille"`; Rarity string `json:"rarity,omitempty"`}
+type UniqueGiftSymbol struct{Name string `json:"name"`; Sticker Sticker `json:"sticker"`; RarityPerMille int `json:"rarity_per_mille"`}
+type Update struct{UpdateID int64 `json:"update_id"`; Message *Message `json:"message,omitempty"`; EditedMessage *Message `json:"edited_message,omitempty"`; ChannelPost *Message `json:"channel_post,omitempty"`; EditedChannelPost *Message `json:"edited_channel_post,omitempty"`; BusinessConnection *BusinessConnection `json:"business_connection,omitempty"`; BusinessMessage *Message `json:"business_message,omitempty"`; EditedBusinessMessage *Message `json:"edited_business_message,omitempty"`; DeletedBusinessMessages *BusinessMessagesDeleted `json:"deleted_business_messages,omitempty"`; GuestMessage *Message `json:"guest_message,omitempty"`; MessageReaction *MessageReactionUpdated `json:"message_reaction,omitempty"`; MessageReactionCount *MessageReactionCountUpdated `json:"message_reaction_count,omitempty"`; InlineQuery *InlineQuery `json:"inline_query,omitempty"`; ChosenInlineResult *ChosenInlineResult `json:"chosen_inline_result,omitempty"`; CallbackQuery *CallbackQuery `json:"callback_query,omitempty"`; ShippingQuery *ShippingQuery `json:"shipping_query,omitempty"`; PreCheckoutQuery *PreCheckoutQuery `json:"pre_checkout_query,omitempty"`; PurchasedPaidMedia *PaidMediaPurchased `json:"purchased_paid_media,omitempty"`; Poll *Poll `json:"poll,omitempty"`; PollAnswer *PollAnswer `json:"poll_answer,omitempty"`; MyChatMember *ChatMemberUpdated `json:"my_chat_member,omitempty"`; ChatMember *ChatMemberUpdated `json:"chat_member,omitempty"`; ChatJoinRequest *ChatJoinRequest `json:"chat_join_request,omitempty"`; ChatBoost *ChatBoostUpdated `json:"chat_boost,omitempty"`; RemovedChatBoost *ChatBoostRemoved `json:"removed_chat_boost,omitempty"`; ManagedBot *ManagedBotUpdated `json:"managed_bot,omitempty"`; Subscription *BotSubscriptionUpdated `json:"subscription,omitempty"`; Raw encoding/json.RawMessage `json:"-"`}
+method (*Update) PrimaryMessage() *Message
+method (*Update) Sender() *User
+method (*Update) Type() UpdateType
+const UpdateBusinessConnection UpdateType = "business_connection"
+const UpdateBusinessMessage UpdateType = "business_message"
+const UpdateCallbackQuery UpdateType = "callback_query"
+const UpdateChannelPost UpdateType = "channel_post"
+const UpdateChatBoost UpdateType = "chat_boost"
+const UpdateChatJoinRequest UpdateType = "chat_join_request"
+const UpdateChatMember UpdateType = "chat_member"
+const UpdateChosenInlineResult UpdateType = "chosen_inline_result"
+const UpdateDeletedBusinessMessages UpdateType = "deleted_business_messages"
+const UpdateEditedBusinessMessage UpdateType = "edited_business_message"
+const UpdateEditedChannelPost UpdateType = "edited_channel_post"
+const UpdateEditedMessage UpdateType = "edited_message"
+const UpdateGuestMessage UpdateType = "guest_message"
+const UpdateInlineQuery UpdateType = "inline_query"
+const UpdateManagedBot UpdateType = "managed_bot"
+const UpdateMessage UpdateType = "message"
+const UpdateMessageReaction UpdateType = "message_reaction"
+const UpdateMessageReactionCount UpdateType = "message_reaction_count"
+const UpdateMyChatMember UpdateType = "my_chat_member"
+const UpdatePoll UpdateType = "poll"
+const UpdatePollAnswer UpdateType = "poll_answer"
+const UpdatePreCheckoutQuery UpdateType = "pre_checkout_query"
+const UpdatePurchasedPaidMedia UpdateType = "purchased_paid_media"
+const UpdateRemovedChatBoost UpdateType = "removed_chat_boost"
+const UpdateShippingQuery UpdateType = "shipping_query"
+const UpdateSubscription UpdateType = "subscription"
+type UpdateType string
+const UpdateUnknown UpdateType = "unknown"
+type User struct{ID int64 `json:"id"`; IsBot bool `json:"is_bot"`; FirstName string `json:"first_name"`; LastName string `json:"last_name,omitempty"`; Username string `json:"username,omitempty"`; LanguageCode string `json:"language_code,omitempty"`; IsPremium bool `json:"is_premium,omitempty"`; AddedToAttachmentMenu bool `json:"added_to_attachment_menu,omitempty"`; CanJoinGroups bool `json:"can_join_groups,omitempty"`; CanReadAllGroupMessages bool `json:"can_read_all_group_messages,omitempty"`; SupportsGuestQueries bool `json:"supports_guest_queries,omitempty"`; SupportsInlineQueries bool `json:"supports_inline_queries,omitempty"`; CanConnectToBusiness bool `json:"can_connect_to_business,omitempty"`; HasMainWebApp bool `json:"has_main_web_app,omitempty"`; HasTopicsEnabled bool `json:"has_topics_enabled,omitempty"`; AllowsUsersToCreateTopics bool `json:"allows_users_to_create_topics,omitempty"`; CanManageBots bool `json:"can_manage_bots,omitempty"`; SupportsJoinRequestQueries bool `json:"supports_join_request_queries,omitempty"`}
+type UserChatBoosts struct{Boosts []ChatBoost `json:"boosts"`}
+type UserProfileAudios struct{TotalCount int `json:"total_count"`; Audios []Audio `json:"audios"`}
+type UserProfilePhotos struct{TotalCount int `json:"total_count"`; Photos [][]PhotoSize `json:"photos"`}
+type UserRating struct{Level int `json:"level"`; Rating int `json:"rating"`; CurrentLevelRating int `json:"current_level_rating"`; NextLevelRating int `json:"next_level_rating,omitempty"`}
+type UsersShared struct{RequestID int `json:"request_id"`; Users []SharedUser `json:"users"`}
+type Venue struct{Location Location `json:"location"`; Title string `json:"title"`; Address string `json:"address"`; FoursquareID string `json:"foursquare_id,omitempty"`; FoursquareType string `json:"foursquare_type,omitempty"`; GooglePlaceID string `json:"google_place_id,omitempty"`; GooglePlaceType string `json:"google_place_type,omitempty"`}
+type Video struct{VideoBotAPIFields; FileID string `json:"file_id"`; FileUniqueID string `json:"file_unique_id"`; Width int `json:"width"`; Height int `json:"height"`; Duration int `json:"duration"`; Thumbnail *PhotoSize `json:"thumbnail,omitempty"`; FileName string `json:"file_name,omitempty"`; MIMEType string `json:"mime_type,omitempty"`; FileSize int64 `json:"file_size,omitempty"`}
+type VideoBotAPIFields struct{Cover []PhotoSize `json:"cover,omitempty"`; StartTimestamp int64 `json:"start_timestamp,omitempty"`; Qualities []VideoQuality `json:"qualities,omitempty"`}
+type VideoChatEnded struct{Duration int `json:"duration"`}
+type VideoChatParticipantsInvited struct{Users []User `json:"users"`}
+type VideoChatScheduled struct{StartDate int64 `json:"start_date"`}
+type VideoChatStarted struct{}
+type VideoNote struct{FileID string `json:"file_id"`; FileUniqueID string `json:"file_unique_id"`; Length int `json:"length"`; Duration int `json:"duration"`; Thumbnail *PhotoSize `json:"thumbnail,omitempty"`; FileSize int64 `json:"file_size,omitempty"`}
+type VideoQuality struct{FileID string `json:"file_id"`; FileUniqueID string `json:"file_unique_id"`; Width int `json:"width"`; Height int `json:"height"`; Codec string `json:"codec"`; FileSize int64 `json:"file_size,omitempty"`}
+type Voice struct{FileID string `json:"file_id"`; FileUniqueID string `json:"file_unique_id"`; Duration int `json:"duration"`; MIMEType string `json:"mime_type,omitempty"`; FileSize int64 `json:"file_size,omitempty"`}
+func WebAppButton(text string, url string) InlineKeyboardButton
+type WebAppData struct{Data string `json:"data"`; ButtonText string `json:"button_text"`}
+type WebAppInfo struct{URL string `json:"url"`}
+func WebAppMenuButton(text string, url string) MenuButton
+type WriteAccessAllowed struct{FromRequest bool `json:"from_request,omitempty"`; WebAppName string `json:"web_app_name,omitempty"`; FromAttachmentMenu bool `json:"from_attachment_menu,omitempty"`}
