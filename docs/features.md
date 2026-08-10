@@ -25,7 +25,7 @@ tools separate. Applications pay only for packages they import.
 | Direct webhook replies | One typed or raw Bot API method encoded in the webhook response with a response-size bound |
 | Helpers | Common sends, replies, edits, media, albums, callbacks, polls, reactions, moderation, and chat actions |
 | Callback data | Typed string, integer, and JSON codecs with Telegram's 64-byte limit enforced |
-| Testing | Network-free JSON/multipart recorder and externally compiled examples |
+| Testing | Hermes Lab for deterministic conversations, virtual users/chats, automatic common Bot API responses, replay, failure injection, per-update expectations, plus the low-level JSON/multipart recorder |
 
 ## Optional production packages
 
@@ -36,6 +36,7 @@ tools separate. Applications pay only for packages they import.
 | `dedupe` | Atomic update claiming, release on error/panic, TTL, capacity bounds, and a store interface for distributed coordination |
 | `ratelimit` | Sharded per-user/chat token buckets, retry estimates, bounded identity cardinality, and explicit idle cleanup |
 | `observe` | Panic-contained trace hooks and fixed-cardinality lock-free metrics for updates and Bot API calls |
+| `testkit` | Optional in-process Hermes Lab and low-level transport recorder; no network, external service, or third-party dependency |
 
 The in-memory stores are process-local by design. Multi-instance deployments
 implement the small `session.Store` and `dedupe.Store` interfaces using their

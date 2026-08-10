@@ -8,7 +8,7 @@ deprecation must identify a direct migration path.
 
 - Each Hermes release targets the Bot API version recorded in the checked-in
   `spec/bot-api.json` manifest.
-- Hermes 1.0.0 targets Bot API 10.2. Its release inventory covers all 185
+- Hermes 1.1.0 targets Bot API 10.2. Its release inventory covers all 185
   methods, 937 parameters, 362 objects, 1,838 object fields, 26 unions, and 187
   variants in that version.
 - Source-audit tests require zero missing methods, parameters, objects, fields,

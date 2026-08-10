@@ -19,7 +19,9 @@ The foundation is designed to expand, not be replaced.
 - All 12 Bot API 10.2 ephemeral-capable send methods.
 - Complete ephemeral edit/delete lifecycle.
 - Primary media uploads, file metadata, and streamed downloads.
-- Deterministic `testkit` request recorder.
+- Hermes Lab with deterministic virtual users and chats, stateful Bot API
+  emulation, update replay, failure injection, and readable per-step
+  expectations, plus the low-level `testkit` request recorder.
 - Typed photo/live-photo/video/audio/document albums with streamed multi-file attachments and attachment parity checks.
 - Polls, dice, reactions, moderation, permissions, members, invite links, and common chat administration.
 - Typed entry points for all 185 methods in Bot API 10.2.

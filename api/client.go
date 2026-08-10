@@ -11,7 +11,7 @@ const (
 	// DefaultResponseLimit is the maximum accepted response size, 32 MiB.
 	DefaultResponseLimit = 32 << 20
 	// DefaultUserAgent is sent by clients that do not configure one.
-	DefaultUserAgent = "hermes-go/1.0.0"
+	DefaultUserAgent = "hermes-go/1.1.0"
 )
 
 // Config contains construction-time settings for Client.

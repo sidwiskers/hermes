@@ -67,7 +67,7 @@ github.com/sidwiskers/hermes
 ├── ratelimit             # optional bounded token buckets
 ├── observe               # optional tracing hooks and fixed-cardinality metrics
 ├── internal/runtime      # bounded dispatch, polling, webhook lifecycle
-└── testkit                # optional network-free test recorder
+└── testkit                # optional Hermes Lab and low-level test recorder
 ```
 
 The complete repository ownership map—including `spec`, maintenance tooling,
@@ -126,7 +126,7 @@ variables are documented in [`docs/releasing.md`](docs/releasing.md).
 
 ## Project status
 
-Hermes 1.0.0 is the stable release. Its typed API is audited against the Bot API
+Hermes 1.1.0 is the stable release. Its typed API is audited against the Bot API
 version recorded in `spec/bot-api.json`, with zero known static parity gaps at
 release time. It also provides permanent raw escape hatches, streamed
 uploads/downloads, bounded update dispatch, race-tested routing, retry-safe
@@ -480,9 +480,46 @@ to the root package. See the runnable
 [`stateful`](examples/stateful) and [`production`](examples/production)
 programs and the complete [`feature map`](docs/features.md).
 
-## Testing without Telegram
+## Hermes Lab: test conversations without Telegram
 
-The optional `testkit` package supplies an in-memory Bot API recorder:
+The optional `testkit` package includes Hermes Lab, a deterministic Telegram
+environment that runs entirely inside a Go test. It creates virtual users and
+chats, delivers updates synchronously, emulates common Bot API responses, and
+keeps each update's outbound calls together:
+
+```go
+func TestSettings(t *testing.T) {
+    lab := testkit.NewLab(t)
+
+    lab.Bot.Command("settings", func(c *hermes.Context) error {
+        return c.Send("Settings", hermes.WithKeyboard(
+            hermes.Keyboard(hermes.Row(hermes.Button("Save", "save"))),
+        ))
+    })
+    lab.Bot.Callback("save", func(c *hermes.Context) error {
+        if err := c.Acknowledge(); err != nil {
+            return err
+        }
+        return c.Edit("Saved")
+    })
+
+    alice := lab.PrivateUser(42, "alice")
+    alice.Command("settings").Want(testkit.Sent("Settings"))
+    alice.Callback("save").Want(
+        testkit.Acknowledged(),
+        testkit.Edited("Saved"),
+    )
+}
+```
+
+Lab also supports custom message shapes, group actors, retained bot messages,
+duplicate-update replay, concurrent actors, multipart assertions, and
+method-scoped API or transport failures. It is standard-library-only and adds
+no runtime work unless `testkit` is imported. See the complete
+[`Hermes Lab guide`](docs/lab.md) and the runnable [`lab` example](examples/lab).
+
+For protocol-level tests, the same package retains its lower-level in-memory
+Bot API recorder:
 
 ```go
 bot, recorder := testkit.New()
@@ -497,7 +534,8 @@ request, _ := recorder.Last()
 fmt.Println(request.Method, request.JSON["text"])
 ```
 
-It records JSON and multipart requests and can queue successful or Telegram-style error responses.
+It records JSON and multipart requests and can queue successful, Telegram-style
+error, or transport-failure responses.
 
 ## Complete, versioned Bot API surface
 

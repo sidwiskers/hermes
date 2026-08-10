@@ -11,7 +11,7 @@ instead of being placed in cosmetic subdirectories.
 | `/` | Public `hermes` facade and conventional project metadata |
 | `api/`, `types/`, `framework/` | Low-level protocol, schemas, and routing primitives |
 | `session/`, `fsm/`, `dedupe/`, `ratelimit/`, `observe/` | Optional production capabilities |
-| `testkit/` | Public network-free testing support |
+| `testkit/` | Public Hermes Lab and low-level network-free testing support |
 | `internal/runtime/` | Private polling, webhook, and dispatch engine |
 | `internal/botapi/`, `internal/cmd/` | Private schema maintenance libraries and commands |
 | `cmd/` | Maintainer-facing benchmark and soak executables |
@@ -54,7 +54,13 @@ Bounded dispatch, polling loops, retry policy, webhook parsing, HTTP server life
 
 ### `testkit`
 
-An optional public package for deterministic API request recording without Telegram or network access.
+An optional public package containing Hermes Lab and the lower-level request
+recorder. Lab composes the ordinary root `Bot` with a deterministic in-process
+Bot API model; it does not add hooks or branches to production packages.
+Virtual actors call the existing synchronous `Bot.Handle` entry point, and an
+HTTP transport records and answers the same JSON or multipart requests that a
+real client would send. The package is concurrency-safe, standard-library-only,
+and absent from applications that do not import it.
 
 This dependency direction is intentional:
 

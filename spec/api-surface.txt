@@ -1140,7 +1140,7 @@ const DefaultBaseURL untyped string = "https://api.telegram.org"
 func DefaultCommandScope() BotCommandScopeDefault
 func DefaultMenuButton() MenuButton
 const DefaultResponseLimit untyped int = 33554432
-const DefaultUserAgent untyped string = "hermes-go/1.0.0"
+const DefaultUserAgent untyped string = "hermes-go/1.1.0"
 type DeleteAllMessageReactionsParams struct{ChatID any `json:"chat_id"`; UserID int64 `json:"user_id,omitempty"`; ActorChatID int64 `json:"actor_chat_id,omitempty"`}
 type DeleteBusinessMessagesParams struct{BusinessConnectionID string `json:"business_connection_id"`; MessageIDs []int `json:"message_ids"`}
 type DeleteEphemeralMessageParams struct{ChatID any `json:"chat_id"`; ReceiverUserID int64 `json:"receiver_user_id"`; EphemeralMessageID int `json:"ephemeral_message_id"`}
@@ -2004,19 +2004,67 @@ func WithCommitOnError(enabled bool) Option
 func WithNamespace(namespace string) Option
 
 package github.com/sidwiskers/hermes/testkit
+func Acknowledged() Expectation
+type Actor struct{}
+method (*Actor) Callback(data string) *Step
+method (*Actor) CallbackOn(message github.com/sidwiskers/hermes.Message, data string) *Step
+method (*Actor) Chat() github.com/sidwiskers/hermes.Chat
+method (*Actor) Command(command string, arguments ...string) *Step
+method (*Actor) Message(message github.com/sidwiskers/hermes.Message) *Step
+method (*Actor) Messages() []github.com/sidwiskers/hermes.Message
+method (*Actor) Text(text string) *Step
+method (*Actor) User() github.com/sidwiskers/hermes.User
+func Answered(text string) Expectation
+func Called(method string) Expectation
+func Deleted() Expectation
+func Edited(text string) Expectation
+var ErrLabRequired error
+var ErrMessageRequired error
+type Expectation interface{match([]Request) error}
 type File struct{Name string; Data []byte}
+type Lab struct{Bot *github.com/sidwiskers/hermes.Bot; API *LabAPI}
+method (*Lab) GroupUser(chatID int64, userID int64, username string) *Actor
+method (*Lab) Handle(update *github.com/sidwiskers/hermes.Update) *Step
+method (*Lab) PrivateUser(id int64, username string) *Actor
+method (*Lab) Requests() []Request
+method (*Lab) Reset()
+type LabAPI struct{}
+method (*LabAPI) Bot() github.com/sidwiskers/hermes.User
+method (*LabAPI) FailNext(method string, code int, description string, parameters *github.com/sidwiskers/hermes.ResponseParameters)
+method (*LabAPI) LastMessage(chatID int64) (github.com/sidwiskers/hermes.Message, bool)
+method (*LabAPI) Messages(chatID int64) []github.com/sidwiskers/hermes.Message
+method (*LabAPI) RateLimitNext(method string, retryAfter time.Duration)
+method (*LabAPI) RespondNext(method string, result any)
+method (*LabAPI) TransportErrorNext(method string, err error)
+func Matching(method string, predicate func(Request) bool) Expectation
 func New() (*github.com/sidwiskers/hermes.Bot, *Recorder)
 func NewClient() (*github.com/sidwiskers/hermes/api.Client, *Recorder)
+func NewLab(tb TB, options ...github.com/sidwiskers/hermes.Option) *Lab
+func NoCalls() Expectation
 type Recorder struct{}
 method (*Recorder) Enqueue(response Response)
+method (*Recorder) EnqueueError(err error)
 method (*Recorder) Fail(code int, description string, parameters *github.com/sidwiskers/hermes.ResponseParameters)
 method (*Recorder) Last() (Request, bool)
 method (*Recorder) Requests() []Request
 method (*Recorder) Reset()
 method (*Recorder) Respond(result any)
 method (*Recorder) RoundTrip(request *net/http.Request) (*net/http.Response, error)
+method (*Recorder) SetResponder(responder Responder)
 type Request struct{Method string; Header net/http.Header; JSON map[string]any; Form map[string]string; Files map[string]File; RawBody []byte}
+type Responder func(Request) (Response, error)
 type Response struct{StatusCode int; Result any; ErrorCode int; Description string; Parameters *github.com/sidwiskers/hermes.ResponseParameters}
+func Sent(text string) Expectation
+type Step struct{}
+method (*Step) Err() error
+method (*Step) Replay() *Step
+method (*Step) Requests() []Request
+method (*Step) Update() *github.com/sidwiskers/hermes.Update
+method (*Step) Want(expectations ...Expectation) *Step
+method (*Step) WantAPIError(code int) *Step
+method (*Step) WantError(target error) *Step
+type TB interface{Fatalf(format string, args ...any); Helper()}
+func Uploaded(method string, field string, filename string) Expectation
 
 package github.com/sidwiskers/hermes/types
 type AcceptedGiftTypes struct{UnlimitedGifts bool `json:"unlimited_gifts"`; LimitedGifts bool `json:"limited_gifts"`; UniqueGifts bool `json:"unique_gifts"`; PremiumSubscription bool `json:"premium_subscription"`; GiftsFromChannels bool `json:"gifts_from_channels"`}

@@ -47,6 +47,33 @@ func TestRouterDirectCommandAndMiddleware(t *testing.T) {
 	}
 }
 
+func TestRouterMiddlewareRunsOnlyAfterMatch(t *testing.T) {
+	t.Parallel()
+
+	router := NewRouter()
+	calls := 0
+	router.Use(func(next Handler) Handler {
+		return func(c *Context) error {
+			calls++
+			return next(c)
+		}
+	})
+	router.On(TextEquals("target"), func(*Context) error { return nil })
+
+	if err := router.Handle(NewContext(context.Background(), nil, messageUpdate("other"), "")); err != nil {
+		t.Fatal(err)
+	}
+	if calls != 0 {
+		t.Fatalf("middleware calls for unmatched update = %d, want 0", calls)
+	}
+	if err := router.Handle(NewContext(context.Background(), nil, messageUpdate("target"), "")); err != nil {
+		t.Fatal(err)
+	}
+	if calls != 1 {
+		t.Fatalf("middleware calls after matching update = %d, want 1", calls)
+	}
+}
+
 func BenchmarkRouterConstruction(b *testing.B) {
 	b.ReportAllocs()
 	for b.Loop() {

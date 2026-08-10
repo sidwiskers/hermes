@@ -37,7 +37,14 @@ func main() {
 	bot.Command("profile", flow.Then("begin", func(c *hermes.Context) error {
 		return c.Send("What should I call you?")
 	}))
-	bot.On(flow.In(waitingForName), func(c *hermes.Context) error {
+	bot.OnUpdate(func(c *hermes.Context) error {
+		current, err := flow.State(c)
+		if err != nil {
+			return err
+		}
+		if current != waitingForName {
+			return nil
+		}
 		name := strings.TrimSpace(c.Text())
 		if name == "" {
 			return c.Send("Please send a name.")

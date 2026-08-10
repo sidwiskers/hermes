@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.1.0 - 2026-08-10
+
+### Hermes Lab
+
+- Added the optional Hermes Lab in `testkit`: deterministic virtual private
+  and group users, synchronous updates through the real bot, and an in-process
+  model for common Bot API messaging methods.
+- Added retained outgoing messages, callbacks, edits, deletes, replay, stable
+  generated identifiers, and concurrent per-update request attribution.
+- Added method-scoped Telegram errors, rate limits, transport failures, exact
+  response overrides, and readable expectations for common bot behavior.
+- Extended the low-level recorder with fallback responders and queued
+  transport errors while preserving the existing `Request` and `Response`
+  struct layouts.
+- Added a complete Lab guide, runnable example, and stateful FSM coverage.
+
+### Compatibility and release polish
+
+- Kept production routing and middleware semantics unchanged; Hermes Lab is
+  absent from applications that do not import `testkit`.
+- Added regression coverage for legacy route-matching and middleware order.
+- Updated the default user agent and release documentation for Hermes 1.1.0.
+- Regenerated and reviewed the deterministic exported-API manifest.
+
 ## 1.0.1 - 2026-07-25
 
 ### Performance and scalability
