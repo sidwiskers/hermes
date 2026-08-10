@@ -87,6 +87,28 @@ rejected request, zero unexpected responses or handler failures, exact
 64-update peak concurrency, full drain, and goroutines returned to the starting
 count.
 
+## Multi-bot process evidence
+
+The optional Fleet harness measures steady-idle process overhead rather than
+request throughput. On the recorded Go 1.26.5 Linux amd64 host, five samples of
+one process hosting five independent webhook bots had a median 9,379,840-byte
+RSS and 5,432,320-byte proportional set size (PSS). The equivalent five
+one-bot processes totaled 46,665,728-byte RSS and 17,264,640-byte PSS. The
+Fleet layout also used three goroutines and eight file descriptors, compared
+with 15 and 40 across the separate processes.
+
+The full environment and machine-readable sample are checked in as the
+[`five-bot Fleet record`](../benchmarks/results/2026-08-10-go1.26.5-fleet-5-idle.json).
+Reproduce it with:
+
+```bash
+go run ./cmd/hermesfleetbench -bots 5 -samples 5
+```
+
+This experiment intentionally excludes traffic and application state. It
+demonstrates process, runtime, and listener consolidation on one host; it is not
+a production latency, throughput, or universal memory-saving claim.
+
 ## Memory and scaling systems pass
 
 The in-process session, deduplication, and rate-limit stores allocate shard

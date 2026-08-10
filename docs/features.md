@@ -36,12 +36,18 @@ tools separate. Applications pay only for packages they import.
 | `dedupe` | Atomic update claiming, release on error/panic, TTL, capacity bounds, and a store interface for distributed coordination |
 | `ratelimit` | Sharded per-user/chat token buckets, retry estimates, bounded identity cardinality, and explicit idle cleanup |
 | `observe` | Panic-contained trace hooks and fixed-cardinality lock-free metrics for updates and Bot API calls |
+| `fleet` | Several independent Hermes bots in one process, optional shared HTTP resources, isolated source failures, status, and graceful coordinated shutdown |
 | `testkit` | Optional in-process Hermes Lab and low-level transport recorder; no network, external service, or third-party dependency |
 
 The in-memory stores are process-local by design. Multi-instance deployments
 implement the small `session.Store` and `dedupe.Store` interfaces using their
 transactional database or cache. Hermes does not force a Redis, SQL, telemetry,
 or logging dependency into every bot.
+
+Fleet is also process-local and opt-in. It reduces process and shared-server
+overhead for multi-bot deployments without merging tokens, routes, middleware,
+state, or dispatchers. See the [Fleet guide](fleet.md) for lifecycle behavior,
+measured idle resource evidence, and the same-process failure boundary.
 
 ## Deliberate boundaries
 

@@ -63,6 +63,7 @@ github.com/sidwiskers/hermes|${MIN_ROOT_COVERAGE:-38.0}
 github.com/sidwiskers/hermes/api|${MIN_API_COVERAGE:-46.0}
 github.com/sidwiskers/hermes/dedupe|${MIN_DEDUPE_COVERAGE:-80.0}
 github.com/sidwiskers/hermes/framework|${MIN_FRAMEWORK_COVERAGE:-30.0}
+github.com/sidwiskers/hermes/fleet|${MIN_FLEET_COVERAGE:-75.0}
 github.com/sidwiskers/hermes/fsm|${MIN_FSM_COVERAGE:-74.0}
 github.com/sidwiskers/hermes/internal/runtime|${MIN_RUNTIME_COVERAGE:-66.0}
 github.com/sidwiskers/hermes/observe|${MIN_OBSERVE_COVERAGE:-84.0}

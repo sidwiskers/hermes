@@ -66,6 +66,7 @@ github.com/sidwiskers/hermes
 ├── dedupe                # optional atomic update claiming
 ├── ratelimit             # optional bounded token buckets
 ├── observe               # optional tracing hooks and fixed-cardinality metrics
+├── fleet                 # optional multi-bot process and webhook host
 ├── internal/runtime      # bounded dispatch, polling, webhook lifecycle
 └── testkit                # optional Hermes Lab and low-level test recorder
 ```
@@ -479,6 +480,41 @@ hooks, and lock-free aggregate metrics without changing or adding dependencies
 to the root package. See the runnable
 [`stateful`](examples/stateful) and [`production`](examples/production)
 programs and the complete [`feature map`](docs/features.md).
+
+## Hermes Fleet: several bots, one process
+
+The optional `fleet` package hosts several independent Hermes bots under one
+lifecycle. Bots created through a Fleet share one HTTP client, and webhook bots
+can share one hardened HTTP server while keeping separate exact paths, secrets,
+routers, middleware, state, and bounded dispatchers:
+
+```go
+host := fleet.New(fleet.WithBotMaxConcurrentUpdates(32))
+
+alerts := host.NewBot(os.Getenv("ALERTS_BOT_TOKEN"))
+support := host.NewBot(os.Getenv("SUPPORT_BOT_TOKEN"))
+
+alerts.Command("start", alertsStart)
+support.Command("start", supportStart)
+
+if err := host.Mount("alerts", alerts); err != nil {
+    log.Fatal(err)
+}
+if err := host.Mount("support", support); err != nil {
+    log.Fatal(err)
+}
+
+if err := host.Run(ctx); err != nil {
+    log.Fatal(err)
+}
+```
+
+Fleet isolates an individual bot's source failure by default and drains active
+handlers during shutdown. It is standard-library-only and absent from programs
+that do not import it, so existing `bot.Run(ctx)` applications have no API,
+behavior, binary, or hot-path change. The normal same-process failure boundary
+still applies. See the [`Fleet guide`](docs/fleet.md), runnable
+[`fleet` example](examples/fleet), and checked-in five-bot resource evidence.
 
 ## Hermes Lab: test conversations without Telegram
 
