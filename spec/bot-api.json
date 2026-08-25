@@ -1,8 +1,8 @@
 {
-  "version": "10.2",
-  "released": "July 14, 2026",
+  "version": "10.3",
+  "released": "August 24, 2026",
   "source": "https://core.telegram.org/bots/api",
-  "source_sha256": "bf6a33a76fe33effd4b3704c9af8219acee512d374364bc81ac68bbf2511c6fc",
+  "source_sha256": "f49b0a5526ae3c366a176b61b1d902e863604f051cbc2d08c351970e1b6ee5ca",
   "methods": [
     {
       "name": "addStickerToSet",
@@ -1034,6 +1034,11 @@
           "required": false
         },
         {
+          "name": "show_caption_above_media",
+          "type": "Boolean",
+          "required": false
+        },
+        {
           "name": "reply_markup",
           "type": "InlineKeyboardMarkup",
           "required": false
@@ -1119,7 +1124,7 @@
         {
           "name": "text",
           "type": "String",
-          "required": true
+          "required": false
         },
         {
           "name": "parse_mode",
@@ -1129,6 +1134,11 @@
         {
           "name": "entities",
           "type": "Array of MessageEntity",
+          "required": false
+        },
+        {
+          "name": "rich_message",
+          "type": "InputRichMessage",
           "required": false
         },
         {
@@ -2401,6 +2411,11 @@
           "name": "can_manage_tags",
           "type": "Boolean",
           "required": false
+        },
+        {
+          "name": "can_send_welcome_messages",
+          "type": "Boolean",
+          "required": false
         }
       ]
     },
@@ -2708,13 +2723,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -2829,13 +2839,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -3028,13 +3033,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -3185,13 +3185,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -3544,13 +3539,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -3650,13 +3640,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -3807,13 +3792,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -3905,6 +3885,16 @@
         {
           "name": "entities",
           "type": "Array of MessageEntity",
+          "required": false
+        },
+        {
+          "name": "can_stop",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "keep_on_stop",
+          "type": "Boolean",
           "required": false
         }
       ]
@@ -4025,13 +4015,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -4302,6 +4287,11 @@
           "required": false
         },
         {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false
+        },
+        {
           "name": "rich_message",
           "type": "InputRichMessage",
           "required": true
@@ -4366,6 +4356,16 @@
           "name": "rich_message",
           "type": "InputRichMessage",
           "required": true
+        },
+        {
+          "name": "can_stop",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "keep_on_stop",
+          "type": "Boolean",
+          "required": false
         }
       ]
     },
@@ -4394,13 +4394,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -4475,13 +4470,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -4586,13 +4576,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -4722,13 +4707,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -4813,13 +4793,8 @@
           "required": false
         },
         {
-          "name": "receiver_user_id",
-          "type": "Integer",
-          "required": false
-        },
-        {
-          "name": "callback_query_id",
-          "type": "String",
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
           "required": false
         },
         {
@@ -6710,6 +6685,11 @@
           "name": "can_manage_tags",
           "type": "Boolean",
           "required": false
+        },
+        {
+          "name": "can_send_welcome_messages",
+          "type": "Boolean",
+          "required": true
         }
       ]
     },
@@ -7360,6 +7340,11 @@
           "required": false
         },
         {
+          "name": "can_send_welcome_messages",
+          "type": "Boolean",
+          "required": true
+        },
+        {
           "name": "custom_title",
           "type": "String",
           "required": false
@@ -7940,6 +7925,17 @@
       ]
     },
     {
+      "name": "CommunityChatJoined",
+      "anchor": "communitychatjoined",
+      "fields": [
+        {
+          "name": "community",
+          "type": "Community",
+          "required": true
+        }
+      ]
+    },
+    {
       "name": "CommunityChatRemoved",
       "anchor": "communitychatremoved",
       "fields": []
@@ -8033,6 +8029,11 @@
           "required": false
         }
       ]
+    },
+    {
+      "name": "DisabledButton",
+      "anchor": "disabledbutton",
+      "fields": []
     },
     {
       "name": "Document",
@@ -8144,6 +8145,27 @@
           "name": "hash",
           "type": "String",
           "required": true
+        }
+      ]
+    },
+    {
+      "name": "EphemeralMessageParameters",
+      "anchor": "ephemeralmessageparameters",
+      "fields": [
+        {
+          "name": "receiver_user_id",
+          "type": "Integer",
+          "required": true
+        },
+        {
+          "name": "callback_query_id",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "replace_callback_query_message",
+          "type": "Boolean",
+          "required": false
         }
       ]
     },
@@ -8882,6 +8904,11 @@
           "name": "pay",
           "type": "Boolean",
           "required": false
+        },
+        {
+          "name": "disabled",
+          "type": "DisabledButton",
+          "required": false
         }
       ]
     },
@@ -8893,6 +8920,11 @@
           "name": "inline_keyboard",
           "type": "Array of Array of InlineKeyboardButton",
           "required": true
+        },
+        {
+          "name": "force_reply",
+          "type": "Boolean",
+          "required": false
         }
       ]
     },
@@ -11120,6 +11152,27 @@
       ]
     },
     {
+      "name": "InputRichBlockButtons",
+      "anchor": "inputrichblockbuttons",
+      "fields": [
+        {
+          "name": "type",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "buttons",
+          "type": "Array of RichMessageButton",
+          "required": true
+        },
+        {
+          "name": "align",
+          "type": "String",
+          "required": false
+        }
+      ]
+    },
+    {
       "name": "InputRichBlockCollage",
       "anchor": "inputrichblockcollage",
       "fields": [
@@ -11174,6 +11227,48 @@
           "name": "type",
           "type": "String",
           "required": true
+        }
+      ]
+    },
+    {
+      "name": "InputRichBlockDocument",
+      "anchor": "inputrichblockdocument",
+      "fields": [
+        {
+          "name": "type",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "document",
+          "type": "InputMediaDocument",
+          "required": true
+        },
+        {
+          "name": "caption",
+          "type": "RichBlockCaption",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "InputRichBlockExpandableBlockQuotation",
+      "anchor": "inputrichblockexpandableblockquotation",
+      "fields": [
+        {
+          "name": "type",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "text",
+          "type": "RichText",
+          "required": true
+        },
+        {
+          "name": "credit",
+          "type": "RichText",
+          "required": false
         }
       ]
     },
@@ -11257,17 +11352,17 @@
         {
           "name": "zoom",
           "type": "Integer",
-          "required": true
+          "required": false
         },
         {
           "name": "width",
           "type": "Integer",
-          "required": true
+          "required": false
         },
         {
           "name": "height",
           "type": "Integer",
-          "required": true
+          "required": false
         },
         {
           "name": "caption",
@@ -11438,6 +11533,11 @@
           "required": false
         },
         {
+          "name": "is_compact",
+          "type": "True",
+          "required": false
+        },
+        {
           "name": "caption",
           "type": "RichText",
           "required": false
@@ -11560,7 +11660,7 @@
         },
         {
           "name": "media",
-          "type": "InputMediaAnimation or InputMediaAudio or InputMediaPhoto or InputMediaVideo or InputMediaVoiceNote",
+          "type": "InputMediaAnimation or InputMediaAudio or InputMediaDocument or InputMediaPhoto or InputMediaVideo or InputMediaVoiceNote",
           "required": true
         }
       ]
@@ -12689,6 +12789,11 @@
           "required": false
         },
         {
+          "name": "community_chat_joined",
+          "type": "CommunityChatJoined",
+          "required": false
+        },
+        {
           "name": "community_chat_removed",
           "type": "CommunityChatRemoved",
           "required": false
@@ -12884,6 +12989,27 @@
           "name": "date_time_format",
           "type": "String",
           "required": false
+        }
+      ]
+    },
+    {
+      "name": "MessageGenerationStopped",
+      "anchor": "messagegenerationstopped",
+      "fields": [
+        {
+          "name": "chat",
+          "type": "Chat",
+          "required": true
+        },
+        {
+          "name": "message_thread_id",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "draft_id",
+          "type": "Integer",
+          "required": true
         }
       ]
     },
@@ -14180,6 +14306,11 @@
           "name": "selective",
           "type": "Boolean",
           "required": false
+        },
+        {
+          "name": "force_reply",
+          "type": "Boolean",
+          "required": false
         }
       ]
     },
@@ -14399,6 +14530,27 @@
       ]
     },
     {
+      "name": "RichBlockButtons",
+      "anchor": "richblockbuttons",
+      "fields": [
+        {
+          "name": "type",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "buttons",
+          "type": "Array of RichMessageButton",
+          "required": true
+        },
+        {
+          "name": "align",
+          "type": "String",
+          "required": false
+        }
+      ]
+    },
+    {
       "name": "RichBlockCaption",
       "anchor": "richblockcaption",
       "fields": [
@@ -14469,6 +14621,48 @@
           "name": "type",
           "type": "String",
           "required": true
+        }
+      ]
+    },
+    {
+      "name": "RichBlockDocument",
+      "anchor": "richblockdocument",
+      "fields": [
+        {
+          "name": "type",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "document",
+          "type": "Document",
+          "required": true
+        },
+        {
+          "name": "caption",
+          "type": "RichBlockCaption",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "RichBlockExpandableBlockQuotation",
+      "anchor": "richblockexpandableblockquotation",
+      "fields": [
+        {
+          "name": "type",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "text",
+          "type": "RichText",
+          "required": true
+        },
+        {
+          "name": "credit",
+          "type": "RichText",
+          "required": false
         }
       ]
     },
@@ -14743,6 +14937,11 @@
           "required": false
         },
         {
+          "name": "is_compact",
+          "type": "True",
+          "required": false
+        },
+        {
           "name": "caption",
           "type": "RichText",
           "required": false
@@ -14865,6 +15064,67 @@
       ]
     },
     {
+      "name": "RichMessageButton",
+      "anchor": "richmessagebutton",
+      "fields": [
+        {
+          "name": "text",
+          "type": "RichText",
+          "required": true
+        },
+        {
+          "name": "style",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "url",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "callback_data",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "web_app",
+          "type": "WebAppInfo",
+          "required": false
+        },
+        {
+          "name": "login_url",
+          "type": "LoginUrl",
+          "required": false
+        },
+        {
+          "name": "switch_inline_query",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "switch_inline_query_current_chat",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "switch_inline_query_chosen_chat",
+          "type": "SwitchInlineQueryChosenChat",
+          "required": false
+        },
+        {
+          "name": "copy_text",
+          "type": "CopyTextButton",
+          "required": false
+        },
+        {
+          "name": "disabled",
+          "type": "DisabledButton",
+          "required": false
+        }
+      ]
+    },
+    {
       "name": "RichTextAnchor",
       "anchor": "richtextanchor",
       "fields": [
@@ -14955,6 +15215,22 @@
         {
           "name": "bot_command",
           "type": "String",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "RichTextButton",
+      "anchor": "richtextbutton",
+      "fields": [
+        {
+          "name": "type",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "button",
+          "type": "RichMessageButton",
           "required": true
         }
       ]
@@ -16405,6 +16681,21 @@
           "required": true
         },
         {
+          "name": "text",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "entities",
+          "type": "Array of MessageEntity",
+          "required": false
+        },
+        {
+          "name": "is_private",
+          "type": "True",
+          "required": false
+        },
+        {
           "name": "last_resale_currency",
           "type": "String",
           "required": false
@@ -16615,6 +16906,11 @@
         {
           "name": "subscription",
           "type": "BotSubscriptionUpdated",
+          "required": false
+        },
+        {
+          "name": "stopped_message_generation",
+          "type": "MessageGenerationStopped",
           "required": false
         }
       ]
@@ -17310,14 +17606,17 @@
         "InputRichBlockAnchor",
         "InputRichBlockList",
         "InputRichBlockBlockQuotation",
+        "InputRichBlockExpandableBlockQuotation",
         "InputRichBlockPullQuotation",
         "InputRichBlockCollage",
         "InputRichBlockSlideshow",
         "InputRichBlockTable",
         "InputRichBlockDetails",
         "InputRichBlockMap",
+        "InputRichBlockButtons",
         "InputRichBlockAnimation",
         "InputRichBlockAudio",
+        "InputRichBlockDocument",
         "InputRichBlockPhoto",
         "InputRichBlockVideo",
         "InputRichBlockVoiceNote",
@@ -17423,14 +17722,17 @@
         "RichBlockAnchor",
         "RichBlockList",
         "RichBlockBlockQuotation",
+        "RichBlockExpandableBlockQuotation",
         "RichBlockPullQuotation",
         "RichBlockCollage",
         "RichBlockSlideshow",
         "RichBlockTable",
         "RichBlockDetails",
         "RichBlockMap",
+        "RichBlockButtons",
         "RichBlockAnimation",
         "RichBlockAudio",
+        "RichBlockDocument",
         "RichBlockPhoto",
         "RichBlockVideo",
         "RichBlockVoiceNote",
@@ -17462,6 +17764,7 @@
         "RichTextHashtag",
         "RichTextCashtag",
         "RichTextBotCommand",
+        "RichTextButton",
         "RichTextAnchor",
         "RichTextAnchorLink",
         "RichTextReference",

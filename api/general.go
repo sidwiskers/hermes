@@ -88,6 +88,8 @@ type SendMessageDraftParams struct {
 	Text            string          `json:"text,omitempty"`
 	ParseMode       string          `json:"parse_mode,omitempty"`
 	Entities        []MessageEntity `json:"entities,omitempty"`
+	CanStop         bool            `json:"can_stop,omitempty"`
+	KeepOnStop      bool            `json:"keep_on_stop,omitempty"`
 }
 
 func (client *Client) SendMessageDraft(ctx context.Context, params SendMessageDraftParams) error {

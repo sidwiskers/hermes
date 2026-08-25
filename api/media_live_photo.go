@@ -7,26 +7,27 @@ import (
 )
 
 type SendLivePhotoParams struct {
-	BusinessConnectionID    string                   `json:"business_connection_id,omitempty"`
-	ChatID                  any                      `json:"chat_id"`
-	MessageThreadID         int                      `json:"message_thread_id,omitempty"`
-	DirectMessagesTopicID   int                      `json:"direct_messages_topic_id,omitempty"`
-	ReceiverUserID          int64                    `json:"receiver_user_id,omitempty"`
-	CallbackQueryID         string                   `json:"callback_query_id,omitempty"`
-	LivePhoto               string                   `json:"live_photo"`
-	Photo                   string                   `json:"photo"`
-	Caption                 string                   `json:"caption,omitempty"`
-	ParseMode               string                   `json:"parse_mode,omitempty"`
-	CaptionEntities         []MessageEntity          `json:"caption_entities,omitempty"`
-	ShowCaptionAboveMedia   bool                     `json:"show_caption_above_media,omitempty"`
-	HasSpoiler              bool                     `json:"has_spoiler,omitempty"`
-	DisableNotification     bool                     `json:"disable_notification,omitempty"`
-	ProtectContent          bool                     `json:"protect_content,omitempty"`
-	AllowPaidBroadcast      bool                     `json:"allow_paid_broadcast,omitempty"`
-	MessageEffectID         string                   `json:"message_effect_id,omitempty"`
-	SuggestedPostParameters *SuggestedPostParameters `json:"suggested_post_parameters,omitempty"`
-	ReplyParameters         *ReplyParameters         `json:"reply_parameters,omitempty"`
-	ReplyMarkup             ReplyMarkup              `json:"reply_markup,omitempty"`
+	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
+	ChatID                     any                         `json:"chat_id"`
+	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+	ReceiverUserID             int64                       `json:"-"` // Deprecated: use EphemeralMessageParameters.
+	CallbackQueryID            string                      `json:"-"` // Deprecated: use EphemeralMessageParameters.
+	LivePhoto                  string                      `json:"live_photo"`
+	Photo                      string                      `json:"photo"`
+	Caption                    string                      `json:"caption,omitempty"`
+	ParseMode                  string                      `json:"parse_mode,omitempty"`
+	CaptionEntities            []MessageEntity             `json:"caption_entities,omitempty"`
+	ShowCaptionAboveMedia      bool                        `json:"show_caption_above_media,omitempty"`
+	HasSpoiler                 bool                        `json:"has_spoiler,omitempty"`
+	DisableNotification        bool                        `json:"disable_notification,omitempty"`
+	ProtectContent             bool                        `json:"protect_content,omitempty"`
+	AllowPaidBroadcast         bool                        `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID            string                      `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters    *SuggestedPostParameters    `json:"suggested_post_parameters,omitempty"`
+	ReplyParameters            *ReplyParameters            `json:"reply_parameters,omitempty"`
+	ReplyMarkup                ReplyMarkup                 `json:"reply_markup,omitempty"`
 }
 
 func validateSendLivePhoto(params SendLivePhotoParams) error {
@@ -46,7 +47,11 @@ func (client *Client) SendLivePhoto(ctx context.Context, params SendLivePhotoPar
 	if err := validateAttachmentUploads(params, nil, "sendLivePhoto"); err != nil {
 		return nil, err
 	}
-	return callMessage(ctx, client, "sendLivePhoto", params)
+	normalized, err := normalizeEphemeralSendParams(params)
+	if err != nil {
+		return nil, err
+	}
+	return callMessage(ctx, client, "sendLivePhoto", normalized)
 }
 
 func (client *Client) SendLivePhotoUpload(ctx context.Context, params SendLivePhotoParams, uploads ...Upload) (*Message, error) {
@@ -66,8 +71,19 @@ func (client *Client) SendLivePhotoUpload(ctx context.Context, params SendLivePh
 	fields.String("business_connection_id", params.BusinessConnectionID)
 	fields.Int("message_thread_id", params.MessageThreadID)
 	fields.Int("direct_messages_topic_id", params.DirectMessagesTopicID)
-	fields.Int64("receiver_user_id", params.ReceiverUserID)
-	fields.String("callback_query_id", params.CallbackQueryID)
+	ephemeral, err := resolveEphemeralMessageParameters(
+		params.EphemeralMessageParameters,
+		params.ReceiverUserID,
+		params.CallbackQueryID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if ephemeral != nil {
+		if err = fields.JSON("ephemeral_message_parameters", ephemeral); err != nil {
+			return nil, err
+		}
+	}
 	fields.String("live_photo", params.LivePhoto)
 	fields.String("photo", params.Photo)
 	fields.String("caption", params.Caption)

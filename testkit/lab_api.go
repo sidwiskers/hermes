@@ -227,7 +227,7 @@ func (a *LabAPI) emulateSend(request Request) hermes.Message {
 		Text:      requestString(request, "text"),
 		Caption:   requestString(request, "caption"),
 	}
-	if receiverID, ok := requestInt64(request, "receiver_user_id"); ok {
+	if receiverID, ok := requestEphemeralReceiver(request); ok {
 		receiver := a.users[receiverID]
 		if receiver.ID == 0 {
 			receiver = hermes.User{ID: receiverID, FirstName: "User " + strconv.FormatInt(receiverID, 10)}
@@ -241,6 +241,37 @@ func (a *LabAPI) emulateSend(request Request) hermes.Message {
 	populateMessageMedia(&message, request)
 	a.messages[chatID] = append(a.messages[chatID], message)
 	return message
+}
+
+func requestEphemeralReceiver(request Request) (int64, bool) {
+	value, ok := requestField(request, "ephemeral_message_parameters")
+	if !ok {
+		return 0, false
+	}
+	if encoded, isString := value.(string); isString {
+		var decoded map[string]any
+		if json.Unmarshal([]byte(encoded), &decoded) != nil {
+			return 0, false
+		}
+		value = decoded
+	}
+	parameters, ok := value.(map[string]any)
+	if !ok {
+		return 0, false
+	}
+	receiver, ok := parameters["receiver_user_id"]
+	if !ok {
+		return 0, false
+	}
+	switch receiver := receiver.(type) {
+	case float64:
+		return int64(receiver), true
+	case json.Number:
+		parsed, err := receiver.Int64()
+		return parsed, err == nil
+	default:
+		return 0, false
+	}
 }
 
 func (a *LabAPI) emulateEdit(request Request) Response {

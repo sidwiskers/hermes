@@ -19,7 +19,8 @@ func TestContextEphemeralFromCallback(t *testing.T) {
 		if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 			t.Fatal(err)
 		}
-		if params.ChatID.(float64) != 100 || params.ReceiverUserID != 7 || params.CallbackQueryID != "cb" {
+		if params.ChatID.(float64) != 100 || params.EphemeralMessageParameters == nil ||
+			params.EphemeralMessageParameters.ReceiverUserID != 7 || params.EphemeralMessageParameters.CallbackQueryID != "cb" {
 			t.Fatalf("unexpected params: %#v", params)
 		}
 		_, _ = w.Write([]byte(`{"ok":true,"result":{"message_id":0,"chat":{"id":100,"type":"supergroup"},"receiver_user":{"id":7,"is_bot":false,"first_name":"A"},"ephemeral_message_id":9}}`))
@@ -52,8 +53,11 @@ func TestContextEphemeralRepliesToEphemeralCommand(t *testing.T) {
 		if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 			t.Fatal(err)
 		}
-		if params.CallbackQueryID != "" {
-			t.Fatalf("unexpected callback id: %q", params.CallbackQueryID)
+		if params.EphemeralMessageParameters == nil || params.EphemeralMessageParameters.ReceiverUserID != 7 {
+			t.Fatalf("missing ephemeral parameters: %#v", params)
+		}
+		if params.EphemeralMessageParameters.CallbackQueryID != "" {
+			t.Fatalf("unexpected callback id: %q", params.EphemeralMessageParameters.CallbackQueryID)
 		}
 		if params.ReplyParameters == nil || params.ReplyParameters.EphemeralMessageID != 22 {
 			t.Fatalf("missing ephemeral reply: %#v", params)

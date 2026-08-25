@@ -329,8 +329,12 @@ func (c *Context) EphemeralMessage(text string, options ...SendOption) (*Message
 	if sender == nil {
 		return nil, fmt.Errorf("hermes: update has no sender")
 	}
-	params := SendMessageParams{ChatID: chatID, Text: text, ReceiverUserID: sender.ID}
-	c.applyEphemeralTarget(&params.CallbackQueryID, &params.ReplyParameters)
+	params := SendMessageParams{
+		ChatID:                     chatID,
+		Text:                       text,
+		EphemeralMessageParameters: &EphemeralMessageParameters{ReceiverUserID: sender.ID},
+	}
+	c.applyEphemeralTarget(params.EphemeralMessageParameters, &params.ReplyParameters)
 	applyTextOptions(&params, resolveSendOptions(options))
 	return c.Bot.SendMessage(c.Context, params)
 }
@@ -377,10 +381,10 @@ func (c *Context) replyParameters() *ReplyParameters {
 	return &ReplyParameters{MessageID: c.Message.MessageID}
 }
 
-func (c *Context) applyEphemeralTarget(callbackID *string, reply **ReplyParameters) {
+func (c *Context) applyEphemeralTarget(parameters *EphemeralMessageParameters, reply **ReplyParameters) {
 	switch {
 	case c != nil && c.Callback != nil:
-		*callbackID = c.Callback.ID
+		parameters.CallbackQueryID = c.Callback.ID
 	case c != nil && c.Message != nil && c.Message.EphemeralMessageID != 0:
 		*reply = &ReplyParameters{EphemeralMessageID: c.Message.EphemeralMessageID}
 	}

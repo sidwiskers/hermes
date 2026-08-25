@@ -146,3 +146,71 @@ func TestRichMessageValidation(t *testing.T) {
 		t.Fatalf("draft thinking block: %v", err)
 	}
 }
+
+func TestBotAPI103RichMessageShapes(t *testing.T) {
+	t.Parallel()
+
+	message := InputRichMessage{Blocks: []InputRichBlock{
+		InputRichBlockButtons{
+			Align: "center",
+			Buttons: []RichMessageButton{func() RichMessageButton {
+				button := RichCallbackButton("Open", "open")
+				button.Style = RichMessageButtonStylePrimary
+				return button
+			}()},
+		},
+		InputRichBlockExpandableBlockQuotation{Text: "Long quote", Credit: "Author"},
+		InputRichBlockDocument{
+			Document: InputMediaDocument{Media: "tg://document?id=42"},
+			Caption:  &RichBlockCaption{Text: "File"},
+		},
+		InputRichBlockTable{Cells: [][]RichBlockTableCell{{{Text: "Cell"}}}, IsCompact: true},
+	}}
+	if err := validateRichMessage(message, false); err != nil {
+		t.Fatal(err)
+	}
+	data, err := json.Marshal(message)
+	if err != nil {
+		t.Fatal(err)
+	}
+	encoded := string(data)
+	for _, fragment := range []string{
+		`"type":"buttons"`,
+		`"callback_data":"open"`,
+		`"type":"expandable_blockquote"`,
+		`"type":"document"`,
+		`"media":"tg://document?id=42"`,
+		`"is_compact":true`,
+	} {
+		if !strings.Contains(encoded, fragment) {
+			t.Fatalf("rich message %s does not contain %s", encoded, fragment)
+		}
+	}
+
+	inline, err := json.Marshal(RichTextButton{Button: RichDisabledButton("Unavailable")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(inline) != `{"type":"button","button":{"text":"Unavailable","disabled":{}}}` {
+		t.Fatalf("rich text button = %s", inline)
+	}
+}
+
+func TestBotAPI103RichButtonValidation(t *testing.T) {
+	t.Parallel()
+
+	callback := "ok"
+	valid := InputRichMessage{Blocks: []InputRichBlock{InputRichBlockButtons{
+		Buttons: []RichMessageButton{{Text: "Run", CallbackData: &callback}},
+	}}}
+	if err := validateRichMessage(valid, false); err != nil {
+		t.Fatal(err)
+	}
+
+	invalid := InputRichMessage{Blocks: []InputRichBlock{InputRichBlockButtons{
+		Buttons: []RichMessageButton{{Text: "Broken"}},
+	}}}
+	if err := validateRichMessage(invalid, false); err == nil {
+		t.Fatal("expected missing action validation error")
+	}
+}

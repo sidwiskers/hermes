@@ -421,8 +421,10 @@ func fieldTypeMatches(expected, actual string) bool {
 		return actual == "string"
 	case "Integer or String":
 		return actual == "any" || NormalizeName(actual) == "chatid"
-	case "InputMediaAnimation or InputMediaAudio or InputMediaPhoto or InputMediaVideo or InputMediaVoiceNote":
+	case "InputMediaAnimation or InputMediaAudio or InputMediaDocument or InputMediaPhoto or InputMediaVideo or InputMediaVoiceNote":
 		return NormalizeName(actual) == "richmessagemedia"
+	case "InputMedia":
+		return NormalizeName(actual) == "inputmedia" || NormalizeName(actual) == "inputeditablemedia"
 	case "InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardRemove or ForceReply":
 		return NormalizeName(actual) == "replymarkup"
 	default:

@@ -5,7 +5,7 @@ does not prove live Telegram behavior or production reliability by itself.
 
 ## Automated release gate
 
-Run from a clean worktree with Go 1.26.5 or any newer stable Go release:
+Run from a clean worktree with Go 1.26.6 or any newer stable Go release:
 
 ```bash
 ./scripts/release-check.sh
@@ -25,7 +25,7 @@ The command verifies:
 
 The version gate compares stable releases semantically, so Go 1.27, 1.28, and
 later stable lines are accepted automatically. Release candidates, development
-toolchains, and versions older than Go 1.26.5 are rejected. Consumer
+toolchains, and versions older than Go 1.26.6 are rejected. Consumer
 compatibility with Go 1.25 is verified separately in CI.
 
 `RELEASE_ALLOW_DIRTY=1` exists only for developing the release checks. Its

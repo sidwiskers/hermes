@@ -3,7 +3,7 @@ set -euo pipefail
 
 readonly minimum_major=1
 readonly minimum_minor=26
-readonly minimum_patch=5
+readonly minimum_patch=6
 
 version="${1:-$(go env GOVERSION)}"
 
@@ -21,7 +21,7 @@ patch="${BASH_REMATCH[3]}"
 if (( major < minimum_major ||
 	(major == minimum_major && minor < minimum_minor) ||
 	(major == minimum_major && minor == minimum_minor && patch < minimum_patch) )); then
-	printf 'release validation requires Go 1.26.5 or a newer stable release; found %s\n' "$version" >&2
+	printf 'release validation requires Go 1.26.6 or a newer stable release; found %s\n' "$version" >&2
 	exit 1
 fi
 

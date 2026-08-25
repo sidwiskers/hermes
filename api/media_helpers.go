@@ -34,7 +34,11 @@ func (b *Client) sendMediaJSON(ctx context.Context, method string, chatID any, m
 	if media == "" {
 		return nil, fmt.Errorf("hermes: %s media is required", method)
 	}
-	return callMessage(ctx, b, method, params)
+	normalized, err := normalizeEphemeralSendParams(params)
+	if err != nil {
+		return nil, err
+	}
+	return callMessage(ctx, b, method, normalized)
 }
 func (b *Client) sendUpload(ctx context.Context, method, field string, fields formFields, name string, reader io.Reader) (*Message, error) {
 	if reader == nil {

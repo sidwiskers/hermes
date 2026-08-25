@@ -32,7 +32,8 @@ func TestSendMessageRequest(t *testing.T) {
 		if params["chat_id"].(float64) != 99 || params["text"].(string) != "private" {
 			t.Fatalf("unexpected params: %#v", params)
 		}
-		if params["receiver_user_id"].(float64) != 42 || params["callback_query_id"].(string) != "callback" {
+		ephemeral := params["ephemeral_message_parameters"].(map[string]any)
+		if ephemeral["receiver_user_id"].(float64) != 42 || ephemeral["callback_query_id"].(string) != "callback" {
 			t.Fatalf("missing ephemeral params: %#v", params)
 		}
 

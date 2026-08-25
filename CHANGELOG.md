@@ -1,5 +1,31 @@
 # Changelog
 
+## Unreleased
+
+### Bot API 10.3
+
+- Updated the deterministic Telegram manifest to Bot API 10.3 with zero gaps
+  across 185 methods, 932 parameters, 374 objects, 1,888 object fields, 26
+  unions, and 194 variants.
+- Added rich-message buttons, expandable quotations, document blocks, compact
+  tables, document media, and optional rich-map dimensions with discriminator-
+  aware encoding and validation.
+- Added `EphemeralMessageParameters`, rich-message ephemeral sends, callback
+  message replacement, rich ephemeral edits, caption placement, and streamed
+  uploads for ephemeral media edits.
+- Kept the Bot API 10.2 `ReceiverUserID` and `CallbackQueryID` send fields as
+  deprecated source-compatible inputs while translating them exclusively to
+  the Bot API 10.3 nested wire object.
+- Added disabled keyboard buttons, markup-level force replies, stoppable draft
+  controls, stopped-generation updates, community-chat join messages, welcome-
+  message administrator rights, and private unique-gift metadata.
+- Updated Hermes Lab's ephemeral-message emulation, the root and framework
+  facades, schema tooling, generated contracts, and focused JSON/multipart
+  regression coverage for the complete 10.3 delta.
+- Raised the contributor and release-evidence toolchain floor to Go 1.26.6
+  after the vulnerability gate identified reachable standard-library issues
+  fixed by that patch; the consumer language floor remains Go 1.25.
+
 ## 1.2.0 - 2026-08-10
 
 ### Hermes Fleet

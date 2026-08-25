@@ -19,11 +19,11 @@ expect_reject() {
 	fi
 }
 
-for version in go1.26.5 go1.26.6 go1.27.0 go1.30.1 go2.0.0; do
+for version in go1.26.6 go1.26.7 go1.27.0 go1.30.1 go2.0.0; do
 	expect_accept "$version"
 done
 
-for version in go1.25.99 go1.26.0 go1.26.4 go1.27rc1 go1.27.0-rc.1 devel-go1.27 unknown; do
+for version in go1.25.99 go1.26.0 go1.26.5 go1.27rc1 go1.27.0-rc.1 devel-go1.27 unknown; do
 	expect_reject "$version"
 done
 

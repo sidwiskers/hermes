@@ -13,42 +13,141 @@ const (
 )
 
 // SendBaseParams contains options shared by most send methods.
-// ReceiverUserID and CallbackQueryID activate Bot API 10.2 ephemeral delivery
-// on methods that support it.
 type SendBaseParams struct {
-	BusinessConnectionID    string                   `json:"business_connection_id,omitempty"`
-	ChatID                  any                      `json:"chat_id"`
-	MessageThreadID         int                      `json:"message_thread_id,omitempty"`
-	DirectMessagesTopicID   int                      `json:"direct_messages_topic_id,omitempty"`
-	DisableNotification     bool                     `json:"disable_notification,omitempty"`
-	ProtectContent          bool                     `json:"protect_content,omitempty"`
-	AllowPaidBroadcast      bool                     `json:"allow_paid_broadcast,omitempty"`
-	MessageEffectID         string                   `json:"message_effect_id,omitempty"`
-	SuggestedPostParameters *SuggestedPostParameters `json:"suggested_post_parameters,omitempty"`
-	ReplyParameters         *ReplyParameters         `json:"reply_parameters,omitempty"`
-	ReplyMarkup             ReplyMarkup              `json:"reply_markup,omitempty"`
-	ReceiverUserID          int64                    `json:"receiver_user_id,omitempty"`
-	CallbackQueryID         string                   `json:"callback_query_id,omitempty"`
+	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
+	ChatID                     any                         `json:"chat_id"`
+	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
+	DisableNotification        bool                        `json:"disable_notification,omitempty"`
+	ProtectContent             bool                        `json:"protect_content,omitempty"`
+	AllowPaidBroadcast         bool                        `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID            string                      `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters    *SuggestedPostParameters    `json:"suggested_post_parameters,omitempty"`
+	ReplyParameters            *ReplyParameters            `json:"reply_parameters,omitempty"`
+	ReplyMarkup                ReplyMarkup                 `json:"reply_markup,omitempty"`
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+
+	// ReceiverUserID and CallbackQueryID are retained for source compatibility.
+	// Hermes translates them to EphemeralMessageParameters on typed send calls.
+	// Deprecated: use EphemeralMessageParameters.
+	ReceiverUserID  int64  `json:"-"`
+	CallbackQueryID string `json:"-"`
 }
 
 type SendMessageParams struct {
-	BusinessConnectionID    string                   `json:"business_connection_id,omitempty"`
-	ChatID                  any                      `json:"chat_id"`
-	MessageThreadID         int                      `json:"message_thread_id,omitempty"`
-	DirectMessagesTopicID   int                      `json:"direct_messages_topic_id,omitempty"`
-	Text                    string                   `json:"text"`
-	ParseMode               string                   `json:"parse_mode,omitempty"`
-	Entities                []MessageEntity          `json:"entities,omitempty"`
-	LinkPreviewOptions      *LinkPreviewOptions      `json:"link_preview_options,omitempty"`
-	DisableNotification     bool                     `json:"disable_notification,omitempty"`
-	ProtectContent          bool                     `json:"protect_content,omitempty"`
-	AllowPaidBroadcast      bool                     `json:"allow_paid_broadcast,omitempty"`
-	MessageEffectID         string                   `json:"message_effect_id,omitempty"`
-	SuggestedPostParameters *SuggestedPostParameters `json:"suggested_post_parameters,omitempty"`
-	ReplyParameters         *ReplyParameters         `json:"reply_parameters,omitempty"`
-	ReplyMarkup             ReplyMarkup              `json:"reply_markup,omitempty"`
-	ReceiverUserID          int64                    `json:"receiver_user_id,omitempty"`
-	CallbackQueryID         string                   `json:"callback_query_id,omitempty"`
+	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
+	ChatID                     any                         `json:"chat_id"`
+	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
+	Text                       string                      `json:"text"`
+	ParseMode                  string                      `json:"parse_mode,omitempty"`
+	Entities                   []MessageEntity             `json:"entities,omitempty"`
+	LinkPreviewOptions         *LinkPreviewOptions         `json:"link_preview_options,omitempty"`
+	DisableNotification        bool                        `json:"disable_notification,omitempty"`
+	ProtectContent             bool                        `json:"protect_content,omitempty"`
+	AllowPaidBroadcast         bool                        `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID            string                      `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters    *SuggestedPostParameters    `json:"suggested_post_parameters,omitempty"`
+	ReplyParameters            *ReplyParameters            `json:"reply_parameters,omitempty"`
+	ReplyMarkup                ReplyMarkup                 `json:"reply_markup,omitempty"`
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+
+	// Deprecated: use EphemeralMessageParameters.
+	ReceiverUserID  int64  `json:"-"`
+	CallbackQueryID string `json:"-"`
+}
+
+func resolveEphemeralMessageParameters(
+	current *EphemeralMessageParameters,
+	receiverUserID int64,
+	callbackQueryID string,
+) (*EphemeralMessageParameters, error) {
+	if current == nil && receiverUserID == 0 && callbackQueryID == "" {
+		return nil, nil
+	}
+	var resolved EphemeralMessageParameters
+	if current != nil {
+		resolved = *current
+	}
+	if receiverUserID != 0 {
+		if resolved.ReceiverUserID != 0 && resolved.ReceiverUserID != receiverUserID {
+			return nil, fmt.Errorf("hermes: conflicting ephemeral receiver_user_id values")
+		}
+		resolved.ReceiverUserID = receiverUserID
+	}
+	if callbackQueryID != "" {
+		if resolved.CallbackQueryID != "" && resolved.CallbackQueryID != callbackQueryID {
+			return nil, fmt.Errorf("hermes: conflicting ephemeral callback_query_id values")
+		}
+		resolved.CallbackQueryID = callbackQueryID
+	}
+	if resolved.ReceiverUserID == 0 {
+		return nil, fmt.Errorf("hermes: ephemeral receiver_user_id is required")
+	}
+	if resolved.ReplaceCallbackQueryMessage && resolved.CallbackQueryID == "" {
+		return nil, fmt.Errorf("hermes: replace_callback_query_message requires callback_query_id")
+	}
+	return &resolved, nil
+}
+
+// normalizeEphemeralSendParams performs the Bot API 10.2-to-10.3 wire
+// translation for the send parameter structs that retain legacy fields.
+func normalizeEphemeralSendParams(params any) (any, error) {
+	normalize := func(current *EphemeralMessageParameters, receiver int64, callback string) (*EphemeralMessageParameters, error) {
+		return resolveEphemeralMessageParameters(current, receiver, callback)
+	}
+	switch value := params.(type) {
+	case SendPhotoParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	case SendAnimationParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	case SendAudioParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	case SendDocumentParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	case SendStickerParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	case SendVideoParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	case SendVideoNoteParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	case SendVoiceParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	case SendContactParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	case SendLocationParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	case SendVenueParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	case SendLivePhotoParams:
+		resolved, err := normalize(value.EphemeralMessageParameters, value.ReceiverUserID, value.CallbackQueryID)
+		value.EphemeralMessageParameters = resolved
+		return value, err
+	default:
+		return params, nil
+	}
 }
 
 func (b *Client) SendMessage(ctx context.Context, params SendMessageParams) (*Message, error) {
@@ -57,6 +156,15 @@ func (b *Client) SendMessage(ctx context.Context, params SendMessageParams) (*Me
 	}
 	if params.Text == "" {
 		return nil, fmt.Errorf("hermes: sendMessage text is required")
+	}
+	var err error
+	params.EphemeralMessageParameters, err = resolveEphemeralMessageParameters(
+		params.EphemeralMessageParameters,
+		params.ReceiverUserID,
+		params.CallbackQueryID,
+	)
+	if err != nil {
+		return nil, err
 	}
 	return callMessage(ctx, b, "sendMessage", params)
 }

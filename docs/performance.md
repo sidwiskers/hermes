@@ -206,7 +206,7 @@ layers are documented in [`benchmarks/competitors`](../benchmarks/competitors/RE
 
 ## Nested attachment validation
 
-Bot API 10.2 includes methods whose files are referenced inside nested JSON
+Bot API 10.3 includes methods whose files are referenced inside nested JSON
 objects. Hermes scans the already-marshaled JSON for `attach://` references
 instead of unmarshaling it into a second generic tree. The direct and legacy
 implementations remain benchmarked in `api` to prevent regression.

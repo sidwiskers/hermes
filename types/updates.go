@@ -66,6 +66,16 @@ type CommunityChatAdded struct {
 
 type CommunityChatRemoved struct{}
 
+type CommunityChatJoined struct {
+	Community Community `json:"community"`
+}
+
+type MessageGenerationStopped struct {
+	Chat            Chat  `json:"chat"`
+	MessageThreadID int   `json:"message_thread_id,omitempty"`
+	DraftID         int64 `json:"draft_id"`
+}
+
 type BotSubscriptionUpdated struct {
 	User           User   `json:"user"`
 	InvoicePayload string `json:"invoice_payload"`

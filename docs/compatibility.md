@@ -8,9 +8,9 @@ deprecation must identify a direct migration path.
 
 - Each Hermes release targets the Bot API version recorded in the checked-in
   `spec/bot-api.json` manifest.
-- Hermes 1.1.0 targets Bot API 10.2. Its release inventory covers all 185
-  methods, 937 parameters, 362 objects, 1,838 object fields, 26 unions, and 187
-  variants in that version.
+- The current Hermes manifest targets Bot API 10.3. Its inventory covers all
+  185 methods, 932 parameters, 374 objects, 1,888 object fields, 26 unions, and
+  194 variants in that version.
 - Source-audit tests require zero missing methods, parameters, objects, fields,
   union roots, or union variants. They also verify requiredness, Go wire types,
   JSON optionality, and optional-object nilability.
@@ -29,14 +29,14 @@ has not yet been audited.
 The module declares Go 1.25.0 as its language and consumer compatibility floor.
 CI compiles and tests with the latest Go 1.25 patch under `GOTOOLCHAIN=local`,
 and independently runs the complete gates with the current stable Go release.
-The `toolchain go1.26.5` line is a contributor recommendation; Go does not use a
+The `toolchain go1.26.6` line is a contributor recommendation; Go does not use a
 dependency module's toolchain recommendation to select an application's
 toolchain.
 
 Applications should use the latest patch available in their chosen Go line.
 The application toolchain supplies the standard library, so an old patch can
 retain vulnerabilities even when Hermes itself is current. Stable-release
-evidence must be produced by Go 1.26.5 or any newer stable release, including
+evidence must be produced by Go 1.26.6 or any newer stable release, including
 future Go lines such as 1.27 and 1.28. Prerelease and development toolchains do
 not qualify as release evidence.
 

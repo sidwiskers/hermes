@@ -8,19 +8,20 @@ import (
 // Telegram schemas and Bot API parameters used by the framework helpers are
 // aliases of their canonical types and remain assignment-compatible.
 type (
-	Update               = telegram.Update
-	UpdateType           = telegram.UpdateType
-	User                 = telegram.User
-	Chat                 = telegram.Chat
-	Message              = telegram.Message
-	CallbackQuery        = telegram.CallbackQuery
-	ReplyParameters      = telegram.ReplyParameters
-	LinkPreviewOptions   = telegram.LinkPreviewOptions
-	ReplyMarkup          = telegram.ReplyMarkup
-	InlineKeyboardMarkup = telegram.InlineKeyboardMarkup
-	EphemeralMessageRef  = telegram.EphemeralMessageRef
-	ReactionType         = telegram.ReactionType
-	ChatPermissions      = telegram.ChatPermissions
+	Update                     = telegram.Update
+	UpdateType                 = telegram.UpdateType
+	User                       = telegram.User
+	Chat                       = telegram.Chat
+	Message                    = telegram.Message
+	CallbackQuery              = telegram.CallbackQuery
+	ReplyParameters            = telegram.ReplyParameters
+	LinkPreviewOptions         = telegram.LinkPreviewOptions
+	ReplyMarkup                = telegram.ReplyMarkup
+	InlineKeyboardMarkup       = telegram.InlineKeyboardMarkup
+	EphemeralMessageRef        = telegram.EphemeralMessageRef
+	EphemeralMessageParameters = telegram.EphemeralMessageParameters
+	ReactionType               = telegram.ReactionType
+	ChatPermissions            = telegram.ChatPermissions
 
 	SendMessageParams                     = api.SendMessageParams
 	InputRichMessage                      = api.InputRichMessage
