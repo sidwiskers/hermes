@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -19,7 +20,11 @@ func TestSendPhotoUploadStreamsMultipart(t *testing.T) {
 		if r.FormValue("chat_id") != "99" || r.FormValue("photo") != "attach://photo" {
 			t.Fatalf("unexpected fields: %#v", r.Form)
 		}
-		if r.FormValue("receiver_user_id") != "7" || r.FormValue("callback_query_id") != "cb" {
+		var ephemeral EphemeralMessageParameters
+		if err := json.Unmarshal([]byte(r.FormValue("ephemeral_message_parameters")), &ephemeral); err != nil {
+			t.Fatal(err)
+		}
+		if ephemeral.ReceiverUserID != 7 || ephemeral.CallbackQueryID != "cb" {
 			t.Fatalf("missing ephemeral fields: %#v", r.Form)
 		}
 

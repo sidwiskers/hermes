@@ -107,7 +107,7 @@ go get github.com/sidwiskers/hermes
 Hermes supports Go 1.25 and every newer stable Go release. Use the latest patch
 available in your chosen Go line: the application toolchain supplies the
 standard library and therefore determines which standard-library security fixes
-are present. The module recommends Go 1.26.5 to contributors without forcing
+are present. The module recommends Go 1.26.6 to contributors without forcing
 that toolchain on applications that import Hermes.
 
 ## Telegram test environment

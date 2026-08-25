@@ -92,8 +92,19 @@ func addSendBaseFields(fields formFields, params SendBaseParams) error {
 			return err
 		}
 	}
-	fields.Int64("receiver_user_id", params.ReceiverUserID)
-	fields.String("callback_query_id", params.CallbackQueryID)
+	ephemeral, err := resolveEphemeralMessageParameters(
+		params.EphemeralMessageParameters,
+		params.ReceiverUserID,
+		params.CallbackQueryID,
+	)
+	if err != nil {
+		return err
+	}
+	if ephemeral != nil {
+		if err := fields.JSON("ephemeral_message_parameters", ephemeral); err != nil {
+			return err
+		}
+	}
 	if params.ReplyParameters != nil {
 		if err := fields.JSON("reply_parameters", params.ReplyParameters); err != nil {
 			return err

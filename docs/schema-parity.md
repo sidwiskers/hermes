@@ -3,17 +3,17 @@
 Hermes measures compatibility against deterministic inventories derived from
 Telegram's official Bot API documentation and the compiled Go packages. Each
 release pins its audited Bot API version in `spec/bot-api.json` and its exported
-Go declarations in `spec/api-surface.txt`. The Bot API manifest shipped with
-Hermes 1.1.0 records Bot API 10.2 and contains:
+Go declarations in `spec/api-surface.txt`. The current manifest records Bot
+API 10.3 and contains:
 
 | Surface | Official count | Missing in Hermes |
 | --- | ---: | ---: |
 | Methods | 185 | 0 |
-| Method parameters | 937 | 0 |
-| Concrete objects | 362 | 0 |
-| Object fields | 1,838 | 0 |
+| Method parameters | 932 | 0 |
+| Concrete objects | 374 | 0 |
+| Object fields | 1,888 | 0 |
 | Union roots | 26 | 0 |
-| Union variants | 187 | 0 |
+| Union variants | 194 | 0 |
 
 The audit additionally verifies parameter and field requiredness, JSON
 `omitempty` behavior, Go wire types, and nilability of optional nested objects.

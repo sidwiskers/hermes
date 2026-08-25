@@ -8,6 +8,7 @@ if [[ -n "$files" ]]; then
 fi
 
 ./scripts/check-secrets.sh
+./scripts/test-check-secrets.sh
 ./scripts/check-generated.sh
 ./scripts/test-check-go-version.sh
 

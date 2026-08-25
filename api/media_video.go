@@ -6,49 +6,51 @@ import (
 )
 
 type SendVideoParams struct {
-	BusinessConnectionID    string                   `json:"business_connection_id,omitempty"`
-	ChatID                  any                      `json:"chat_id"`
-	MessageThreadID         int                      `json:"message_thread_id,omitempty"`
-	DirectMessagesTopicID   int                      `json:"direct_messages_topic_id,omitempty"`
-	Video                   string                   `json:"video"`
-	Duration                int                      `json:"duration,omitempty"`
-	Width                   int                      `json:"width,omitempty"`
-	Height                  int                      `json:"height,omitempty"`
-	Thumbnail               string                   `json:"thumbnail,omitempty"`
-	Cover                   string                   `json:"cover,omitempty"`
-	StartTimestamp          int                      `json:"start_timestamp,omitempty"`
-	Caption                 string                   `json:"caption,omitempty"`
-	ParseMode               string                   `json:"parse_mode,omitempty"`
-	CaptionEntities         []MessageEntity          `json:"caption_entities,omitempty"`
-	ShowCaptionAboveMedia   bool                     `json:"show_caption_above_media,omitempty"`
-	HasSpoiler              bool                     `json:"has_spoiler,omitempty"`
-	SupportsStreaming       bool                     `json:"supports_streaming,omitempty"`
-	DisableNotification     bool                     `json:"disable_notification,omitempty"`
-	ProtectContent          bool                     `json:"protect_content,omitempty"`
-	AllowPaidBroadcast      bool                     `json:"allow_paid_broadcast,omitempty"`
-	MessageEffectID         string                   `json:"message_effect_id,omitempty"`
-	SuggestedPostParameters *SuggestedPostParameters `json:"suggested_post_parameters,omitempty"`
-	ReplyParameters         *ReplyParameters         `json:"reply_parameters,omitempty"`
-	ReplyMarkup             ReplyMarkup              `json:"reply_markup,omitempty"`
-	ReceiverUserID          int64                    `json:"receiver_user_id,omitempty"`
-	CallbackQueryID         string                   `json:"callback_query_id,omitempty"`
+	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
+	ChatID                     any                         `json:"chat_id"`
+	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
+	Video                      string                      `json:"video"`
+	Duration                   int                         `json:"duration,omitempty"`
+	Width                      int                         `json:"width,omitempty"`
+	Height                     int                         `json:"height,omitempty"`
+	Thumbnail                  string                      `json:"thumbnail,omitempty"`
+	Cover                      string                      `json:"cover,omitempty"`
+	StartTimestamp             int                         `json:"start_timestamp,omitempty"`
+	Caption                    string                      `json:"caption,omitempty"`
+	ParseMode                  string                      `json:"parse_mode,omitempty"`
+	CaptionEntities            []MessageEntity             `json:"caption_entities,omitempty"`
+	ShowCaptionAboveMedia      bool                        `json:"show_caption_above_media,omitempty"`
+	HasSpoiler                 bool                        `json:"has_spoiler,omitempty"`
+	SupportsStreaming          bool                        `json:"supports_streaming,omitempty"`
+	DisableNotification        bool                        `json:"disable_notification,omitempty"`
+	ProtectContent             bool                        `json:"protect_content,omitempty"`
+	AllowPaidBroadcast         bool                        `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID            string                      `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters    *SuggestedPostParameters    `json:"suggested_post_parameters,omitempty"`
+	ReplyParameters            *ReplyParameters            `json:"reply_parameters,omitempty"`
+	ReplyMarkup                ReplyMarkup                 `json:"reply_markup,omitempty"`
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+	ReceiverUserID             int64                       `json:"-"` // Deprecated: use EphemeralMessageParameters.
+	CallbackQueryID            string                      `json:"-"` // Deprecated: use EphemeralMessageParameters.
 }
 
 func (p SendVideoParams) base() SendBaseParams {
 	return SendBaseParams{
-		BusinessConnectionID:    p.BusinessConnectionID,
-		ChatID:                  p.ChatID,
-		MessageThreadID:         p.MessageThreadID,
-		DirectMessagesTopicID:   p.DirectMessagesTopicID,
-		DisableNotification:     p.DisableNotification,
-		ProtectContent:          p.ProtectContent,
-		AllowPaidBroadcast:      p.AllowPaidBroadcast,
-		MessageEffectID:         p.MessageEffectID,
-		SuggestedPostParameters: p.SuggestedPostParameters,
-		ReplyParameters:         p.ReplyParameters,
-		ReplyMarkup:             p.ReplyMarkup,
-		ReceiverUserID:          p.ReceiverUserID,
-		CallbackQueryID:         p.CallbackQueryID,
+		BusinessConnectionID:       p.BusinessConnectionID,
+		ChatID:                     p.ChatID,
+		MessageThreadID:            p.MessageThreadID,
+		DirectMessagesTopicID:      p.DirectMessagesTopicID,
+		DisableNotification:        p.DisableNotification,
+		ProtectContent:             p.ProtectContent,
+		AllowPaidBroadcast:         p.AllowPaidBroadcast,
+		MessageEffectID:            p.MessageEffectID,
+		SuggestedPostParameters:    p.SuggestedPostParameters,
+		ReplyParameters:            p.ReplyParameters,
+		ReplyMarkup:                p.ReplyMarkup,
+		EphemeralMessageParameters: p.EphemeralMessageParameters,
+		ReceiverUserID:             p.ReceiverUserID,
+		CallbackQueryID:            p.CallbackQueryID,
 	}
 }
 func (p SendVideoParams) caption() CaptionParams {
@@ -79,40 +81,42 @@ func (b *Client) SendVideoUpload(ctx context.Context, p SendVideoParams, name st
 }
 
 type SendVideoNoteParams struct {
-	BusinessConnectionID    string                   `json:"business_connection_id,omitempty"`
-	ChatID                  any                      `json:"chat_id"`
-	MessageThreadID         int                      `json:"message_thread_id,omitempty"`
-	DirectMessagesTopicID   int                      `json:"direct_messages_topic_id,omitempty"`
-	VideoNote               string                   `json:"video_note"`
-	Duration                int                      `json:"duration,omitempty"`
-	Length                  int                      `json:"length,omitempty"`
-	Thumbnail               string                   `json:"thumbnail,omitempty"`
-	DisableNotification     bool                     `json:"disable_notification,omitempty"`
-	ProtectContent          bool                     `json:"protect_content,omitempty"`
-	AllowPaidBroadcast      bool                     `json:"allow_paid_broadcast,omitempty"`
-	MessageEffectID         string                   `json:"message_effect_id,omitempty"`
-	SuggestedPostParameters *SuggestedPostParameters `json:"suggested_post_parameters,omitempty"`
-	ReplyParameters         *ReplyParameters         `json:"reply_parameters,omitempty"`
-	ReplyMarkup             ReplyMarkup              `json:"reply_markup,omitempty"`
-	ReceiverUserID          int64                    `json:"receiver_user_id,omitempty"`
-	CallbackQueryID         string                   `json:"callback_query_id,omitempty"`
+	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
+	ChatID                     any                         `json:"chat_id"`
+	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
+	VideoNote                  string                      `json:"video_note"`
+	Duration                   int                         `json:"duration,omitempty"`
+	Length                     int                         `json:"length,omitempty"`
+	Thumbnail                  string                      `json:"thumbnail,omitempty"`
+	DisableNotification        bool                        `json:"disable_notification,omitempty"`
+	ProtectContent             bool                        `json:"protect_content,omitempty"`
+	AllowPaidBroadcast         bool                        `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID            string                      `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters    *SuggestedPostParameters    `json:"suggested_post_parameters,omitempty"`
+	ReplyParameters            *ReplyParameters            `json:"reply_parameters,omitempty"`
+	ReplyMarkup                ReplyMarkup                 `json:"reply_markup,omitempty"`
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+	ReceiverUserID             int64                       `json:"-"` // Deprecated: use EphemeralMessageParameters.
+	CallbackQueryID            string                      `json:"-"` // Deprecated: use EphemeralMessageParameters.
 }
 
 func (p SendVideoNoteParams) base() SendBaseParams {
 	return SendBaseParams{
-		BusinessConnectionID:    p.BusinessConnectionID,
-		ChatID:                  p.ChatID,
-		MessageThreadID:         p.MessageThreadID,
-		DirectMessagesTopicID:   p.DirectMessagesTopicID,
-		DisableNotification:     p.DisableNotification,
-		ProtectContent:          p.ProtectContent,
-		AllowPaidBroadcast:      p.AllowPaidBroadcast,
-		MessageEffectID:         p.MessageEffectID,
-		SuggestedPostParameters: p.SuggestedPostParameters,
-		ReplyParameters:         p.ReplyParameters,
-		ReplyMarkup:             p.ReplyMarkup,
-		ReceiverUserID:          p.ReceiverUserID,
-		CallbackQueryID:         p.CallbackQueryID,
+		BusinessConnectionID:       p.BusinessConnectionID,
+		ChatID:                     p.ChatID,
+		MessageThreadID:            p.MessageThreadID,
+		DirectMessagesTopicID:      p.DirectMessagesTopicID,
+		DisableNotification:        p.DisableNotification,
+		ProtectContent:             p.ProtectContent,
+		AllowPaidBroadcast:         p.AllowPaidBroadcast,
+		MessageEffectID:            p.MessageEffectID,
+		SuggestedPostParameters:    p.SuggestedPostParameters,
+		ReplyParameters:            p.ReplyParameters,
+		ReplyMarkup:                p.ReplyMarkup,
+		EphemeralMessageParameters: p.EphemeralMessageParameters,
+		ReceiverUserID:             p.ReceiverUserID,
+		CallbackQueryID:            p.CallbackQueryID,
 	}
 }
 func (b *Client) SendVideoNote(ctx context.Context, p SendVideoNoteParams) (*Message, error) {

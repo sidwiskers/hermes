@@ -8,6 +8,7 @@ type ReplyMarkup interface {
 
 type InlineKeyboardMarkup struct {
 	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
+	ForceReply     bool                     `json:"force_reply,omitempty"`
 }
 
 func (InlineKeyboardMarkup) replyMarkup() {}
@@ -25,7 +26,11 @@ type InlineKeyboardButton struct {
 	CopyText                     *CopyTextButton              `json:"copy_text,omitempty"`
 	CallbackGame                 *CallbackGame                `json:"callback_game,omitempty"`
 	Pay                          bool                         `json:"pay,omitempty"`
+	Disabled                     *DisabledButton              `json:"disabled,omitempty"`
 }
+
+// DisabledButton marks a keyboard button as intentionally non-interactive.
+type DisabledButton struct{}
 
 type WebAppInfo struct {
 	URL string `json:"url"`
@@ -85,6 +90,7 @@ type ReplyKeyboardMarkup struct {
 	OneTimeKeyboard       bool               `json:"one_time_keyboard,omitempty"`
 	InputFieldPlaceholder string             `json:"input_field_placeholder,omitempty"`
 	Selective             bool               `json:"selective,omitempty"`
+	ForceReply            bool               `json:"force_reply,omitempty"`
 }
 
 func (ReplyKeyboardMarkup) replyMarkup() {}

@@ -266,6 +266,75 @@ type RichTextReferenceLink struct {
 	ReferenceName string   `json:"reference_name"`
 }
 
+const (
+	RichMessageButtonStyleDanger  = "danger"
+	RichMessageButtonStyleSuccess = "success"
+	RichMessageButtonStylePrimary = "primary"
+	RichMessageButtonStyleLink    = "link"
+)
+
+// RichMessageButton is an interactive button embedded in rich text or a
+// buttons block. Exactly one action field must be present.
+type RichMessageButton struct {
+	Text                         RichText                     `json:"text"`
+	Style                        string                       `json:"style,omitempty"`
+	URL                          *string                      `json:"url,omitempty"`
+	CallbackData                 *string                      `json:"callback_data,omitempty"`
+	WebApp                       *WebAppInfo                  `json:"web_app,omitempty"`
+	LoginURL                     *LoginURL                    `json:"login_url,omitempty"`
+	SwitchInlineQuery            *string                      `json:"switch_inline_query,omitempty"`
+	SwitchInlineQueryCurrentChat *string                      `json:"switch_inline_query_current_chat,omitempty"`
+	SwitchInlineQueryChosenChat  *SwitchInlineQueryChosenChat `json:"switch_inline_query_chosen_chat,omitempty"`
+	CopyText                     *CopyTextButton              `json:"copy_text,omitempty"`
+	Disabled                     *DisabledButton              `json:"disabled,omitempty"`
+}
+
+// RichTextButton embeds a RichMessageButton in inline rich text.
+type RichTextButton struct {
+	Button RichMessageButton `json:"button"`
+}
+
+func (value RichTextButton) MarshalJSON() ([]byte, error) {
+	type plain RichTextButton
+	return richTextEnvelope("button", plain(value))
+}
+
+func RichURLButton(text RichText, url string) RichMessageButton {
+	return RichMessageButton{Text: text, URL: &url}
+}
+
+func RichCallbackButton(text RichText, data string) RichMessageButton {
+	return RichMessageButton{Text: text, CallbackData: &data}
+}
+
+func RichWebAppButton(text RichText, webApp WebAppInfo) RichMessageButton {
+	return RichMessageButton{Text: text, WebApp: &webApp}
+}
+
+func RichLoginButton(text RichText, loginURL LoginURL) RichMessageButton {
+	return RichMessageButton{Text: text, LoginURL: &loginURL}
+}
+
+func RichSwitchInlineButton(text RichText, query string) RichMessageButton {
+	return RichMessageButton{Text: text, SwitchInlineQuery: &query}
+}
+
+func RichSwitchInlineCurrentChatButton(text RichText, query string) RichMessageButton {
+	return RichMessageButton{Text: text, SwitchInlineQueryCurrentChat: &query}
+}
+
+func RichSwitchInlineChosenChatButton(text RichText, query SwitchInlineQueryChosenChat) RichMessageButton {
+	return RichMessageButton{Text: text, SwitchInlineQueryChosenChat: &query}
+}
+
+func RichCopyButton(text RichText, value string) RichMessageButton {
+	return RichMessageButton{Text: text, CopyText: &CopyTextButton{Text: value}}
+}
+
+func RichDisabledButton(text RichText) RichMessageButton {
+	return RichMessageButton{Text: text, Disabled: &DisabledButton{}}
+}
+
 func (value RichTextReferenceLink) MarshalJSON() ([]byte, error) {
 	type plain RichTextReferenceLink
 	return richTextEnvelope("reference_link", plain(value))
@@ -310,6 +379,9 @@ type RichBlock struct {
 	Cells      [][]RichBlockTableCell `json:"cells,omitempty"`
 	IsBordered bool                   `json:"is_bordered,omitempty"`
 	IsStriped  bool                   `json:"is_striped,omitempty"`
+	IsCompact  bool                   `json:"is_compact,omitempty"`
+	Buttons    []RichMessageButton    `json:"buttons,omitempty"`
+	Align      string                 `json:"align,omitempty"`
 	Summary    RichText               `json:"summary,omitempty"`
 	IsOpen     bool                   `json:"is_open,omitempty"`
 	Location   *Location              `json:"location,omitempty"`
@@ -321,6 +393,7 @@ type RichBlock struct {
 	Photo      []PhotoSize            `json:"photo,omitempty"`
 	Video      *Video                 `json:"video,omitempty"`
 	VoiceNote  *Voice                 `json:"voice_note,omitempty"`
+	Document   *Document              `json:"document,omitempty"`
 	HasSpoiler bool                   `json:"has_spoiler,omitempty"`
 }
 

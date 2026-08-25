@@ -16,7 +16,8 @@ The foundation is designed to expand, not be replaced.
 - Broad update decoding with raw forward compatibility.
 - Typed callback-data codecs with the 64-byte limit enforced.
 - Inline/reply keyboards and common context actions.
-- All 12 Bot API 10.2 ephemeral-capable send methods.
+- All 14 Bot API 10.3 ephemeral-capable send methods, including live photos
+  and rich messages.
 - Complete ephemeral edit/delete lifecycle.
 - Primary media uploads, file metadata, and streamed downloads.
 - Hermes Lab with deterministic virtual users and chats, stateful Bot API
@@ -27,8 +28,8 @@ The foundation is designed to expand, not be replaced.
   failures, lifecycle status, and coordinated graceful shutdown.
 - Typed photo/live-photo/video/audio/document albums with streamed multi-file attachments and attachment parity checks.
 - Polls, dice, reactions, moderation, permissions, members, invite links, and common chat administration.
-- Typed entry points for all 185 methods in Bot API 10.2.
-- Rich Messages and all 21 input block variants with nested streamed uploads.
+- Typed entry points for all 185 methods in Bot API 10.3.
+- Rich Messages and all 24 input block variants with nested streamed uploads.
 - Payments, Stars, paid media, gifts, forum topics, inline mode, Web Apps, business accounts, managed bots, stories, checklists, games, Passport, and sticker sets.
 
 
@@ -42,7 +43,7 @@ The foundation is designed to expand, not be replaced.
 - Reproducible decode, routing, middleware, API, and multipart benchmarks.
 - CPU/heap profiling command and CI benchmark smoke tests.
 - Race, coverage, fuzz-smoke, formatting, and vet regression gates.
-- Deterministic Bot API 10.2 inventory and source audit covering methods,
+- Deterministic Bot API 10.3 inventory and source audit covering methods,
   parameters, objects, fields, unions, and variants.
 - Zero-gap generated object, field, union-root, and union-variant declarations,
   re-exported through `types`, `api`, and the root facade.

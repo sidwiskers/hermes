@@ -3,11 +3,10 @@ package framework
 import "fmt"
 
 type contextSendTarget struct {
-	chatID     int64
-	receiverID int64
-	callbackID string
-	reply      *ReplyParameters
-	options    sendOptions
+	chatID    int64
+	ephemeral *EphemeralMessageParameters
+	reply     *ReplyParameters
+	options   sendOptions
 }
 
 func (c *Context) mediaTarget(ephemeral bool, options []SendOption) (contextSendTarget, error) {
@@ -21,8 +20,8 @@ func (c *Context) mediaTarget(ephemeral bool, options []SendOption) (contextSend
 		if sender == nil {
 			return contextSendTarget{}, fmt.Errorf("hermes: update has no sender")
 		}
-		target.receiverID = sender.ID
-		c.applyEphemeralTarget(&target.callbackID, &target.reply)
+		target.ephemeral = &EphemeralMessageParameters{ReceiverUserID: sender.ID}
+		c.applyEphemeralTarget(target.ephemeral, &target.reply)
 	}
 	return target, nil
 }
@@ -37,8 +36,7 @@ func applyPhotoOptions(p *SendPhotoParams, target contextSendTarget) {
 	p.MessageEffectID = target.options.messageEffectID
 	p.HasSpoiler = target.options.hasSpoiler
 	p.ShowCaptionAboveMedia = target.options.showCaptionAbove
-	p.ReceiverUserID = target.receiverID
-	p.CallbackQueryID = target.callbackID
+	p.EphemeralMessageParameters = target.ephemeral
 	p.ReplyParameters = target.reply
 }
 
@@ -84,8 +82,7 @@ func applyDocumentOptions(p *SendDocumentParams, target contextSendTarget) {
 	p.MessageThreadID = target.options.messageThreadID
 	p.ReplyMarkup = target.options.replyMarkup
 	p.MessageEffectID = target.options.messageEffectID
-	p.ReceiverUserID = target.receiverID
-	p.CallbackQueryID = target.callbackID
+	p.EphemeralMessageParameters = target.ephemeral
 	p.ReplyParameters = target.reply
 }
 
@@ -129,8 +126,7 @@ func applyVideoOptions(p *SendVideoParams, target contextSendTarget) {
 	p.HasSpoiler = target.options.hasSpoiler
 	p.ShowCaptionAboveMedia = target.options.showCaptionAbove
 	p.SupportsStreaming = target.options.supportsStreaming
-	p.ReceiverUserID = target.receiverID
-	p.CallbackQueryID = target.callbackID
+	p.EphemeralMessageParameters = target.ephemeral
 	p.ReplyParameters = target.reply
 }
 
@@ -168,8 +164,7 @@ func applyAnimationOptions(p *SendAnimationParams, target contextSendTarget) {
 	p.MessageEffectID = target.options.messageEffectID
 	p.HasSpoiler = target.options.hasSpoiler
 	p.ShowCaptionAboveMedia = target.options.showCaptionAbove
-	p.ReceiverUserID = target.receiverID
-	p.CallbackQueryID = target.callbackID
+	p.EphemeralMessageParameters = target.ephemeral
 	p.ReplyParameters = target.reply
 }
 
@@ -205,8 +200,7 @@ func applyAudioOptions(p *SendAudioParams, target contextSendTarget) {
 	p.MessageThreadID = target.options.messageThreadID
 	p.ReplyMarkup = target.options.replyMarkup
 	p.MessageEffectID = target.options.messageEffectID
-	p.ReceiverUserID = target.receiverID
-	p.CallbackQueryID = target.callbackID
+	p.EphemeralMessageParameters = target.ephemeral
 	p.ReplyParameters = target.reply
 }
 
@@ -242,8 +236,7 @@ func applyVoiceOptions(p *SendVoiceParams, target contextSendTarget) {
 	p.MessageThreadID = target.options.messageThreadID
 	p.ReplyMarkup = target.options.replyMarkup
 	p.MessageEffectID = target.options.messageEffectID
-	p.ReceiverUserID = target.receiverID
-	p.CallbackQueryID = target.callbackID
+	p.EphemeralMessageParameters = target.ephemeral
 	p.ReplyParameters = target.reply
 }
 
@@ -278,8 +271,7 @@ func applyStickerOptions(p *SendStickerParams, target contextSendTarget) {
 	p.MessageThreadID = target.options.messageThreadID
 	p.ReplyMarkup = target.options.replyMarkup
 	p.MessageEffectID = target.options.messageEffectID
-	p.ReceiverUserID = target.receiverID
-	p.CallbackQueryID = target.callbackID
+	p.EphemeralMessageParameters = target.ephemeral
 	p.ReplyParameters = target.reply
 }
 

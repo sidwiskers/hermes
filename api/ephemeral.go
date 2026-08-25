@@ -22,9 +22,10 @@ type EditEphemeralMessageTextParams struct {
 	ChatID             any                   `json:"chat_id"`
 	ReceiverUserID     int64                 `json:"receiver_user_id"`
 	EphemeralMessageID int                   `json:"ephemeral_message_id"`
-	Text               string                `json:"text"`
+	Text               string                `json:"text,omitempty"`
 	ParseMode          string                `json:"parse_mode,omitempty"`
 	Entities           []MessageEntity       `json:"entities,omitempty"`
+	RichMessage        *InputRichMessage     `json:"rich_message,omitempty"`
 	LinkPreviewOptions *LinkPreviewOptions   `json:"link_preview_options,omitempty"`
 	ReplyMarkup        *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
@@ -37,8 +38,16 @@ func (b *Client) EditEphemeralText(ctx context.Context, params EditEphemeralMess
 	}); err != nil {
 		return err
 	}
-	if params.Text == "" {
-		return fmt.Errorf("hermes: ephemeral text is required")
+	if (params.Text == "") == (params.RichMessage == nil) {
+		return fmt.Errorf("hermes: editEphemeralMessageText requires exactly one of text or rich_message")
+	}
+	if params.RichMessage != nil {
+		if err := validateRichMessage(*params.RichMessage, false); err != nil {
+			return err
+		}
+		if err := validateAttachmentUploads(*params.RichMessage, nil, "editEphemeralMessageText"); err != nil {
+			return err
+		}
 	}
 	return b.callTrue(ctx, "editEphemeralMessageText", params)
 }
@@ -53,11 +62,44 @@ type InputMedia struct {
 }
 
 type EditEphemeralMessageMediaParams struct {
-	ChatID             any                   `json:"chat_id"`
-	ReceiverUserID     int64                 `json:"receiver_user_id"`
-	EphemeralMessageID int                   `json:"ephemeral_message_id"`
-	Media              InputMedia            `json:"media"`
-	ReplyMarkup        *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	ChatID             any        `json:"chat_id"`
+	ReceiverUserID     int64      `json:"receiver_user_id"`
+	EphemeralMessageID int        `json:"ephemeral_message_id"`
+	Media              InputMedia `json:"media"`
+	// TypedMedia selects a discriminator-aware media variant. It is mutually
+	// exclusive with the source-compatible Media field.
+	TypedMedia  InputEditableMedia    `json:"-"`
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+}
+
+func editEphemeralMedia(params EditEphemeralMessageMediaParams) (InputEditableMedia, error) {
+	legacyPresent := params.Media.Type != "" || params.Media.Media != ""
+	if params.TypedMedia != nil {
+		if legacyPresent {
+			return nil, fmt.Errorf("hermes: editEphemeralMessageMedia media and typed_media are mutually exclusive")
+		}
+		return params.TypedMedia, nil
+	}
+	if !legacyPresent {
+		return nil, fmt.Errorf("hermes: ephemeral media is required")
+	}
+	return params.Media, nil
+}
+
+func editEphemeralMediaParams(params EditEphemeralMessageMediaParams, media InputEditableMedia) any {
+	return struct {
+		ChatID             any                   `json:"chat_id"`
+		ReceiverUserID     int64                 `json:"receiver_user_id"`
+		EphemeralMessageID int                   `json:"ephemeral_message_id"`
+		Media              InputEditableMedia    `json:"media"`
+		ReplyMarkup        *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	}{
+		ChatID:             params.ChatID,
+		ReceiverUserID:     params.ReceiverUserID,
+		EphemeralMessageID: params.EphemeralMessageID,
+		Media:              media,
+		ReplyMarkup:        params.ReplyMarkup,
+	}
 }
 
 func (b *Client) EditEphemeralMedia(ctx context.Context, params EditEphemeralMessageMediaParams) error {
@@ -68,20 +110,80 @@ func (b *Client) EditEphemeralMedia(ctx context.Context, params EditEphemeralMes
 	}); err != nil {
 		return err
 	}
-	if params.Media.Type == "" || params.Media.Media == "" {
-		return fmt.Errorf("hermes: ephemeral media type and media are required")
+	media, err := editEphemeralMedia(params)
+	if err != nil {
+		return err
 	}
-	return b.callTrue(ctx, "editEphemeralMessageMedia", params)
+	if media.editableMediaSource() == "" {
+		return fmt.Errorf("hermes: ephemeral media is required")
+	}
+	if generic, ok := media.(InputMedia); ok && generic.Type == "" {
+		return fmt.Errorf("hermes: generic ephemeral media type is required")
+	}
+	if livePhoto, ok := media.(InputMediaLivePhoto); ok && livePhoto.Photo == "" {
+		return fmt.Errorf("hermes: ephemeral live photo requires photo")
+	}
+	if err := validateAttachmentUploads(media, nil, "editEphemeralMessageMedia"); err != nil {
+		return err
+	}
+	return b.callTrue(ctx, "editEphemeralMessageMedia", editEphemeralMediaParams(params, media))
+}
+
+// EditEphemeralMediaUpload streams every attach:// reference in Media.
+func (b *Client) EditEphemeralMediaUpload(ctx context.Context, params EditEphemeralMessageMediaParams, uploads ...Upload) error {
+	if len(uploads) == 0 {
+		return b.EditEphemeralMedia(ctx, params)
+	}
+	if err := validateEphemeralRef(EphemeralMessageRef{
+		ChatID:             params.ChatID,
+		ReceiverUserID:     params.ReceiverUserID,
+		EphemeralMessageID: params.EphemeralMessageID,
+	}); err != nil {
+		return err
+	}
+	media, err := editEphemeralMedia(params)
+	if err != nil {
+		return err
+	}
+	if media.editableMediaSource() == "" {
+		return fmt.Errorf("hermes: ephemeral media is required")
+	}
+	if err := validateAttachmentUploads(media, uploads, "editEphemeralMessageMedia"); err != nil {
+		return err
+	}
+	fields, err := newFormFields(params.ChatID)
+	if err != nil {
+		return err
+	}
+	fields.Int64("receiver_user_id", params.ReceiverUserID)
+	fields.Int("ephemeral_message_id", params.EphemeralMessageID)
+	if err = fields.JSON("media", media); err != nil {
+		return err
+	}
+	if params.ReplyMarkup != nil {
+		if err = fields.JSON("reply_markup", params.ReplyMarkup); err != nil {
+			return err
+		}
+	}
+	var ok bool
+	if err = b.CallMultipart(ctx, "editEphemeralMessageMedia", fields, uploads, &ok); err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("hermes: editEphemeralMessageMedia returned false")
+	}
+	return nil
 }
 
 type EditEphemeralMessageCaptionParams struct {
-	ChatID             any                   `json:"chat_id"`
-	ReceiverUserID     int64                 `json:"receiver_user_id"`
-	EphemeralMessageID int                   `json:"ephemeral_message_id"`
-	Caption            string                `json:"caption,omitempty"`
-	ParseMode          string                `json:"parse_mode,omitempty"`
-	CaptionEntities    []MessageEntity       `json:"caption_entities,omitempty"`
-	ReplyMarkup        *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	ChatID                any                   `json:"chat_id"`
+	ReceiverUserID        int64                 `json:"receiver_user_id"`
+	EphemeralMessageID    int                   `json:"ephemeral_message_id"`
+	Caption               string                `json:"caption,omitempty"`
+	ParseMode             string                `json:"parse_mode,omitempty"`
+	CaptionEntities       []MessageEntity       `json:"caption_entities,omitempty"`
+	ShowCaptionAboveMedia bool                  `json:"show_caption_above_media,omitempty"`
+	ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
 func (b *Client) EditEphemeralCaption(ctx context.Context, params EditEphemeralMessageCaptionParams) error {

@@ -7,8 +7,51 @@ import (
 	"strings"
 )
 
+const (
+	RichMessageButtonStyleDanger  = "danger"
+	RichMessageButtonStyleSuccess = "success"
+	RichMessageButtonStylePrimary = "primary"
+	RichMessageButtonStyleLink    = "link"
+)
+
+func RichURLButton(text RichText, url string) RichMessageButton {
+	return RichMessageButton{Text: text, URL: &url}
+}
+
+func RichCallbackButton(text RichText, data string) RichMessageButton {
+	return RichMessageButton{Text: text, CallbackData: &data}
+}
+
+func RichWebAppButton(text RichText, webApp WebAppInfo) RichMessageButton {
+	return RichMessageButton{Text: text, WebApp: &webApp}
+}
+
+func RichLoginButton(text RichText, loginURL LoginURL) RichMessageButton {
+	return RichMessageButton{Text: text, LoginURL: &loginURL}
+}
+
+func RichSwitchInlineButton(text RichText, query string) RichMessageButton {
+	return RichMessageButton{Text: text, SwitchInlineQuery: &query}
+}
+
+func RichSwitchInlineCurrentChatButton(text RichText, query string) RichMessageButton {
+	return RichMessageButton{Text: text, SwitchInlineQueryCurrentChat: &query}
+}
+
+func RichSwitchInlineChosenChatButton(text RichText, query SwitchInlineQueryChosenChat) RichMessageButton {
+	return RichMessageButton{Text: text, SwitchInlineQueryChosenChat: &query}
+}
+
+func RichCopyButton(text RichText, value string) RichMessageButton {
+	return RichMessageButton{Text: text, CopyText: &CopyTextButton{Text: value}}
+}
+
+func RichDisabledButton(text RichText) RichMessageButton {
+	return RichMessageButton{Text: text, Disabled: &DisabledButton{}}
+}
+
 // RichMessageMedia is media accepted by InputRichMessageMedia. The interface
-// is closed to the five media types supported by Bot API 10.2.
+// is closed to the media types supported by Bot API 10.3.
 type RichMessageMedia interface {
 	richMessageMedia()
 	richMessageSource() string
@@ -22,6 +65,8 @@ func (InputMediaPhoto) richMessageMedia()                   {}
 func (value InputMediaPhoto) richMessageSource() string     { return value.Media }
 func (InputMediaVideo) richMessageMedia()                   {}
 func (value InputMediaVideo) richMessageSource() string     { return value.Media }
+func (InputMediaDocument) richMessageMedia()                {}
+func (value InputMediaDocument) richMessageSource() string  { return value.Media }
 
 // InputMediaVoiceNote represents a voice note embedded in a rich message.
 type InputMediaVoiceNote struct {
@@ -46,7 +91,7 @@ type InputRichMessageMedia struct {
 	Media RichMessageMedia `json:"media"`
 }
 
-// InputRichBlock is one of the 21 block forms accepted by Bot API 10.2.
+// InputRichBlock is one of the block forms accepted by Bot API 10.3.
 type InputRichBlock interface {
 	inputRichBlock()
 	richBlockType() string
@@ -224,6 +269,7 @@ type InputRichBlockTable struct {
 	Cells      [][]RichBlockTableCell `json:"cells"`
 	IsBordered bool                   `json:"is_bordered,omitempty"`
 	IsStriped  bool                   `json:"is_striped,omitempty"`
+	IsCompact  bool                   `json:"is_compact,omitempty"`
 	Caption    RichText               `json:"caption,omitempty"`
 }
 
@@ -249,9 +295,9 @@ func (value InputRichBlockDetails) MarshalJSON() ([]byte, error) {
 
 type InputRichBlockMap struct {
 	Location Location          `json:"location"`
-	Zoom     int               `json:"zoom"`
-	Width    int               `json:"width"`
-	Height   int               `json:"height"`
+	Zoom     int               `json:"zoom,omitempty"`
+	Width    int               `json:"width,omitempty"`
+	Height   int               `json:"height,omitempty"`
 	Caption  *RichBlockCaption `json:"caption,omitempty"`
 }
 
@@ -333,6 +379,42 @@ func (value InputRichBlockThinking) MarshalJSON() ([]byte, error) {
 	return marshalTaggedObject("thinking", plain(value))
 }
 
+type InputRichBlockButtons struct {
+	Buttons []RichMessageButton `json:"buttons"`
+	Align   string              `json:"align,omitempty"`
+}
+
+func (InputRichBlockButtons) inputRichBlock()       {}
+func (InputRichBlockButtons) richBlockType() string { return "buttons" }
+func (value InputRichBlockButtons) MarshalJSON() ([]byte, error) {
+	type plain InputRichBlockButtons
+	return marshalTaggedObject("buttons", plain(value))
+}
+
+type InputRichBlockExpandableBlockQuotation struct {
+	Text   RichText `json:"text"`
+	Credit RichText `json:"credit,omitempty"`
+}
+
+func (InputRichBlockExpandableBlockQuotation) inputRichBlock()       {}
+func (InputRichBlockExpandableBlockQuotation) richBlockType() string { return "expandable_blockquote" }
+func (value InputRichBlockExpandableBlockQuotation) MarshalJSON() ([]byte, error) {
+	type plain InputRichBlockExpandableBlockQuotation
+	return marshalTaggedObject("expandable_blockquote", plain(value))
+}
+
+type InputRichBlockDocument struct {
+	Document InputMediaDocument `json:"document"`
+	Caption  *RichBlockCaption  `json:"caption,omitempty"`
+}
+
+func (InputRichBlockDocument) inputRichBlock()       {}
+func (InputRichBlockDocument) richBlockType() string { return "document" }
+func (value InputRichBlockDocument) MarshalJSON() ([]byte, error) {
+	type plain InputRichBlockDocument
+	return marshalTaggedObject("document", plain(value))
+}
+
 type InputRichMessage struct {
 	Blocks              []InputRichBlock        `json:"blocks,omitempty"`
 	HTML                string                  `json:"html,omitempty"`
@@ -370,6 +452,18 @@ func validateRichBlocks(blocks []InputRichBlock, draft bool) error {
 			return fmt.Errorf("hermes: thinking blocks are only valid in sendRichMessageDraft")
 		}
 		switch value := block.(type) {
+		case InputRichBlockButtons:
+			if len(value.Buttons) < 1 || len(value.Buttons) > 8 {
+				return fmt.Errorf("hermes: rich buttons block %d requires 1-8 buttons", index)
+			}
+			if value.Align != "" && value.Align != "left" && value.Align != "center" && value.Align != "right" {
+				return fmt.Errorf("hermes: rich buttons block %d has invalid alignment %q", index, value.Align)
+			}
+			for buttonIndex, button := range value.Buttons {
+				if err := validateRichMessageButton(button); err != nil {
+					return fmt.Errorf("hermes: rich buttons block %d button %d: %w", index, buttonIndex, err)
+				}
+			}
 		case InputRichBlockList:
 			for itemIndex, item := range value.Items {
 				if err := validateRichBlocks(item.Blocks, draft); err != nil {
@@ -393,6 +487,43 @@ func validateRichBlocks(blocks []InputRichBlock, draft bool) error {
 				return err
 			}
 		}
+	}
+	return nil
+}
+
+func validateRichMessageButton(button RichMessageButton) error {
+	if button.Text == nil {
+		return fmt.Errorf("button text is required")
+	}
+	switch button.Style {
+	case "", RichMessageButtonStyleDanger, RichMessageButtonStyleSuccess, RichMessageButtonStylePrimary, RichMessageButtonStyleLink:
+	default:
+		return fmt.Errorf("invalid style %q", button.Style)
+	}
+	actions := 0
+	for _, present := range []bool{
+		button.URL != nil,
+		button.CallbackData != nil,
+		button.WebApp != nil,
+		button.LoginURL != nil,
+		button.SwitchInlineQuery != nil,
+		button.SwitchInlineQueryCurrentChat != nil,
+		button.SwitchInlineQueryChosenChat != nil,
+		button.CopyText != nil,
+		button.Disabled != nil,
+	} {
+		if present {
+			actions++
+		}
+	}
+	if actions != 1 {
+		return fmt.Errorf("exactly one action is required")
+	}
+	if button.Style == RichMessageButtonStyleLink && button.CallbackData == nil {
+		return fmt.Errorf("link style requires callback_data")
+	}
+	if button.CallbackData != nil && (len(*button.CallbackData) < 1 || len(*button.CallbackData) > 64) {
+		return fmt.Errorf("callback_data must contain 1-64 bytes")
 	}
 	return nil
 }
@@ -436,18 +567,19 @@ func validateRichMessage(message InputRichMessage, draft bool) error {
 }
 
 type SendRichMessageParams struct {
-	BusinessConnectionID    string                   `json:"business_connection_id,omitempty"`
-	ChatID                  any                      `json:"chat_id"`
-	MessageThreadID         int                      `json:"message_thread_id,omitempty"`
-	DirectMessagesTopicID   int                      `json:"direct_messages_topic_id,omitempty"`
-	RichMessage             InputRichMessage         `json:"rich_message"`
-	DisableNotification     bool                     `json:"disable_notification,omitempty"`
-	ProtectContent          bool                     `json:"protect_content,omitempty"`
-	AllowPaidBroadcast      bool                     `json:"allow_paid_broadcast,omitempty"`
-	MessageEffectID         string                   `json:"message_effect_id,omitempty"`
-	SuggestedPostParameters *SuggestedPostParameters `json:"suggested_post_parameters,omitempty"`
-	ReplyParameters         *ReplyParameters         `json:"reply_parameters,omitempty"`
-	ReplyMarkup             ReplyMarkup              `json:"reply_markup,omitempty"`
+	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
+	ChatID                     any                         `json:"chat_id"`
+	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+	RichMessage                InputRichMessage            `json:"rich_message"`
+	DisableNotification        bool                        `json:"disable_notification,omitempty"`
+	ProtectContent             bool                        `json:"protect_content,omitempty"`
+	AllowPaidBroadcast         bool                        `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID            string                      `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters    *SuggestedPostParameters    `json:"suggested_post_parameters,omitempty"`
+	ReplyParameters            *ReplyParameters            `json:"reply_parameters,omitempty"`
+	ReplyMarkup                ReplyMarkup                 `json:"reply_markup,omitempty"`
 }
 
 func validateSendRichMessage(params SendRichMessageParams, uploads []Upload) error {
@@ -455,6 +587,9 @@ func validateSendRichMessage(params SendRichMessageParams, uploads []Upload) err
 		return err
 	}
 	if err := validateRichMessage(params.RichMessage, false); err != nil {
+		return err
+	}
+	if _, err := resolveEphemeralMessageParameters(params.EphemeralMessageParameters, 0, ""); err != nil {
 		return err
 	}
 	return validateAttachmentUploads(params.RichMessage, uploads, "sendRichMessage")
@@ -491,6 +626,11 @@ func (client *Client) SendRichMessageUpload(
 	fields.String("business_connection_id", params.BusinessConnectionID)
 	fields.Int("message_thread_id", params.MessageThreadID)
 	fields.Int("direct_messages_topic_id", params.DirectMessagesTopicID)
+	if params.EphemeralMessageParameters != nil {
+		if err = fields.JSON("ephemeral_message_parameters", params.EphemeralMessageParameters); err != nil {
+			return nil, err
+		}
+	}
 	if err = fields.JSON("rich_message", params.RichMessage); err != nil {
 		return nil, err
 	}
@@ -525,6 +665,8 @@ type SendRichMessageDraftParams struct {
 	MessageThreadID int              `json:"message_thread_id,omitempty"`
 	DraftID         int              `json:"draft_id"`
 	RichMessage     InputRichMessage `json:"rich_message"`
+	CanStop         bool             `json:"can_stop,omitempty"`
+	KeepOnStop      bool             `json:"keep_on_stop,omitempty"`
 }
 
 func (client *Client) SendRichMessageDraft(ctx context.Context, params SendRichMessageDraftParams) error {

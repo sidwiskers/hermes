@@ -12,33 +12,34 @@ type ResponseParameters struct {
 type UpdateType string
 
 const (
-	UpdateUnknown                 UpdateType = "unknown"
-	UpdateMessage                 UpdateType = "message"
-	UpdateEditedMessage           UpdateType = "edited_message"
-	UpdateChannelPost             UpdateType = "channel_post"
-	UpdateEditedChannelPost       UpdateType = "edited_channel_post"
-	UpdateBusinessConnection      UpdateType = "business_connection"
-	UpdateBusinessMessage         UpdateType = "business_message"
-	UpdateEditedBusinessMessage   UpdateType = "edited_business_message"
-	UpdateDeletedBusinessMessages UpdateType = "deleted_business_messages"
-	UpdateGuestMessage            UpdateType = "guest_message"
-	UpdateMessageReaction         UpdateType = "message_reaction"
-	UpdateMessageReactionCount    UpdateType = "message_reaction_count"
-	UpdateInlineQuery             UpdateType = "inline_query"
-	UpdateChosenInlineResult      UpdateType = "chosen_inline_result"
-	UpdateCallbackQuery           UpdateType = "callback_query"
-	UpdateShippingQuery           UpdateType = "shipping_query"
-	UpdatePreCheckoutQuery        UpdateType = "pre_checkout_query"
-	UpdatePurchasedPaidMedia      UpdateType = "purchased_paid_media"
-	UpdatePoll                    UpdateType = "poll"
-	UpdatePollAnswer              UpdateType = "poll_answer"
-	UpdateMyChatMember            UpdateType = "my_chat_member"
-	UpdateChatMember              UpdateType = "chat_member"
-	UpdateChatJoinRequest         UpdateType = "chat_join_request"
-	UpdateChatBoost               UpdateType = "chat_boost"
-	UpdateRemovedChatBoost        UpdateType = "removed_chat_boost"
-	UpdateManagedBot              UpdateType = "managed_bot"
-	UpdateSubscription            UpdateType = "subscription"
+	UpdateUnknown                  UpdateType = "unknown"
+	UpdateMessage                  UpdateType = "message"
+	UpdateEditedMessage            UpdateType = "edited_message"
+	UpdateChannelPost              UpdateType = "channel_post"
+	UpdateEditedChannelPost        UpdateType = "edited_channel_post"
+	UpdateBusinessConnection       UpdateType = "business_connection"
+	UpdateBusinessMessage          UpdateType = "business_message"
+	UpdateEditedBusinessMessage    UpdateType = "edited_business_message"
+	UpdateDeletedBusinessMessages  UpdateType = "deleted_business_messages"
+	UpdateGuestMessage             UpdateType = "guest_message"
+	UpdateMessageReaction          UpdateType = "message_reaction"
+	UpdateMessageReactionCount     UpdateType = "message_reaction_count"
+	UpdateInlineQuery              UpdateType = "inline_query"
+	UpdateChosenInlineResult       UpdateType = "chosen_inline_result"
+	UpdateCallbackQuery            UpdateType = "callback_query"
+	UpdateShippingQuery            UpdateType = "shipping_query"
+	UpdatePreCheckoutQuery         UpdateType = "pre_checkout_query"
+	UpdatePurchasedPaidMedia       UpdateType = "purchased_paid_media"
+	UpdatePoll                     UpdateType = "poll"
+	UpdatePollAnswer               UpdateType = "poll_answer"
+	UpdateMyChatMember             UpdateType = "my_chat_member"
+	UpdateChatMember               UpdateType = "chat_member"
+	UpdateChatJoinRequest          UpdateType = "chat_join_request"
+	UpdateChatBoost                UpdateType = "chat_boost"
+	UpdateRemovedChatBoost         UpdateType = "removed_chat_boost"
+	UpdateManagedBot               UpdateType = "managed_bot"
+	UpdateSubscription             UpdateType = "subscription"
+	UpdateStoppedMessageGeneration UpdateType = "stopped_message_generation"
 )
 
 // Update is one incoming Telegram update. Raw is populated only when the
@@ -46,34 +47,35 @@ const (
 // configured API/runtime decoder. The zero-value fast path avoids copying the
 // original payload for every update.
 type Update struct {
-	UpdateID                int64                        `json:"update_id"`
-	Message                 *Message                     `json:"message,omitempty"`
-	EditedMessage           *Message                     `json:"edited_message,omitempty"`
-	ChannelPost             *Message                     `json:"channel_post,omitempty"`
-	EditedChannelPost       *Message                     `json:"edited_channel_post,omitempty"`
-	BusinessConnection      *BusinessConnection          `json:"business_connection,omitempty"`
-	BusinessMessage         *Message                     `json:"business_message,omitempty"`
-	EditedBusinessMessage   *Message                     `json:"edited_business_message,omitempty"`
-	DeletedBusinessMessages *BusinessMessagesDeleted     `json:"deleted_business_messages,omitempty"`
-	GuestMessage            *Message                     `json:"guest_message,omitempty"`
-	MessageReaction         *MessageReactionUpdated      `json:"message_reaction,omitempty"`
-	MessageReactionCount    *MessageReactionCountUpdated `json:"message_reaction_count,omitempty"`
-	InlineQuery             *InlineQuery                 `json:"inline_query,omitempty"`
-	ChosenInlineResult      *ChosenInlineResult          `json:"chosen_inline_result,omitempty"`
-	CallbackQuery           *CallbackQuery               `json:"callback_query,omitempty"`
-	ShippingQuery           *ShippingQuery               `json:"shipping_query,omitempty"`
-	PreCheckoutQuery        *PreCheckoutQuery            `json:"pre_checkout_query,omitempty"`
-	PurchasedPaidMedia      *PaidMediaPurchased          `json:"purchased_paid_media,omitempty"`
-	Poll                    *Poll                        `json:"poll,omitempty"`
-	PollAnswer              *PollAnswer                  `json:"poll_answer,omitempty"`
-	MyChatMember            *ChatMemberUpdated           `json:"my_chat_member,omitempty"`
-	ChatMember              *ChatMemberUpdated           `json:"chat_member,omitempty"`
-	ChatJoinRequest         *ChatJoinRequest             `json:"chat_join_request,omitempty"`
-	ChatBoost               *ChatBoostUpdated            `json:"chat_boost,omitempty"`
-	RemovedChatBoost        *ChatBoostRemoved            `json:"removed_chat_boost,omitempty"`
-	ManagedBot              *ManagedBotUpdated           `json:"managed_bot,omitempty"`
-	Subscription            *BotSubscriptionUpdated      `json:"subscription,omitempty"`
-	Raw                     json.RawMessage              `json:"-"`
+	UpdateID                 int64                        `json:"update_id"`
+	Message                  *Message                     `json:"message,omitempty"`
+	EditedMessage            *Message                     `json:"edited_message,omitempty"`
+	ChannelPost              *Message                     `json:"channel_post,omitempty"`
+	EditedChannelPost        *Message                     `json:"edited_channel_post,omitempty"`
+	BusinessConnection       *BusinessConnection          `json:"business_connection,omitempty"`
+	BusinessMessage          *Message                     `json:"business_message,omitempty"`
+	EditedBusinessMessage    *Message                     `json:"edited_business_message,omitempty"`
+	DeletedBusinessMessages  *BusinessMessagesDeleted     `json:"deleted_business_messages,omitempty"`
+	GuestMessage             *Message                     `json:"guest_message,omitempty"`
+	MessageReaction          *MessageReactionUpdated      `json:"message_reaction,omitempty"`
+	MessageReactionCount     *MessageReactionCountUpdated `json:"message_reaction_count,omitempty"`
+	InlineQuery              *InlineQuery                 `json:"inline_query,omitempty"`
+	ChosenInlineResult       *ChosenInlineResult          `json:"chosen_inline_result,omitempty"`
+	CallbackQuery            *CallbackQuery               `json:"callback_query,omitempty"`
+	ShippingQuery            *ShippingQuery               `json:"shipping_query,omitempty"`
+	PreCheckoutQuery         *PreCheckoutQuery            `json:"pre_checkout_query,omitempty"`
+	PurchasedPaidMedia       *PaidMediaPurchased          `json:"purchased_paid_media,omitempty"`
+	Poll                     *Poll                        `json:"poll,omitempty"`
+	PollAnswer               *PollAnswer                  `json:"poll_answer,omitempty"`
+	MyChatMember             *ChatMemberUpdated           `json:"my_chat_member,omitempty"`
+	ChatMember               *ChatMemberUpdated           `json:"chat_member,omitempty"`
+	ChatJoinRequest          *ChatJoinRequest             `json:"chat_join_request,omitempty"`
+	ChatBoost                *ChatBoostUpdated            `json:"chat_boost,omitempty"`
+	RemovedChatBoost         *ChatBoostRemoved            `json:"removed_chat_boost,omitempty"`
+	ManagedBot               *ManagedBotUpdated           `json:"managed_bot,omitempty"`
+	Subscription             *BotSubscriptionUpdated      `json:"subscription,omitempty"`
+	StoppedMessageGeneration *MessageGenerationStopped    `json:"stopped_message_generation,omitempty"`
+	Raw                      json.RawMessage              `json:"-"`
 }
 
 func (u *Update) Type() UpdateType {
@@ -133,6 +135,8 @@ func (u *Update) Type() UpdateType {
 		return UpdateManagedBot
 	case u.Subscription != nil:
 		return UpdateSubscription
+	case u.StoppedMessageGeneration != nil:
+		return UpdateStoppedMessageGeneration
 	default:
 		return UpdateUnknown
 	}
@@ -308,6 +312,7 @@ type Message struct {
 	ReplyMarkup           *InlineKeyboardMarkup     `json:"reply_markup,omitempty"`
 	CommunityChatAdded    *CommunityChatAdded       `json:"community_chat_added,omitempty"`
 	CommunityChatRemoved  *CommunityChatRemoved     `json:"community_chat_removed,omitempty"`
+	CommunityChatJoined   *CommunityChatJoined      `json:"community_chat_joined,omitempty"`
 	RichMessage           *RichMessage              `json:"rich_message,omitempty"`
 	Invoice               *Invoice                  `json:"invoice,omitempty"`
 	SuccessfulPayment     *SuccessfulPayment        `json:"successful_payment,omitempty"`

@@ -164,33 +164,39 @@ const (
 	ReactionCustomEmoji = telegram.ReactionCustomEmoji
 	ReactionPaid        = telegram.ReactionPaid
 
-	UpdateUnknown                 = telegram.UpdateUnknown
-	UpdateMessage                 = telegram.UpdateMessage
-	UpdateEditedMessage           = telegram.UpdateEditedMessage
-	UpdateChannelPost             = telegram.UpdateChannelPost
-	UpdateEditedChannelPost       = telegram.UpdateEditedChannelPost
-	UpdateBusinessConnection      = telegram.UpdateBusinessConnection
-	UpdateBusinessMessage         = telegram.UpdateBusinessMessage
-	UpdateEditedBusinessMessage   = telegram.UpdateEditedBusinessMessage
-	UpdateDeletedBusinessMessages = telegram.UpdateDeletedBusinessMessages
-	UpdateGuestMessage            = telegram.UpdateGuestMessage
-	UpdateMessageReaction         = telegram.UpdateMessageReaction
-	UpdateMessageReactionCount    = telegram.UpdateMessageReactionCount
-	UpdateInlineQuery             = telegram.UpdateInlineQuery
-	UpdateChosenInlineResult      = telegram.UpdateChosenInlineResult
-	UpdateCallbackQuery           = telegram.UpdateCallbackQuery
-	UpdateShippingQuery           = telegram.UpdateShippingQuery
-	UpdatePreCheckoutQuery        = telegram.UpdatePreCheckoutQuery
-	UpdatePurchasedPaidMedia      = telegram.UpdatePurchasedPaidMedia
-	UpdatePoll                    = telegram.UpdatePoll
-	UpdatePollAnswer              = telegram.UpdatePollAnswer
-	UpdateMyChatMember            = telegram.UpdateMyChatMember
-	UpdateChatMember              = telegram.UpdateChatMember
-	UpdateChatJoinRequest         = telegram.UpdateChatJoinRequest
-	UpdateChatBoost               = telegram.UpdateChatBoost
-	UpdateRemovedChatBoost        = telegram.UpdateRemovedChatBoost
-	UpdateManagedBot              = telegram.UpdateManagedBot
-	UpdateSubscription            = telegram.UpdateSubscription
+	UpdateUnknown                  = telegram.UpdateUnknown
+	UpdateMessage                  = telegram.UpdateMessage
+	UpdateEditedMessage            = telegram.UpdateEditedMessage
+	UpdateChannelPost              = telegram.UpdateChannelPost
+	UpdateEditedChannelPost        = telegram.UpdateEditedChannelPost
+	UpdateBusinessConnection       = telegram.UpdateBusinessConnection
+	UpdateBusinessMessage          = telegram.UpdateBusinessMessage
+	UpdateEditedBusinessMessage    = telegram.UpdateEditedBusinessMessage
+	UpdateDeletedBusinessMessages  = telegram.UpdateDeletedBusinessMessages
+	UpdateGuestMessage             = telegram.UpdateGuestMessage
+	UpdateMessageReaction          = telegram.UpdateMessageReaction
+	UpdateMessageReactionCount     = telegram.UpdateMessageReactionCount
+	UpdateInlineQuery              = telegram.UpdateInlineQuery
+	UpdateChosenInlineResult       = telegram.UpdateChosenInlineResult
+	UpdateCallbackQuery            = telegram.UpdateCallbackQuery
+	UpdateShippingQuery            = telegram.UpdateShippingQuery
+	UpdatePreCheckoutQuery         = telegram.UpdatePreCheckoutQuery
+	UpdatePurchasedPaidMedia       = telegram.UpdatePurchasedPaidMedia
+	UpdatePoll                     = telegram.UpdatePoll
+	UpdatePollAnswer               = telegram.UpdatePollAnswer
+	UpdateMyChatMember             = telegram.UpdateMyChatMember
+	UpdateChatMember               = telegram.UpdateChatMember
+	UpdateChatJoinRequest          = telegram.UpdateChatJoinRequest
+	UpdateChatBoost                = telegram.UpdateChatBoost
+	UpdateRemovedChatBoost         = telegram.UpdateRemovedChatBoost
+	UpdateManagedBot               = telegram.UpdateManagedBot
+	UpdateSubscription             = telegram.UpdateSubscription
+	UpdateStoppedMessageGeneration = telegram.UpdateStoppedMessageGeneration
+
+	RichMessageButtonStyleDanger  = telegram.RichMessageButtonStyleDanger
+	RichMessageButtonStyleSuccess = telegram.RichMessageButtonStyleSuccess
+	RichMessageButtonStylePrimary = telegram.RichMessageButtonStylePrimary
+	RichMessageButtonStyleLink    = telegram.RichMessageButtonStyleLink
 )
 
 // EmojiReaction constructs a standard emoji reaction.
@@ -234,6 +240,42 @@ func Keyboard(rows ...[]InlineKeyboardButton) InlineKeyboardMarkup { return tele
 
 // Row groups inline buttons into one keyboard row.
 func Row(buttons ...InlineKeyboardButton) []InlineKeyboardButton { return telegram.Row(buttons...) }
+
+func RichURLButton(text RichText, url string) RichMessageButton {
+	return telegram.RichURLButton(text, url)
+}
+
+func RichCallbackButton(text RichText, data string) RichMessageButton {
+	return telegram.RichCallbackButton(text, data)
+}
+
+func RichWebAppButton(text RichText, webApp WebAppInfo) RichMessageButton {
+	return telegram.RichWebAppButton(text, webApp)
+}
+
+func RichLoginButton(text RichText, loginURL LoginURL) RichMessageButton {
+	return telegram.RichLoginButton(text, loginURL)
+}
+
+func RichSwitchInlineButton(text RichText, query string) RichMessageButton {
+	return telegram.RichSwitchInlineButton(text, query)
+}
+
+func RichSwitchInlineCurrentChatButton(text RichText, query string) RichMessageButton {
+	return telegram.RichSwitchInlineCurrentChatButton(text, query)
+}
+
+func RichSwitchInlineChosenChatButton(text RichText, query SwitchInlineQueryChosenChat) RichMessageButton {
+	return telegram.RichSwitchInlineChosenChatButton(text, query)
+}
+
+func RichCopyButton(text RichText, value string) RichMessageButton {
+	return telegram.RichCopyButton(text, value)
+}
+
+func RichDisabledButton(text RichText) RichMessageButton {
+	return telegram.RichDisabledButton(text)
+}
 
 // Key creates a plain reply-keyboard button.
 func Key(text string) KeyboardButton { return telegram.Key(text) }

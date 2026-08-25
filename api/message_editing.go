@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-// InputEditableMedia is media accepted by editMessageMedia. It is closed to
-// Telegram's supported animation, audio, document, live-photo, photo, and
-// video variants.
+// InputEditableMedia is media accepted by editMessageMedia and typed
+// editEphemeralMessageMedia calls. It is closed to Telegram's supported
+// animation, audio, document, live-photo, photo, and video variants.
 type InputEditableMedia interface {
 	inputEditableMedia()
 	editableMediaSource() string
