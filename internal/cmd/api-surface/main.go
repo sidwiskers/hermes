@@ -148,7 +148,7 @@ func writePackage(buffer *bytes.Buffer, pkg *types.Package) {
 
 func writeType(buffer *bytes.Buffer, object *types.TypeName, qualifier types.Qualifier) {
 	if object.IsAlias() {
-		fmt.Fprintf(buffer, "type %s = %s\n", object.Name(), types.TypeString(types.Unalias(object.Type()), qualifier))
+		fmt.Fprintf(buffer, "type %s = %s\n", object.Name(), aliasTargetString(object.Type(), qualifier))
 		return
 	}
 
@@ -171,6 +171,14 @@ func writeType(buffer *bytes.Buffer, object *types.TypeName, qualifier types.Qua
 		sig := method.Type().(*types.Signature)
 		fmt.Fprintf(buffer, "method (%s) %s%s\n", types.TypeString(sig.Recv().Type(), qualifier), method.Name(), signature(sig, qualifier))
 	}
+}
+
+func aliasTargetString(value types.Type, qualifier types.Qualifier) string {
+	unaliased := types.Unalias(value)
+	if empty, ok := unaliased.(*types.Interface); ok && empty.Empty() {
+		return "any"
+	}
+	return types.TypeString(unaliased, qualifier)
 }
 
 func underlyingString(value types.Type, qualifier types.Qualifier) string {
