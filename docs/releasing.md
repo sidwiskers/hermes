@@ -28,8 +28,31 @@ later stable lines are accepted automatically. Release candidates, development
 toolchains, and versions older than Go 1.26.6 are rejected. Consumer
 compatibility with Go 1.25 is verified separately in CI.
 
-`RELEASE_ALLOW_DIRTY=1` exists only for developing the release checks. Its
-output is not release evidence.
+Do not treat a passing run with `RELEASE_ALLOW_DIRTY=1` on an arbitrary modified
+checkout as release evidence. Guardian uses this setting for its generated
+candidate inside a container with read-only source, then publishes that exact
+validated tree. Its report records the candidate and validation result; it does
+not claim live Telegram conformance.
+
+## Publishing through Guardian
+
+Guardian prepares update PRs by default. Merging an update does not automatically
+publish a version. After reviewing the update and completing the applicable
+release evidence below, open **Actions → Hermes Guardian → Run workflow**, choose
+branch **main**, and select **release-current**.
+
+This action revalidates current main, including compatibility with Go 1.25, and
+publishes the version recorded at the top of the changelog. It refuses to release
+if main changes after validation and never moves an existing tag. Rerun the same
+action to finish an interrupted release when its tag still matches the validated
+commit.
+
+Optional automatic publishing applies only to supported generated updates that
+pass Guardian's checks. It requires both `GUARDIAN_MODE=automatic` and
+`GUARDIAN_RELEASE=true`; normal repository merge rules still apply. Coding
+repairs require maintainer approval even after automated tests and AI review.
+Automated validation does not run the credentialed live checks or production
+soak described below. See the [owner guide](guardian-owner.md) for all controls.
 
 ## Live Telegram conformance
 

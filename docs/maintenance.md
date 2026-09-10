@@ -6,6 +6,8 @@ Docker, model services and GitHub APIs are maintenance tools, never dependencies
 of applications importing Hermes.
 
 The [owner guide](guardian-owner.md) covers setup, controls, costs and recovery.
+The default policy prepares PRs for approval. Coding repair, automatic merging,
+and automatic releases each require explicit configuration.
 
 ## Detection and evidence
 
@@ -13,7 +15,9 @@ The [owner guide](guardian-owner.md) covers setup, controls, costs and recovery.
 with a bounded response size, timeout and retries. The trusted Go parser creates
 its structural manifest. An independent HTML parser snapshots normalized
 section descriptions, return-contract prose, field descriptions and link targets
-in `spec/bot-api-semantics.json`. Cosmetic HTML markup is ignored; changes to
+in `spec/bot-api-semantics.json`. The snapshot also retains recent release
+announcements so announcement-only changes can be referred for review.
+Cosmetic HTML markup is ignored; changes to
 existing documentation are conservatively referred for review. Wording changes
 can therefore produce a review even when Telegram's actual behavior is unchanged.
 
@@ -55,7 +59,7 @@ bounded attempt. AI claims alone cannot mark an update ready.
 Generators and orchestration run from trusted main. Candidate tests run in a
 separate Docker container with a read-only repository and root filesystem,
 no inherited credentials, dropped capabilities, no privilege escalation, and
-CPU, memory, process and time limits. Intermediate repair tests have no network.
+CPU, memory, process, time and captured-log limits. Intermediate repair tests have no network.
 Full release validation allows network access for public dependency and
 vulnerability data downloads but receives no repair, publishing, or live-bot
 credentials. No host home directory, Docker socket or credential cache is mounted.
@@ -67,6 +71,9 @@ adapters, benchmark smoke tests and cross-platform builds. The benchmark smoke
 check is not a statistical proof against all performance regressions, and the
 integration compilation is not live Telegram conformance. Novel behavior still
 needs appropriate independent conformance evidence and maintainer review.
+After the full gate passes, a separate Go 1.25 container checks generated files,
+runs vet, and executes the full test suite to verify the minimum supported Go
+version.
 
 The sandbox mounts candidate source read-only so tests cannot rewrite the patch
 that is later published. The publication job starts on a fresh runner and reads
