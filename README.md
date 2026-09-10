@@ -137,12 +137,8 @@ webhooks, and a standard-library-only runtime.
 Telegram evolves independently of Hermes. Version-specific claims and exact
 surface counts live in [`docs/schema-parity.md`](docs/schema-parity.md) and the
 changelog; `Call` and `CallMultipart` provide day-zero access to newly released
-methods while the next typed schema update is prepared. The deterministic
-[`Hermes Guardian`](docs/maintenance.md) watches the official API, regenerates
-safe additions, validates isolated updates, and prepares pull requests. Optional
-bounded coding repair supports interchangeable providers; automatic releases
-are restricted to verified mechanical updates. The [owner guide](docs/guardian-owner.md)
-explains the controls without requiring programming.
+methods while the next typed schema update is prepared. [Hermes Guardian](#keeping-up-with-telegram)
+checks for updates and prepares changes for review.
 
 The code is held to stable-v1 gates rather than treating “v1” as a first
 iteration. Deterministic local, Telegram test-DC, credentialed production,
@@ -155,6 +151,36 @@ Cancellation, overload, panic, retry, and shutdown guarantees are specified in
 [`docs/reliability.md`](docs/reliability.md).
 Credentialed Telegram test-DC and production results are tracked
 in [`docs/conformance.md`](docs/conformance.md).
+
+## Keeping up with Telegram
+
+Hermes Guardian checks Telegram's official API and documentation daily. It detects
+new fields and changes to documented behavior, prepares an update on a separate
+branch, and tests it before opening or updating a pull request. Unfinished work
+is preserved between attempts. A second workflow checks for missed runs and can
+restart maintenance.
+
+By default, Guardian prepares PRs for maintainer approval. It does not merge them
+or publish releases automatically. The optional controls are:
+
+| Capability | Default | When enabled |
+| --- | --- | --- |
+| API and documentation checks | Daily | Prepare updates and report their status |
+| Coding repair | Off | Attempt code changes using a configured model service, with bounded retries and a separate review |
+| Automatic merging | Off | Merge supported generated updates after validation, subject to repository rules |
+| Automatic releases | Off | Publish versions after those automatic merges |
+
+Coding repairs still require maintainer approval. Detection and generation need
+no AI service; optional repairs use separate model API access and do not depend
+on a ChatGPT subscription. Future changes that cannot be resolved remain open
+for attention.
+
+Guardian runs in the repository's maintenance workflows. It adds no dependencies
+to Hermes applications and never updates a running bot's installed library.
+
+See the [owner guide](docs/guardian-owner.md) for GitHub controls and setup, the
+[maintenance guide](docs/maintenance.md) for the implementation, and the
+[release guide](docs/releasing.md) for validation and publishing.
 
 ## Routes, filters, and groups
 

@@ -1,6 +1,6 @@
 # Managing Hermes without writing code
 
-Guardian maintains the repository independently of this ChatGPT conversation.
+Guardian runs through repository workflows and does not depend on an ongoing AI conversation.
 You do not need a ChatGPT subscription to run it. It needs a working scheduler
 and build runner; optional coding repairs also need a separately configured model
 service. An API account and its quota are separate from a ChatGPT subscription.
@@ -27,19 +27,33 @@ you upgrade and rebuild them.
 
 ## Start here
 
-After the Guardian implementation is merged:
+Guardian defaults to preparing pull requests for approval. Coding repair,
+automatic merging, and automatic releases are off unless you enable them.
 
-1. Open **Settings → Secrets and variables → Actions → Variables**.
-2. Add `GUARDIAN_MODE` with value `automatic` to allow verified mechanical merges.
-3. Add `GUARDIAN_RELEASE` with value `true` to publish those merged updates.
-4. Open **Actions → Hermes Guardian → Run workflow**, keep branch **main** and
-   action **check**, and select **Run workflow**.
-5. Open the run's summary and the **Hermes maintenance status** issue. Those are
-   the places to check whether maintenance is healthy or needs your attention.
+1. Open **Actions → Hermes Guardian → Run workflow**.
+2. Keep branch **main** and action **check**, then select **Run workflow**.
+3. Read the run's summary and the **Hermes maintenance status** issue. These show
+   whether Hermes is up to date, an update is ready, or something needs attention.
+4. Review any update PR before merging it. The [release guide](releasing.md)
+   explains the checks and the separate publishing step.
 
-Leave `GUARDIAN_MODE` as `pull-request` if you want every merge to be manual.
-Set it to `paused` to stop update preparation. The health check respects this
-setting. You can change these variables any time without editing code.
+You do not need model credentials to check for updates or generate supported
+additions. Scheduled checks run daily while GitHub Actions is available and the
+workflow is enabled.
+
+To change the policy, open **Settings → Secrets and variables → Actions → Variables**:
+
+| Variable | Default | Available controls |
+| --- | --- | --- |
+| `GUARDIAN_MODE` | `pull-request` | Keep every merge manual; choose `automatic` for verified generated updates, or `paused` to stop update preparation |
+| `GUARDIAN_RELEASE` | `false` | Set to `true` to publish releases after automatic merges |
+| `GUARDIAN_REPAIR` | `false` | Set to `true` after configuring a repair provider below |
+
+Leave `GUARDIAN_MODE` unset or set it to `pull-request` to keep approval of every
+change to main. Automatic releases require both `GUARDIAN_MODE=automatic` and
+`GUARDIAN_RELEASE=true`. These settings do not authorize automatic merging of
+coding repairs. The health check respects `paused`; the explicit
+`release-current` action remains a separate owner-requested publishing action.
 
 **GitHub permissions:** Actions must be allowed to create pull requests in
 **Settings → Actions → General → Workflow permissions**. This repository setting
