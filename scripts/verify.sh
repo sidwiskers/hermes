@@ -11,6 +11,7 @@ fi
 ./scripts/test-check-secrets.sh
 ./scripts/check-generated.sh
 ./scripts/test-check-go-version.sh
+python3 -m unittest discover -s scripts/guardian -p 'test_*.py'
 
 go vet ./...
 go test -shuffle=on -count=1 ./...

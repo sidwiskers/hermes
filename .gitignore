@@ -8,3 +8,6 @@ coverage.txt
 .vscode/
 .DS_Store
 .guardian/
+
+__pycache__/
+*.pyc

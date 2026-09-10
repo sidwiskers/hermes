@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.4.0 - 2026-09-10
+
+### Self-maintenance
+
+- Extend Guardian with independent documentation/return-contract detection,
+  stable per-source update branches, resumable bounded coding repairs, provider
+  fallback, isolated validation, and a separate review context.
+- Add owner controls for check, retry and verified release, optional automatic
+  mechanical merges/releases, a persistent status issue, a heartbeat workflow,
+  and an external watcher entry point.
+- Preserve existing tests, official manifests and release controls from repair
+  edits; keep all maintenance services outside the dependency-free Go runtime.
+- Correct stale README version/block-count claims and align the default user
+  agent with the new release.
+
 ## 1.3.0 - 2026-08-25
 
 ### Bot API 10.3
