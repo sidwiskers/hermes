@@ -1,0 +1,31 @@
+name: Hermes maintenance health
+
+on:
+  schedule:
+    - cron: '43 15 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+
+concurrency:
+  group: hermes-guardian-health
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Check heartbeat and recover a missed run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GUARDIAN_MODE: ${{ vars.GUARDIAN_MODE || 'pull-request' }}
+        run: python3 scripts/guardian/main.py health

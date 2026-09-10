@@ -127,7 +127,8 @@ variables are documented in [`docs/releasing.md`](docs/releasing.md).
 
 ## Project status
 
-Hermes 1.1.0 is the stable release. Its typed API is audited against the Bot API
+The [latest stable release](https://github.com/sidwiskers/hermes/releases/latest)
+is available on GitHub. Its typed API is audited against the Bot API
 version recorded in `spec/bot-api.json`, with zero known static parity gaps at
 release time. It also provides permanent raw escape hatches, streamed
 uploads/downloads, bounded update dispatch, race-tested routing, retry-safe
@@ -138,8 +139,10 @@ surface counts live in [`docs/schema-parity.md`](docs/schema-parity.md) and the
 changelog; `Call` and `CallMultipart` provide day-zero access to newly released
 methods while the next typed schema update is prepared. The deterministic
 [`Hermes Guardian`](docs/maintenance.md) watches the official API, regenerates
-safe additions, and opens evidence-backed draft updates without depending on a
-specific AI provider.
+safe additions, validates isolated updates, and prepares pull requests. Optional
+bounded coding repair supports interchangeable providers; automatic releases
+are restricted to verified mechanical updates. The [owner guide](docs/guardian-owner.md)
+explains the controls without requiring programming.
 
 The code is held to stable-v1 gates rather than treating “v1” as a first
 iteration. Deterministic local, Telegram test-DC, credentialed production,
@@ -582,7 +585,7 @@ The current structured foundation includes:
 - every ephemeral-capable send method in the checked-in schema;
 - albums with typed media items and streamed multi-file attachments;
 - polls, dice, reactions, members, moderation, permissions, invite links, and chat administration;
-- Rich Messages with all 21 input blocks and streamed nested media;
+- Rich Messages with typed input blocks and streamed nested media;
 - invoices, Stars, paid media, gifts, business accounts, stories, and managed bots;
 - forum topics, checklists, suggested posts, games, Passport errors, and sticker-set lifecycle;
 - inline, Web App, guest, and prepared-message results;
