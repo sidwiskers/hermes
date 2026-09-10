@@ -1,8 +1,6 @@
 """Bounded provider-neutral repair; models never receive shell or Git credentials."""
 import json
 import os
-import re
-import subprocess
 import time
 import urllib.error
 import urllib.parse
@@ -85,10 +83,14 @@ def providers():
         raise ValueError("GUARDIAN_PROVIDERS must contain at most three providers")
     result = []
     for item in entries:
+        if not isinstance(item, dict) or not isinstance(item.get("url"), str):
+            raise ValueError("each provider needs a URL, model and key_env")
+        if not isinstance(item.get("model"), str) or not 1 <= len(item["model"]) <= 256:
+            raise ValueError("each provider needs a nonempty model name")
         url = urllib.parse.urlparse(item["url"])
         if url.scheme != "https" or not url.hostname or url.username or url.password or url.query:
             raise ValueError("provider URL must be HTTPS without embedded credentials/query")
-        key_env = item["key_env"]
+        key_env = item.get("key_env")
         if key_env not in ("GUARDIAN_KEY_1", "GUARDIAN_KEY_2", "GUARDIAN_KEY_3"):
             raise ValueError("invalid provider key variable")
         if os.environ.get(key_env):
@@ -115,6 +117,8 @@ def completion(provider, messages):
     if len(raw) > MAX_REPLY:
         raise ValueError("provider response too large")
     text = json.loads(raw)["choices"][0]["message"]["content"]
+    if not isinstance(text, str):
+        raise ValueError("provider returned no text response")
     if text.startswith("```json") and text.rstrip().endswith("```"):
         text = text.strip()[7:-3]
     result = json.loads(text)

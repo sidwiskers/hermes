@@ -24,6 +24,12 @@ def diff(kind="unchanged"):
 
 
 class ProtocolTests(unittest.TestCase):
+    def test_announcement_only_change_is_not_silently_ignored(self):
+        a = protocol.snapshot(document())
+        b = protocol.snapshot(document() + '<h4><a name="august-24-2026"></a>August 24, 2026</h4>'
+                              '<p>Bot API 10.3 changed delivery behavior.</p>')
+        self.assertIn("release-notes:", protocol.semantic_changes(a, b, diff())[0])
+
     def test_ignores_html_style_and_whitespace(self):
         a = protocol.snapshot(document())
         b = protocol.snapshot(document().replace("Returns True", "Returns  <b>True</b>"))
@@ -157,6 +163,11 @@ class RepairTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             repair.NoRedirect().redirect_request(None, None, None, None, None)
 
+    def test_malformed_provider_configuration_has_a_clear_error(self):
+        for config in (["not-an-object"], [{"url": "https://example.test", "model": None}]):
+            with patch.dict(os.environ, {"GUARDIAN_PROVIDERS": json.dumps(config)}, clear=True), self.assertRaises(ValueError):
+                repair.providers()
+
     def test_fallback_and_bounded_loop(self):
         with patch.object(repair, "providers", return_value=[{"name": "first"}, {"name": "second"}]), \
                 patch.object(repair, "completion", side_effect=[OSError("private error"), {"action": "done", "summary": "done"}]) as call:
@@ -177,6 +188,15 @@ class RepairTests(unittest.TestCase):
 
 
 class ControlPlaneTests(unittest.TestCase):
+    def test_auto_release_requires_pure_generation_and_all_gates(self):
+        report = {"status": "ready", "mechanical": True, "parity": True, "validation": {"passed": True}}
+        changes = [{"path": "types/zz_botapi_generated.go"}]
+        self.assertTrue(main.automatic_candidate(report, changes))
+        for update in ({"repair": {"status": "proposed"}}, {"parity": False},
+                       {"validation": {"passed": False}}, {"mechanical": False}, {"status": "reviewed"}):
+            self.assertFalse(main.automatic_candidate(dict(report, **update), changes))
+        self.assertFalse(main.automatic_candidate(report, [{"path": "api/handwritten.go"}]))
+
     def test_paused_health_never_calls_github(self):
         with tempfile.TemporaryDirectory() as tmp, patch.object(main, "OUT", Path(tmp)), \
                 patch.dict(os.environ, {"GUARDIAN_MODE": "paused"}), \

@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """Repository maintenance control plane. Python standard library only."""
 import argparse
-import base64
 import datetime as dt
 import json
 import os
 import re
 import shutil
 import subprocess
-import sys
 import time
 import urllib.error
 import urllib.request
@@ -51,7 +49,8 @@ def write_json(path, value):
 def api(route, method="GET", body=None, missing=False):
     if not route.startswith("/repos/"):
         raise ValueError("repository API route required")
-    headers = {"Accept": "application/vnd.github+json", "User-Agent": "hermes-guardian"}
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "hermes-guardian",
+               "Content-Type": "application/json"}
     token = os.environ.get("GH_TOKEN")
     if token:
         headers["Authorization"] = "Bearer " + token
@@ -122,6 +121,10 @@ def scope_check(root, base):
     return sorted(set(names))
 
 
+def candidate_digest(root, base):
+    return digest({name: (root / name).read_text() for name in scope_check(root, base) if name != STATE})
+
+
 def validation_image(minimum=False):
     version = "1.25" if minimum else run(["go", "env", "GOVERSION"]).strip().removeprefix("go")
     if not re.fullmatch(r"\d+\.\d+(?:\.\d+)?", version):
@@ -150,9 +153,13 @@ def sandbox(command, network=False, timeout=900, minimum=False):
             "-e", "RELEASE_ALLOW_DIRTY=1", "-e", "GOMAXPROCS=2",
             image, "bash", "-c", "git config --global --add safe.directory /repo && " + command]
     log = OUT / ("minimum-go.log" if minimum else "release.log" if network else "repair-check.log")
+    def limit_log():
+        import resource
+        resource.setrlimit(resource.RLIMIT_FSIZE, (16_000_000, 16_000_000))
     try:
         with log.open("w") as output:
-            result = subprocess.run(args, stdout=output, stderr=subprocess.STDOUT, timeout=timeout)
+            result = subprocess.run(args, stdout=output, stderr=subprocess.STDOUT,
+                                    timeout=timeout, preexec_fn=limit_log)
         text = log.read_text(errors="replace")
         return {"passed": result.returncode == 0, "output": text[-16000:]}
     except subprocess.TimeoutExpired:
@@ -279,7 +286,15 @@ def prepare(args):
         # Cosmetic HTML changes must not rewrite the same candidate every day.
         candidate["source_sha256"] = read_json(WORK / "spec/bot-api.json")["source_sha256"]
         write_json(candidate_path, candidate)
-    if (previous_state.get("last_base") == base and not args.retry
+    same_candidate = (previous_state.get("last_base") == base and
+                      previous_state.get("candidate_digest") == candidate_digest(WORK, base))
+    if same_candidate and not args.retry and previous_state.get("status") == "reviewed":
+        report.update(status="reviewed", repair=previous_state.get("repair"),
+                      review=previous_state.get("review"),
+                      message="The previously verified repair awaits your PR review. Its tested code is unchanged.")
+        finish(report)
+        return
+    if (same_candidate and not args.retry
             and previous_state.get("status") == "needs_attention"
             and (previous_state.get("repair_runs", 0) >= 2 or
                  os.environ.get("GUARDIAN_REPAIR", "false") != "true" or not providers())):
@@ -296,6 +311,10 @@ def prepare(args):
     except RuntimeError as exc:
         report["generation_error"] = str(exc)[-4000:]
     report["parity"] = parity
+    # Once code repair is needed, this is no longer a purely generated update,
+    # even if Telegram's declaration change was classified as additive.
+    if not parity:
+        report["mechanical"] = False
     repair_runs = previous_state.get("repair_runs", 0)
     if not isinstance(repair_runs, int) or not 0 <= repair_runs <= 100:
         raise ValueError("invalid persisted repair count")
@@ -304,6 +323,7 @@ def prepare(args):
                         k in {n.lower() for category in ("methods", "objects", "unions")
                               for kind in ("added", "changed") for n in diff[category][kind]}}
     evidence = {"diff": diff, "semantic_reasons": reasons,
+                "release_announcements": semantics.get("announcements", {}),
                 "official_sections": changed_sections,
                 "previous_review": previous_state.get("review"),
                 "previous_validation": previous_state.get("validation"),
@@ -411,6 +431,7 @@ def validate(args):
         report.update(status="needs_attention", message=str(exc)[-6000:])
     state = {k: report[k] for k in ("identity", "repair_runs", "repair", "review", "status") if k in report}
     state["last_base"] = report["base"]
+    state["candidate_digest"] = candidate_digest(WORK, report["base"])
     if report["status"] == "needs_attention":
         state["validation"] = report.get("validation")
     write_json(WORK / STATE, state)
@@ -424,6 +445,8 @@ def validate(args):
 
 
 def release_check(args):
+    if OUT.exists():
+        shutil.rmtree(OUT)
     OUT.mkdir(exist_ok=True)
     if WORK.exists():
         shutil.rmtree(WORK)
@@ -521,8 +544,8 @@ def publish(args):
     write_json(OUT / "report.json", report)
     # Existing PR drafts are never silently promoted. An owner may have deliberately
     # paused one. Repository branch protection is honored by the normal merge API.
-    if (os.environ.get("GUARDIAN_MODE") == "automatic" and report["status"] == "ready"
-            and report["mechanical"] and not pr["draft"]):
+    if (os.environ.get("GUARDIAN_MODE") == "automatic" and automatic_candidate(report, changes)
+            and not pr["draft"]):
         latest = api(route + "/git/ref/heads/main")["object"]["sha"]
         if latest != main:
             raise ValueError("main moved before merge; rerun validation")
@@ -536,10 +559,23 @@ def publish(args):
                 finish(report)
                 return
             raise
-        if merged.get("merged") and os.environ.get("GUARDIAN_RELEASE") == "true":
-            publish_release(route, report["release"], merged["sha"], body)
+        if merged.get("merged"):
+            actual = api(route + "/git/commits/" + merged["sha"])
+            if actual["tree"]["sha"] != tree["sha"]:
+                raise ValueError("main changed while GitHub merged the PR; revalidate current main before releasing")
+            report.update(status="merged", message="Verified mechanical update merged successfully.")
+            if os.environ.get("GUARDIAN_RELEASE") == "true":
+                publish_release(route, report["release"], merged["sha"], body)
+                report.update(status="released", message="Verified mechanical update merged and released successfully.")
     finish(report)
     print(pr["html_url"])
+
+
+def automatic_candidate(report, changes):
+    return (report.get("status") == "ready" and report.get("mechanical") is True
+            and report.get("parity") is True and report.get("validation", {}).get("passed") is True
+            and not report.get("repair")
+            and all(c["path"] in GENERATED for c in changes))
 
 
 def publish_release(route, tag, sha, notes):

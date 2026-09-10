@@ -81,11 +81,13 @@ def snapshot(html):
     parser = Document()
     parser.feed(html)
     sections = {}
+    announcements = {}
     for anchor, section in parser.sections.items():
         title = " ".join(" ".join(section["title"]).split())
         # Release announcements are retained separately as evidence, not mixed
         # with each declaration: every new release naturally changes them.
         if re.match(r"^[A-Z][a-z]+ \d{1,2}, \d{4}$", title):
+            announcements[title] = " ".join(" ".join(section["body"]).split())
             continue
         sections[anchor] = {
             "title": title,
@@ -94,7 +96,7 @@ def snapshot(html):
         }
     if "sendmessage" not in sections or "update" not in sections:
         raise ValueError("official document is incomplete or its layout changed")
-    return {"format": 1, "sections": sections}
+    return {"format": 1, "sections": sections, "announcements": announcements}
 
 
 def semantic_changes(before, after, structural):
@@ -106,6 +108,9 @@ def semantic_changes(before, after, structural):
     if not before or before.get("format") != 1:
         return ["Documentation baseline needs review"]
     reasons = []
+    if (before.get("announcements", {}) != after.get("announcements", {})
+            and structural["classification"] == "unchanged"):
+        reasons.append("release-notes: announcement changed without structural declarations")
     old, new = before["sections"], after["sections"]
     added_objects = {n.lower() for n in structural["objects"]["added"]}
     changed_objects = {n.lower() for n in structural["objects"]["changed"]}
