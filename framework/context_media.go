@@ -3,7 +3,7 @@ package framework
 import "fmt"
 
 type contextSendTarget struct {
-	chatID    int64
+	chatID    any
 	ephemeral *EphemeralMessageParameters
 	reply     *ReplyParameters
 	options   sendOptions
