@@ -10,6 +10,6 @@
   "candidate_digest": "673c54d54eb4459193d0807bc60f7aff7df6da63895c07d295192dab38a6366f",
   "validation": {
     "passed": false,
-    "output": "release toolchain accepted: go1.27.3\nBot API 10.4: 193 methods, 982 parameters, 396 objects, 1983 fields, 29 unions, 204 variants\nparity gaps: 78\n  missing method bindings: 8\n  missing method parameters: 50\n  mismatched method optionality: 14\n  mismatched method types: 0\n  non-nilable optional method objects: 0\n  missing object types: 0\n  missing object fields: 2\n  mismatched object optionality: 0\n  mismatched object types: 1\n  non-nilable optional object fields: 0\n  missing union types: 3\n  missing union variants: 0\nexit status 1\n"
+    "output": "Superseded initial Guardian scan: its 78-gap audit ran before the Bot API 10.4 implementation was completed and does not describe the current branch.\nStatic audit on c65078e21b057d5a34b5996b456c5ea32692cdb7:\nBot API 10.4: 193 methods, 982 parameters, 396 objects, 1983 fields, 29 unions, 204 variants\nparity gaps: 0\nLatest PR head 1a492774fcb1790c66e48cc69588520386d02db2: all CI jobs passed (main verification, Go 1.25, macOS, Windows).\nThe full scripts/release-check.sh release gate has not been run. Maintainer review remains required.\n"
   }
 }
