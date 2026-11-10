@@ -103,7 +103,7 @@ func (b *Client) SendSticker(ctx context.Context, p SendStickerParams) (*Message
 	return b.sendMediaJSON(ctx, "sendSticker", p.ChatID, p.Sticker, p)
 }
 func (b *Client) SendStickerUpload(ctx context.Context, p SendStickerParams, name string, reader io.Reader) (*Message, error) {
-	fields, err := newFormFields(p.ChatID)
+	fields, err := newSendFormFields(p.base(), "sendSticker")
 	if err != nil {
 		return nil, err
 	}

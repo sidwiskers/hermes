@@ -123,7 +123,7 @@ func (b *Client) SendVideoNote(ctx context.Context, p SendVideoNoteParams) (*Mes
 	return b.sendMediaJSON(ctx, "sendVideoNote", p.ChatID, p.VideoNote, p)
 }
 func (b *Client) SendVideoNoteUpload(ctx context.Context, p SendVideoNoteParams, name string, reader io.Reader) (*Message, error) {
-	fields, err := newFormFields(p.ChatID)
+	fields, err := newSendFormFields(p.base(), "sendVideoNote")
 	if err != nil {
 		return nil, err
 	}

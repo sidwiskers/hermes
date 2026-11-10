@@ -27,13 +27,10 @@ type SendContactParams struct {
 }
 
 func (b *Client) SendContact(ctx context.Context, p SendContactParams) (*Message, error) {
-	if err := validateChatID(p.ChatID, "sendContact"); err != nil {
-		return nil, err
-	}
 	if p.PhoneNumber == "" || p.FirstName == "" {
 		return nil, fmt.Errorf("hermes: sendContact phone_number and first_name are required")
 	}
-	normalized, err := normalizeEphemeralSendParams(p)
+	normalized, err := prepareEphemeralSendParams(p, p.ChatID, "sendContact")
 	if err != nil {
 		return nil, err
 	}
@@ -64,10 +61,7 @@ type SendLocationParams struct {
 }
 
 func (b *Client) SendLocation(ctx context.Context, p SendLocationParams) (*Message, error) {
-	if err := validateChatID(p.ChatID, "sendLocation"); err != nil {
-		return nil, err
-	}
-	normalized, err := normalizeEphemeralSendParams(p)
+	normalized, err := prepareEphemeralSendParams(p, p.ChatID, "sendLocation")
 	if err != nil {
 		return nil, err
 	}
@@ -100,13 +94,10 @@ type SendVenueParams struct {
 }
 
 func (b *Client) SendVenue(ctx context.Context, p SendVenueParams) (*Message, error) {
-	if err := validateChatID(p.ChatID, "sendVenue"); err != nil {
-		return nil, err
-	}
 	if p.Title == "" || p.Address == "" {
 		return nil, fmt.Errorf("hermes: sendVenue title and address are required")
 	}
-	normalized, err := normalizeEphemeralSendParams(p)
+	normalized, err := prepareEphemeralSendParams(p, p.ChatID, "sendVenue")
 	if err != nil {
 		return nil, err
 	}
