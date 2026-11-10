@@ -49,10 +49,10 @@ func TestCheckedInManifest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if schema.Version != "10.3" || schema.Source != "https://core.telegram.org/bots/api" {
+	if schema.Version != "10.4" || schema.Source != "https://core.telegram.org/bots/api" {
 		t.Fatalf("metadata = %#v", schema)
 	}
-	want := Stats{Methods: 185, Parameters: 932, Objects: 374, ObjectFields: 1888, Unions: 26, Variants: 194}
+	want := Stats{Methods: 193, Parameters: 982, Objects: 396, ObjectFields: 1983, Unions: 29, Variants: 204}
 	if got := schema.Stats(); got != want {
 		t.Fatalf("stats = %#v, want %#v", got, want)
 	}

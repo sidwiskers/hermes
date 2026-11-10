@@ -15,18 +15,28 @@ const (
 	maxWidgetStateBytes    = 1024
 )
 
-func validateWidgetState(value, field string) error {
+func validateWidgetPayload(value, field string) error {
 	if len(value) > maxWidgetStateBytes {
 		return fmt.Errorf("hermes: %s must not exceed %d bytes", field, maxWidgetStateBytes)
 	}
-	if !utf8.ValidString(value) || strings.IndexByte(value, 0) >= 0 {
-		return fmt.Errorf("hermes: %s must be valid UTF-8 without NUL bytes", field)
+	if !utf8.ValidString(value) {
+		return fmt.Errorf("hermes: %s must be valid UTF-8", field)
+	}
+	return nil
+}
+
+func validateWidgetState(value, field string) error {
+	if err := validateWidgetPayload(value, field); err != nil {
+		return err
+	}
+	if strings.IndexByte(value, 0) >= 0 {
+		return fmt.Errorf("hermes: %s must not contain NUL bytes", field)
 	}
 	return nil
 }
 
 func validateWidgetHTML(value string) error {
-	if strings.TrimSpace(value) == "" {
+	if len(value) == 0 {
 		return fmt.Errorf("hermes: sendWidget html is required")
 	}
 	if len(value) > maxWidgetHTMLBytes {
@@ -135,7 +145,7 @@ func (client *Client) AnswerWidgetQuery(ctx context.Context, params AnswerWidget
 	if strings.TrimSpace(params.WidgetQueryID) == "" {
 		return fmt.Errorf("hermes: answerWidgetQuery widget_query_id is required")
 	}
-	if err := validateWidgetState(params.Data, "answerWidgetQuery data"); err != nil {
+	if err := validateWidgetPayload(params.Data, "answerWidgetQuery data"); err != nil {
 		return err
 	}
 	return client.callTrue(ctx, "answerWidgetQuery", params)
@@ -179,8 +189,8 @@ func (client *Client) EditSharedWidgetData(ctx context.Context, params EditShare
 	if err := validateWidgetState(params.PublicData, "editSharedWidgetData public_data"); err != nil {
 		return err
 	}
-	if params.CacheTime != 0 && (params.CacheTime < 5 || params.CacheTime > 3600) {
-		return fmt.Errorf("hermes: editSharedWidgetData cache_time must be between 5 and 3600 seconds")
+	if params.CacheTime != 0 && params.CacheTime < 5 {
+		return fmt.Errorf("hermes: editSharedWidgetData cache_time must be at least 5 seconds")
 	}
 	return client.callTrue(ctx, "editSharedWidgetData", params)
 }

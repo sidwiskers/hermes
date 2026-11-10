@@ -19,9 +19,9 @@ func TestContextEphemeralFromCallback(t *testing.T) {
 		if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 			t.Fatal(err)
 		}
-		if params.ChatID.(float64) != 100 || params.EphemeralMessageParameters == nil ||
-			params.EphemeralMessageParameters.ReceiverUserID != 7 || params.EphemeralMessageParameters.CallbackQueryID != "cb" {
-			t.Fatalf("unexpected params: %#v", params)
+		if params.ChatID != nil || params.EphemeralMessageParameters == nil ||
+			params.EphemeralMessageParameters.ReceiverUserID != 0 || params.EphemeralMessageParameters.CallbackQueryID != "cb" {
+			t.Fatalf("callback-targeted ephemeral send must omit chat_id and receiver_user_id: %#v", params)
 		}
 		_, _ = w.Write([]byte(`{"ok":true,"result":{"message_id":0,"chat":{"id":100,"type":"supergroup"},"receiver_user":{"id":7,"is_bot":false,"first_name":"A"},"ephemeral_message_id":9}}`))
 	}))

@@ -15,9 +15,15 @@ func TestBotAPI104WidgetAndGiftMethods(t *testing.T) {
 	t.Parallel()
 
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		var body map[string]any
-		if err := json.NewDecoder(request.Body).Decode(&body); err != nil {
+		body := make(map[string]any)
+		rawBody, err := io.ReadAll(request.Body)
+		if err != nil {
 			t.Fatal(err)
+		}
+		if len(rawBody) != 0 {
+			if err := json.Unmarshal(rawBody, &body); err != nil {
+				t.Fatal(err)
+			}
 		}
 		switch {
 		case strings.HasSuffix(request.URL.Path, "/sendWidget"):
@@ -112,15 +118,21 @@ func TestBotAPI104WidgetAndGiftMethods(t *testing.T) {
 	}
 }
 
-func TestEditSharedWidgetDataAllowsEmptyValueToClearState(t *testing.T) {
+func TestEditSharedWidgetDataAllowsEmptyValueAndServerClampedCacheTime(t *testing.T) {
 	t.Parallel()
 
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		var body map[string]any
-		if err := json.NewDecoder(request.Body).Decode(&body); err != nil {
+		body := make(map[string]any)
+		rawBody, err := io.ReadAll(request.Body)
+		if err != nil {
 			t.Fatal(err)
 		}
-		if body["widget_id"] != "shared-1" || body["public_data"] != "" {
+		if len(rawBody) != 0 {
+			if err := json.Unmarshal(rawBody, &body); err != nil {
+				t.Fatal(err)
+			}
+		}
+		if body["widget_id"] != "shared-1" || body["public_data"] != "" || body["cache_time"] != float64(3601) {
 			t.Fatalf("editSharedWidgetData body = %#v", body)
 		}
 		_, _ = io.WriteString(writer, `{"ok":true,"result":true}`)
@@ -129,7 +141,7 @@ func TestEditSharedWidgetDataAllowsEmptyValueToClearState(t *testing.T) {
 
 	client := New("TOKEN", WithBaseURL(server.URL), WithHTTPClient(server.Client()))
 	if err := client.EditSharedWidgetData(context.Background(), EditSharedWidgetDataParams{
-		WidgetID: "shared-1", PublicData: "",
+		WidgetID: "shared-1", PublicData: "", CacheTime: 3601,
 	}); err != nil {
 		t.Fatal(err)
 	}
@@ -150,6 +162,15 @@ func TestWidgetPayloadLimitsUseUTF8Bytes(t *testing.T) {
 	if err := validateWidgetHTML("<main>valid</main>"); err != nil {
 		t.Fatalf("valid widget HTML rejected: %v", err)
 	}
+	if err := validateWidgetHTML(" "); err != nil {
+		t.Fatalf("non-empty whitespace HTML rejected: %v", err)
+	}
+	if err := validateWidgetHTML(""); err == nil {
+		t.Fatal("expected empty HTML to fail")
+	}
+	if err := validateWidgetPayload("\x00", "answer data"); err != nil {
+		t.Fatalf("NUL in answer data rejected: %v", err)
+	}
 	if err := validateWidgetHTML(strings.Repeat("x", maxWidgetHTMLBytes+1)); err == nil {
 		t.Fatal("expected HTML larger than 32768 bytes to fail")
 	}
@@ -168,9 +189,15 @@ func TestSendMessageEphemeralCallbackDoesNotRequireChatID(t *testing.T) {
 	t.Parallel()
 
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		var body map[string]any
-		if err := json.NewDecoder(request.Body).Decode(&body); err != nil {
+		body := make(map[string]any)
+		rawBody, err := io.ReadAll(request.Body)
+		if err != nil {
 			t.Fatal(err)
+		}
+		if len(rawBody) != 0 {
+			if err := json.Unmarshal(rawBody, &body); err != nil {
+				t.Fatal(err)
+			}
 		}
 		if _, exists := body["chat_id"]; exists {
 			t.Fatalf("chat_id must be omitted for callback-scoped ephemeral send: %#v", body)
