@@ -4,12 +4,58 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      regenerate_botapi:
+        description: Regenerate Bot API declarations and public API manifest on this branch
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
 
 jobs:
+  regenerate-botapi:
+    if: github.event_name == 'workflow_dispatch' && inputs.regenerate_botapi
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Check out selected branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref }}
+          persist-credentials: true
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: stable
+          check-latest: true
+          cache: true
+
+      - name: Format and regenerate schema aliases
+        run: |
+          gofmt -w $(git ls-files '*.go')
+          go run ./internal/cmd/botapi-models
+          go run ./internal/cmd/api-surface -output spec/api-surface.txt
+
+      - name: Commit generated declarations
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add types/zz_botapi_generated.go api/zz_botapi_aliases_generated.go zz_botapi_aliases_generated.go spec/api-surface.txt
+          if git diff --cached --quiet; then
+            echo "Generated declarations are already current."
+            exit 0
+          fi
+          git commit -m "chore(bot-api): refresh generated aliases and public API surface"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
   test:
+    if: github.event_name != 'workflow_dispatch' || !inputs.regenerate_botapi
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -58,6 +104,7 @@ jobs:
         run: go test -tags=integration -run '^$' ./integration
 
   minimum-go:
+    if: github.event_name != 'workflow_dispatch' || !inputs.regenerate_botapi
     name: Test (Go 1.25)
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -96,6 +143,7 @@ jobs:
           go test -tags=integration -run '^$' ./integration/...
 
   portable:
+    if: github.event_name != 'workflow_dispatch' || !inputs.regenerate_botapi
     name: Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
