@@ -1,0 +1,15 @@
+{
+  "identity": "92d94099ee36d4b25f6fc165b41597a26929b3a046249d481f97bd44be4274bb",
+  "repair_runs": 0,
+  "repair": {
+    "status": "disabled",
+    "summary": "Coding repair is disabled."
+  },
+  "status": "needs_attention",
+  "last_base": "50e4e6a1527eeb8679af9f4d4850dbdb6e172756",
+  "candidate_digest": "673c54d54eb4459193d0807bc60f7aff7df6da63895c07d295192dab38a6366f",
+  "validation": {
+    "passed": false,
+    "output": "release toolchain accepted: go1.27.3\nBot API 10.4: 193 methods, 982 parameters, 396 objects, 1983 fields, 29 unions, 204 variants\nparity gaps: 78\n  missing method bindings: 8\n  missing method parameters: 50\n  mismatched method optionality: 14\n  mismatched method types: 0\n  non-nilable optional method objects: 0\n  missing object types: 0\n  missing object fields: 2\n  mismatched object optionality: 0\n  mismatched object types: 1\n  non-nilable optional object fields: 0\n  missing union types: 3\n  missing union variants: 0\nexit status 1\n"
+  }
+}
