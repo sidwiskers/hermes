@@ -199,8 +199,10 @@ func (client *Client) GetMyDefaultAdministratorRights(ctx context.Context, param
 }
 
 type VerifyUserParams struct {
-	UserID            int64  `json:"user_id"`
-	CustomDescription string `json:"custom_description,omitempty"`
+	UserID                     int64           `json:"user_id"`
+	CustomDescription          string          `json:"custom_description,omitempty"`
+	CustomDescriptionParseMode string          `json:"custom_description_parse_mode,omitempty"`
+	CustomDescriptionEntities  []MessageEntity `json:"custom_description_entities,omitempty"`
 }
 
 func (client *Client) VerifyUser(ctx context.Context, params VerifyUserParams) error {
@@ -214,8 +216,10 @@ func (client *Client) VerifyUser(ctx context.Context, params VerifyUserParams) e
 }
 
 type VerifyChatParams struct {
-	ChatID            any    `json:"chat_id"`
-	CustomDescription string `json:"custom_description,omitempty"`
+	ChatID                     any             `json:"chat_id"`
+	CustomDescription          string          `json:"custom_description,omitempty"`
+	CustomDescriptionParseMode string          `json:"custom_description_parse_mode,omitempty"`
+	CustomDescriptionEntities  []MessageEntity `json:"custom_description_entities,omitempty"`
 }
 
 func (client *Client) VerifyChat(ctx context.Context, params VerifyChatParams) error {

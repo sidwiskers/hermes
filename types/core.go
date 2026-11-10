@@ -25,6 +25,8 @@ const (
 	UpdateMessageReaction          UpdateType = "message_reaction"
 	UpdateMessageReactionCount     UpdateType = "message_reaction_count"
 	UpdateInlineQuery              UpdateType = "inline_query"
+	UpdateWidgetQuery              UpdateType = "widget_query"
+	UpdateSharedWidgetQuery        UpdateType = "shared_widget_query"
 	UpdateChosenInlineResult       UpdateType = "chosen_inline_result"
 	UpdateCallbackQuery            UpdateType = "callback_query"
 	UpdateShippingQuery            UpdateType = "shipping_query"
@@ -48,6 +50,7 @@ const (
 // original payload for every update.
 type Update struct {
 	UpdateID                 int64                        `json:"update_id"`
+	UpdateBotAPIFields
 	Message                  *Message                     `json:"message,omitempty"`
 	EditedMessage            *Message                     `json:"edited_message,omitempty"`
 	ChannelPost              *Message                     `json:"channel_post,omitempty"`
@@ -107,6 +110,10 @@ func (u *Update) Type() UpdateType {
 		return UpdateMessageReactionCount
 	case u.InlineQuery != nil:
 		return UpdateInlineQuery
+	case u.WidgetQuery != nil:
+		return UpdateWidgetQuery
+	case u.SharedWidgetQuery != nil:
+		return UpdateSharedWidgetQuery
 	case u.ChosenInlineResult != nil:
 		return UpdateChosenInlineResult
 	case u.CallbackQuery != nil:
@@ -185,6 +192,10 @@ func (u *Update) Sender() *User {
 		return &u.ChatMember.From
 	case u.InlineQuery != nil:
 		return &u.InlineQuery.From
+	case u.WidgetQuery != nil:
+		return &u.WidgetQuery.From
+	case u.SharedWidgetQuery != nil:
+		return &u.SharedWidgetQuery.From
 	case u.ChosenInlineResult != nil:
 		return &u.ChosenInlineResult.From
 	case u.ShippingQuery != nil:
