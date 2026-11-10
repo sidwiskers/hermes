@@ -7,7 +7,7 @@ import (
 
 type SendContactParams struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
 	PhoneNumber                string                      `json:"phone_number"`
@@ -39,7 +39,7 @@ func (b *Client) SendContact(ctx context.Context, p SendContactParams) (*Message
 
 type SendLocationParams struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
 	Latitude                   float64                     `json:"latitude"`
@@ -70,7 +70,7 @@ func (b *Client) SendLocation(ctx context.Context, p SendLocationParams) (*Messa
 
 type SendVenueParams struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
 	Latitude                   float64                     `json:"latitude"`
