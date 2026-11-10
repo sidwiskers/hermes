@@ -51,14 +51,9 @@ func (content InputStoryContentVideo) MarshalJSON() ([]byte, error) {
 	}{Type: "video", alias: alias(content)})
 }
 
-type StoryAreaPosition struct {
-	XPercentage            float64 `json:"x_percentage"`
-	YPercentage            float64 `json:"y_percentage"`
-	WidthPercentage        float64 `json:"width_percentage"`
-	HeightPercentage       float64 `json:"height_percentage"`
-	RotationAngle          float64 `json:"rotation_angle"`
-	CornerRadiusPercentage float64 `json:"corner_radius_percentage"`
-}
+// StoryAreaPosition is retained as a source-compatible alias. Bot API 10.4
+// names this shared geometry object AreaPosition.
+type StoryAreaPosition = AreaPosition
 
 // StoryAreaType is the compact union of location, suggested reaction, link,
 // weather, and unique-gift story area variants.
@@ -78,8 +73,8 @@ type StoryAreaType struct {
 }
 
 type StoryArea struct {
-	Position StoryAreaPosition `json:"position"`
-	Type     StoryAreaType     `json:"type"`
+	Position AreaPosition  `json:"position"`
+	Type     StoryAreaType `json:"type"`
 }
 
 type PostStoryParams struct {

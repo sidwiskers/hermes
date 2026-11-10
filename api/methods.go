@@ -90,8 +90,8 @@ func resolveEphemeralMessageParameters(
 	return &resolved, nil
 }
 
-// normalizeEphemeralSendParams maps legacy convenience fields to the nested
-// ephemeral-send object and validates Bot API 10.4 callback-only targets.
+// validateSendChatID enforces the ordinary chat target and Bot API 10.4's
+// callback-scoped exception for ephemeral sends.
 func validateSendChatID(chatID any, ephemeral *EphemeralMessageParameters, method string) error {
 	if chatID != nil {
 		return validateChatID(chatID, method)
@@ -146,6 +146,8 @@ func prepareEphemeralSendParams(params any, chatID any, method string) (any, err
 	return normalized, nil
 }
 
+// normalizeEphemeralSendParams maps legacy convenience fields to the nested
+// ephemeral-send object while preserving explicit Bot API 10.4 callback targets.
 func normalizeEphemeralSendParams(params any) (any, error) {
 	normalize := func(current *EphemeralMessageParameters, receiver int64, callback string) (*EphemeralMessageParameters, error) {
 		return resolveEphemeralMessageParameters(current, receiver, callback)
