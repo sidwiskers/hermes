@@ -82,6 +82,12 @@ parameters consistently through JSON and multipart send paths. The older
 for source compatibility and are translated into the nested
 `ephemeral_message_parameters` object.
 
+The generated types also include `PaidMessagesWaived` service messages,
+the optional `suggested_username` on managed-bot keyboard requests, and the
+new `ton_address` and `bank_card_number` message-entity type values.
+The new private-bot-topic link form uses the existing message-thread/topic
+identifiers; it does not require another Bot API method.
+
 ## Completion strategy
 
 1. Use marker interfaces and discriminator-aware encoding for request unions,

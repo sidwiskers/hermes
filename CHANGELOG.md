@@ -21,6 +21,9 @@
   paths. Make `receiver_user_id` optional as specified by Bot API 10.4.
 - Add rich-text quote fields and formatted verification descriptions, plus
   lookup of unique gifts by name and deletion of business-account gifts.
+- Include the new paid-message waiver service message, managed-bot suggested
+  usernames, and `ton_address`/`bank_card_number` message-entity values in
+  the generated protocol models.
 - Add request/response, discriminator, unknown-variant, payload-limit, and
   ephemeral-send regression tests for the new protocol surface.
 - Document production widget restrictions, query deadlines, and Telegram's

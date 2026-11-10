@@ -43,7 +43,7 @@ type MessageOrigin struct {
 	AuthorSignature string `json:"author_signature,omitempty"`
 }
 
-// InputMessageContent is implemented by the eight supported inline-message
+// InputMessageContent is implemented by the seven supported inline-message
 // content objects. The marker prevents unrelated request values at compile
 // time without adding reflection to encoding.
 type InputMessageContent interface {
