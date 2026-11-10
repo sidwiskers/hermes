@@ -1,241 +1,27 @@
 # Changelog
 
+## Unreleased
+
+### Telegram Bot API 10.4
+
+- Update the checked-in official schema to Bot API 10.4 (2026-11-09):
+  193 methods, 982 method parameters, 396 objects, 1,983 object fields,
+  29 union roots, and 204 union variants.
+- Add typed native HTML widget methods for sending standalone and shared
+  widgets, answering widget queries, and updating per-message or shared widget
+  data. Widget message content is also supported by inline-query input content.
+- Add discriminator-aware `ChatShareTheme`, `EmojiType`, and `WidgetQueryType`
+  response unions, including round-trip preservation of unknown future
+  variants. Expose widget and shared-widget updates through `Update`, including
+  update classification and sender attribution.
+- Add TON Wallet card and transfer models, wallet-related message and chat
+  fields, chat-share theme models, and the `ton_address` rich-text discriminator.
+- Support callback-scoped ephemeral sends without requiring a chat ID, while
+  retaining explicit validation and multipart handling for all typed send
+  paths. Make `receiver_user_id` optional as specified by Bot API 10.4.
+- Add rich-text quote fields and formatted verification descriptions, plus
+  lookup of unique gifts by name and deletion of business-account gifts.
+- Add request/response, discriminator, unknown-variant, and ephemeral-send
+  regression tests for the new protocol surface.
+
 ## 1.4.0 - 2026-09-10
-
-### Self-maintenance
-
-- Extend Guardian with independent documentation/return-contract detection,
-  stable per-source update branches, resumable bounded coding repairs, provider
-  fallback, isolated validation, and a separate review context.
-- Add owner controls for check, retry and verified release, optional automatic
-  mechanical merges/releases, a persistent status issue, a heartbeat workflow,
-  and an external watcher entry point.
-- Preserve existing tests, official manifests and release controls from repair
-  edits; keep all maintenance services outside the dependency-free Go runtime.
-- Correct stale README version/block-count claims and align the default user
-  agent with the new release.
-
-## 1.3.0 - 2026-08-25
-
-### Bot API 10.3
-
-- Updated the deterministic Telegram manifest to Bot API 10.3 with zero gaps
-  across 185 methods, 932 parameters, 374 objects, 1,888 object fields, 26
-  unions, and 194 variants.
-- Added rich-message buttons, expandable quotations, document blocks, compact
-  tables, document media, and optional rich-map dimensions with discriminator-
-  aware encoding and validation.
-- Added `EphemeralMessageParameters`, rich-message ephemeral sends, callback
-  message replacement, rich ephemeral edits, caption placement, and streamed
-  uploads for ephemeral media edits.
-- Kept the Bot API 10.2 `ReceiverUserID` and `CallbackQueryID` send fields as
-  deprecated source-compatible inputs while translating them exclusively to
-  the Bot API 10.3 nested wire object.
-- Added disabled keyboard buttons, markup-level force replies, stoppable draft
-  controls, stopped-generation updates, community-chat join messages, welcome-
-  message administrator rights, and private unique-gift metadata.
-- Updated Hermes Lab's ephemeral-message emulation, the root and framework
-  facades, schema tooling, generated contracts, and focused JSON/multipart
-  regression coverage for the complete 10.3 delta.
-- Raised the contributor and release-evidence toolchain floor to Go 1.26.6
-  after the vulnerability gate identified reachable standard-library issues
-  fixed by that patch; the consumer language floor remains Go 1.25.
-
-## 1.2.0 - 2026-08-10
-
-### Hermes Fleet
-
-- Added the optional `fleet` package for hosting several independent Hermes
-  bots in one Go process with one coordinated lifecycle.
-- Added shared-client bot construction, mixed polling and webhook mounts, one
-  exact-path webhook server, queued and synchronous reply modes, stable status,
-  and graceful handler draining.
-- Isolated ordinary bot preparation and source failures by default, with an
-  explicit fail-fast policy for applications whose bots must stop together.
-- Kept tokens, routing, middleware, state, and bounded dispatchers independent;
-  existing single-bot APIs and execution paths are unchanged.
-- Added race-tested lifecycle coverage, a runnable example, a complete guide,
-  and reproducible five-bot RSS, PSS, goroutine, and file-descriptor evidence.
-
-## 1.1.0 - 2026-08-10
-
-### Hermes Lab
-
-- Added the optional Hermes Lab in `testkit`: deterministic virtual private
-  and group users, synchronous updates through the real bot, and an in-process
-  model for common Bot API messaging methods.
-- Added retained outgoing messages, callbacks, edits, deletes, replay, stable
-  generated identifiers, and concurrent per-update request attribution.
-- Added method-scoped Telegram errors, rate limits, transport failures, exact
-  response overrides, and readable expectations for common bot behavior.
-- Extended the low-level recorder with fallback responders and queued
-  transport errors while preserving the existing `Request` and `Response`
-  struct layouts.
-- Added a complete Lab guide, runnable example, and stateful FSM coverage.
-
-### Compatibility and release polish
-
-- Kept production routing and middleware semantics unchanged; Hermes Lab is
-  absent from applications that do not import `testkit`.
-- Added regression coverage for legacy route-matching and middleware order.
-- Updated the default user agent and release documentation for Hermes 1.1.0.
-- Regenerated and reviewed the deterministic exported-API manifest.
-
-## 1.0.1 - 2026-07-25
-
-### Performance and scalability
-
-- Made session, deduplication, rate-limit, router, and FSM maps demand-driven,
-  eliminating up to 64 eager allocations per component while keeping
-  steady-state key operations allocation-free.
-- Release empty store shards after fill-and-drain workloads so transient key
-  cardinality does not permanently pin map backing storage.
-- Replaced globally locked key-capacity admission with exact atomic
-  reservations, preserving strict bounds while allowing unrelated shards to
-  admit new keys concurrently.
-- Reduced each live rate-limit bucket by one redundant timestamp, cutting
-  allocated bytes by 24% in the checked-in 1,000-identity benchmark.
-- Reused bounded webhook body buffers without retaining oversized requests and
-  expanded the soak report with peak heap, live-object, stack, per-request
-  allocation, and GC telemetry.
-
-### Compatibility and maintenance
-
-- Lowered the consumer language floor to Go 1.25 while retaining Go 1.26.5 as
-  the recommended contributor toolchain and testing both the latest Go 1.25
-  patch and the current stable release in CI.
-- Made release-toolchain validation accept every future stable Go release after
-  Go 1.26.5 while rejecting older, prerelease, and development toolchains.
-- Added Hermes Guardian: a deterministic daily Bot API watcher, semantic schema
-  diff, safe regeneration pipeline, zero-gap classification, draft pull-request
-  workflow, and infrastructure-failure reporting.
-- Closed the schema audit's parameterless-method blind spot so every official
-  method requires an actual typed binding, even when it accepts no parameters.
-- Defined a provider-neutral repair contract so any current or future coding
-  agent can consume the same evidence without making project maintenance depend
-  on one vendor or model name.
-
-## 1.0.0 - 2026-07-19
-
-### Hermes identity and release polish
-
-- Renamed the canonical module and root package to `github.com/sidwiskers/hermes` and `hermes`.
-- Renamed the network-free recorder package to `testkit` and the profiling command to `hermesbench`.
-- Standardized user-facing error prefixes and the default user agent on the Hermes name.
-- Documented the pre-1.0 compatibility policy and explicit release gates.
-- Published the canonical `framework` package so root aliases link to complete
-  `Context`, `Router`, `Group`, filter, and middleware documentation.
-- Added externally compiled package examples plus complete polling, webhook,
-  upload, inline-mode, payment, and standalone-client programs.
-- Standardized nil raw-call failures on `ErrClientRequired`.
-- Added macOS and Windows CI, cross-architecture release compilation, and a
-  single automated release-gate command.
-- Added first-class Telegram test-environment endpoints and an opt-in live
-  conformance suite for identity, message lifecycle, streamed uploads, polling
-  cancellation, and webhook configuration.
-- Corrected test-environment file downloads and added a live byte-for-byte
-  upload, `getFile`, and streamed-download conformance check.
-- Added bounded synchronous webhook acknowledgement, direct Bot API replies,
-  shared global concurrency limits, response-size limits, and retry-preserving
-  handler error semantics.
-- Added optional typed `session`, `fsm`, `dedupe`, `ratelimit`, and `observe`
-  packages without adding a dependency to the core module.
-- Added an owned-lifecycle soak harness with JSON runtime, latency, overload,
-  allocation, heap, goroutine, and drain evidence.
-- Added a deterministic exported-API manifest plus credential, dependency, and
-  official Go vulnerability release gates.
-- Raised the minimum toolchain to Go 1.26.5 after the vulnerability gate found
-  reachable standard-library flaws in the original Go 1.26.0 release.
-- Expanded current competitor coverage to Telego, go-tg, and Telebot v4 beta,
-  and excluded adapter setup from every timed benchmark.
-- Recorded credentialed production polling, streamed file round trips, a
-  bounded live period, public HTTPS webhook delivery, synchronous replies,
-  Telegram redelivery after handler error and contained panic, secret/path/body
-  rejection, and duplicate suppression.
-- Added a build-tagged, dependency-free live webhook probe plus a checksum-
-  verified Cloudflare Quick Tunnel runner for repeatable release conformance.
-
-### Bot API 10.2 completion
-
-- Completed typed entry points for all 185 official Bot API 10.2 methods while retaining raw JSON and multipart escape hatches.
-- Added a deterministic official-schema inventory and source audit covering 937
-  parameters, 362 objects, 1,838 object fields, 26 unions, and 187 variants.
-- Added a strict zero-gap source gate; method and parameter gaps are fixed at
-  zero and any schema regression fails CI.
-- Generated every missing Bot API object, field, union root, and concrete union
-  variant, with aliases in the low-level client and root facade.
-- Extended schema gates to requiredness, Go wire types, JSON optionality, and
-  optional-object nilability; every checked category is at zero gaps.
-- Replaced permissive inline-result and Passport-error structs with sealed
-  concrete unions that inject discriminators automatically. Raw compatibility
-  forms remain available as `InlineQueryResultRaw` and
-  `PassportElementErrorRaw`.
-- Renamed menu-button discriminator constants to `MenuButtonTypeCommands`,
-  `MenuButtonTypeWebApp`, and `MenuButtonTypeDefault`, and renamed the
-  force-reply constructor to `NewForceReply` so the official concrete type can
-  use the `ForceReply` name.
-- Added Rich Messages with all 21 input block variants, strict format validation, draft support, and nested streamed uploads.
-- Added invoices, Stars, paid media, gifts, forum topics, business accounts, managed bots, stories, checklists, games, Passport errors, suggested posts, and full sticker-set management.
-- Added typed inline, Web App, guest, and prepared-message results, profile/admin settings, chat boosts, business rights, and bulk forwarding/copying.
-- Added live-photo sending and media editing with attachment/upload parity validation.
-- Replaced multipart attachment inspection through a decoded `any` tree with a single-pass scan of marshaled JSON and changed method validation to byte-wise ASCII checks.
-- Added contract, validation, decode, upload, and micro-benchmark coverage for the new surfaces.
-
-### Round 5
-
-- Made raw update preservation opt-in for polling, webhooks, and standalone decoders, removing the default full-payload copy.
-- Added allocation-free handler dispatch through pooled borrowed contexts, plus `Context.Clone` and a pooling opt-out.
-- Batched startup route registration automatically and compile the immutable snapshot once on first dispatch, eliminating quadratic startup rebuilds.
-- Added bounded transport-buffer pooling and precomputed method URL prefixes, reducing JSON call latency and allocations.
-- Added direct framework/runtime tests, malformed-input coverage, queue/backpressure tests, and raw-mode tests.
-- Added fuzz targets for update decoding, command parsing, callback codecs, API envelopes, and method validation.
-- Added a reproducible benchmark package, profiling command, benchmark scripts, coverage gates, fuzz smoke tests, and CI performance smoke tests.
-
-### Round 4
-
-- Added typed photo, live-photo, video, audio, and document media groups with 2–10 item validation and streamed multi-file attachments.
-- Added current poll schemas, closed typed poll-media unions, streamed poll-media uploads, poll creation/stopping, optional-boolean helpers, and all supported dice.
-- Added typed message reactions, reaction removal, and incoming reaction-count decoding.
-- Added member banning, restriction, promotion, permissions, administrator titles, member tags, and sender-chat moderation.
-- Added administrator/member lookup and join-request actions.
-- Added normal and subscription invite-link creation, editing, export, and revocation.
-- Added chat photo, title, description, pin, and sticker-set management.
-- Added context helpers for reactions, polls, dice, moderation, join requests, and pins.
-- Added attachment/upload parity validation plus multipart, schema, administration, and context-action contract tests.
-
-### Structure
-
-- Restructured the flat root implementation into `api`, `types`, `framework`, and `internal/runtime` packages.
-- Preserved a small root-facade syntax through type re-exports and the embedded low-level client.
-- Made `api.New` available for applications that want the library without the framework.
-- Isolated bounded dispatch, polling, and webhook lifecycle code from public declarations.
-
-
-### Round 2
-
-- Expanded incoming update, message, media, query, payment, community, and subscription types.
-- Added ordered filter routes and composable filter helpers.
-- Added nested route groups with group-local middleware.
-- Added typed callback codecs and 64-byte validation.
-- Added inline, reply, remove, and force-reply keyboard types and helpers.
-- Added all 12 Bot API 10.2 ephemeral-capable send methods.
-- Added streamed uploads for photo, animation, audio, document, sticker, video, video note, and voice.
-- Added automatic context media, edit, caption, keyboard, delete, callback-answer, and chat-action helpers.
-- Added forwarding, copying, bulk deletion, command scopes, command retrieval/deletion, and common chat methods.
-- Added file metadata, safe streamed downloads, webhook status, and certificate uploads.
-- Added structured logging and configurable panic reporting middleware.
-- Added the `testkit` in-memory request recorder.
-- Split large API/type implementations into focused files.
-
-### Foundation
-
-- Standard-library-only Telegram Bot API transport.
-- Generic raw JSON and streamed multipart calls.
-- Typed Telegram API and HTTP errors.
-- Lock-free command and callback routing snapshots.
-- Middleware, panic recovery, and handler deadlines.
-- Bounded long-polling and webhook dispatch.
-- Graceful webhook shutdown and secret-token verification.
-- Typed `sendMessage`, `sendPhoto`, callback, command, and webhook methods.
-- Bot API 10.2 ephemeral commands, sends, replies, edits, and deletion.
-- Unit, race, backpressure, upload, and routing benchmark coverage.

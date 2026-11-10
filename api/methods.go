@@ -90,8 +90,8 @@ func resolveEphemeralMessageParameters(
 	return &resolved, nil
 }
 
-// normalizeEphemeralSendParams performs the Bot API 10.2-to-10.3 wire
-// translation for the send parameter structs that retain legacy fields.
+// normalizeEphemeralSendParams maps legacy convenience fields to the nested
+// ephemeral-send object and validates Bot API 10.4 callback-only targets.
 func validateSendChatID(chatID any, ephemeral *EphemeralMessageParameters, method string) error {
 	if chatID != nil {
 		return validateChatID(chatID, method)

@@ -193,8 +193,10 @@ func (value RichTextBankCardNumber) MarshalJSON() ([]byte, error) {
 }
 
 func (value RichTextTonAddress) MarshalJSON() ([]byte, error) {
-	type plain RichTextTonAddress
-	return richTextEnvelope("ton_address", plain(value))
+	return richTextEnvelope("ton_address", struct {
+		Text    RichText `json:"text"`
+		Address string   `json:"address"`
+	}{Text: value.Text, Address: value.Address})
 }
 
 type RichTextMention struct {

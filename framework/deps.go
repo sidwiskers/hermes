@@ -55,7 +55,9 @@ type (
 
 // Common update and parse-mode constants used by Context helpers.
 const (
-	UpdateUnknown       = telegram.UpdateUnknown
+	UpdateUnknown           = telegram.UpdateUnknown
+	UpdateWidgetQuery       = telegram.UpdateWidgetQuery
+	UpdateSharedWidgetQuery = telegram.UpdateSharedWidgetQuery
 	ParseModeHTML       = api.ParseModeHTML
 	ParseModeMarkdown   = api.ParseModeMarkdown
 	ParseModeMarkdownV2 = api.ParseModeMarkdownV2

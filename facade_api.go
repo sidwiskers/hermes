@@ -78,6 +78,13 @@ type (
 	InputRichBlockVoiceNote                 = api.InputRichBlockVoiceNote
 	InputRichBlockThinking                  = api.InputRichBlockThinking
 	SendRichMessageParams                   = api.SendRichMessageParams
+	SendWidgetParams                         = api.SendWidgetParams
+	SendSharedWidgetParams                   = api.SendSharedWidgetParams
+	AnswerWidgetQueryParams                  = api.AnswerWidgetQueryParams
+	EditMessageWidgetDataParams              = api.EditMessageWidgetDataParams
+	EditSharedWidgetDataParams               = api.EditSharedWidgetDataParams
+	GetUniqueGiftParams                      = api.GetUniqueGiftParams
+	DeleteBusinessAccountGiftParams          = api.DeleteBusinessAccountGiftParams
 	SendRichMessageDraftParams              = api.SendRichMessageDraftParams
 	SendInvoiceParams                       = api.SendInvoiceParams
 	CreateInvoiceLinkParams                 = api.CreateInvoiceLinkParams

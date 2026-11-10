@@ -96,11 +96,11 @@ type EmojiType struct {
 	Raw         json.RawMessage
 }
 
-func NewEmoji(value string) EmojiType {
+func NewEmojiTypeEmoji(value string) EmojiType {
 	return EmojiType{Emoji: &EmojiTypeEmoji{Emoji: value}}
 }
 
-func NewCustomEmoji(customEmojiID string) EmojiType {
+func NewEmojiTypeCustomEmoji(customEmojiID string) EmojiType {
 	return EmojiType{CustomEmoji: &EmojiTypeCustomEmoji{CustomEmojiID: customEmojiID}}
 }
 
