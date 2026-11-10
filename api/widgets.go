@@ -1,10 +1,58 @@
 package api
 
 import (
+	"bytes"
+	"compress/zlib"
 	"context"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 )
+
+const (
+	maxWidgetHTMLBytes = 32 * 1024
+	maxWidgetHTMLZlibBytes = 4 * 1024
+	maxWidgetStateBytes = 1024
+)
+
+func validateWidgetState(value, field string) error {
+	if len(value) > maxWidgetStateBytes {
+		return fmt.Errorf("hermes: %s must not exceed %d bytes", field, maxWidgetStateBytes)
+	}
+	if !utf8.ValidString(value) || strings.IndexByte(value, 0) >= 0 {
+		return fmt.Errorf("hermes: %s must be valid UTF-8 without NUL bytes", field)
+	}
+	return nil
+}
+
+func validateWidgetHTML(value string) error {
+	if strings.TrimSpace(value) == "" {
+		return fmt.Errorf("hermes: sendWidget html is required")
+	}
+	if len(value) > maxWidgetHTMLBytes {
+		return fmt.Errorf("hermes: sendWidget html must not exceed %d bytes", maxWidgetHTMLBytes)
+	}
+	if !utf8.ValidString(value) || strings.IndexByte(value, 0) >= 0 {
+		return fmt.Errorf("hermes: sendWidget html must be valid UTF-8 without NUL bytes")
+	}
+
+	var compressed bytes.Buffer
+	writer, err := zlib.NewWriterLevel(&compressed, zlib.BestCompression)
+	if err != nil {
+		return fmt.Errorf("hermes: initialize widget HTML compression: %w", err)
+	}
+	if _, err := writer.Write([]byte(value)); err != nil {
+		_ = writer.Close()
+		return fmt.Errorf("hermes: compress widget HTML: %w", err)
+	}
+	if err := writer.Close(); err != nil {
+		return fmt.Errorf("hermes: finish widget HTML compression: %w", err)
+	}
+	if compressed.Len() > maxWidgetHTMLZlibBytes {
+		return fmt.Errorf("hermes: sendWidget compressed html must not exceed %d bytes", maxWidgetHTMLZlibBytes)
+	}
+	return nil
+}
 
 // SendWidgetParams sends a standalone HTML widget message.
 type SendWidgetParams struct {
@@ -34,8 +82,14 @@ func (client *Client) SendWidget(ctx context.Context, params SendWidgetParams) (
 	if err := validateChatID(params.ChatID, "sendWidget"); err != nil {
 		return nil, err
 	}
-	if strings.TrimSpace(params.HTML) == "" {
-		return nil, fmt.Errorf("hermes: sendWidget html is required")
+	if err := validateWidgetHTML(params.HTML); err != nil {
+		return nil, err
+	}
+	if err := validateWidgetState(params.PublicData, "sendWidget public_data"); err != nil {
+		return nil, err
+	}
+	if err := validateWidgetState(params.ChatData, "sendWidget chat_data"); err != nil {
+		return nil, err
 	}
 	return callMessage(ctx, client, "sendWidget", params)
 }
@@ -66,6 +120,9 @@ func (client *Client) SendSharedWidget(ctx context.Context, params SendSharedWid
 	if strings.TrimSpace(params.WidgetID) == "" {
 		return nil, fmt.Errorf("hermes: sendSharedWidget widget_id is required")
 	}
+	if err := validateWidgetState(params.ChatData, "sendSharedWidget chat_data"); err != nil {
+		return nil, err
+	}
 	return callMessage(ctx, client, "sendSharedWidget", params)
 }
 
@@ -78,8 +135,8 @@ func (client *Client) AnswerWidgetQuery(ctx context.Context, params AnswerWidget
 	if strings.TrimSpace(params.WidgetQueryID) == "" {
 		return fmt.Errorf("hermes: answerWidgetQuery widget_query_id is required")
 	}
-	if len(params.Data) > 1024 {
-		return fmt.Errorf("hermes: answerWidgetQuery data must not exceed 1024 bytes")
+	if err := validateWidgetState(params.Data, "answerWidgetQuery data"); err != nil {
+		return err
 	}
 	return client.callTrue(ctx, "answerWidgetQuery", params)
 }
@@ -96,6 +153,16 @@ func (client *Client) EditMessageWidgetData(ctx context.Context, params EditMess
 	if err := validateMessageEditTarget(params.ChatID, params.MessageID, params.InlineMessageID, "editMessageWidgetData"); err != nil {
 		return err
 	}
+	if params.PublicData != nil {
+		if err := validateWidgetState(*params.PublicData, "editMessageWidgetData public_data"); err != nil {
+			return err
+		}
+	}
+	if params.ChatData != nil {
+		if err := validateWidgetState(*params.ChatData, "editMessageWidgetData chat_data"); err != nil {
+			return err
+		}
+	}
 	return client.callTrue(ctx, "editMessageWidgetData", params)
 }
 
@@ -109,8 +176,8 @@ func (client *Client) EditSharedWidgetData(ctx context.Context, params EditShare
 	if strings.TrimSpace(params.WidgetID) == "" {
 		return fmt.Errorf("hermes: editSharedWidgetData widget_id is required")
 	}
-	if strings.TrimSpace(params.PublicData) == "" {
-		return fmt.Errorf("hermes: editSharedWidgetData public_data is required")
+	if err := validateWidgetState(params.PublicData, "editSharedWidgetData public_data"); err != nil {
+		return err
 	}
 	if params.CacheTime != 0 && (params.CacheTime < 5 || params.CacheTime > 3600) {
 		return fmt.Errorf("hermes: editSharedWidgetData cache_time must be between 5 and 3600 seconds")

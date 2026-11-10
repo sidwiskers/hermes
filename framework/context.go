@@ -338,7 +338,7 @@ func (c *Context) EphemeralMessage(text string, options ...SendOption) (*Message
 	}
 	parameters := &EphemeralMessageParameters{}
 	params := SendMessageParams{Text: text, EphemeralMessageParameters: parameters}
-	if hasChat {
+	if c.Callback == nil && hasChat {
 		params.ChatID = chatID
 		parameters.ReceiverUserID = sender.ID
 	}
