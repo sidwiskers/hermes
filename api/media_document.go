@@ -7,7 +7,7 @@ import (
 
 type SendDocumentParams struct {
 	BusinessConnectionID        string                      `json:"business_connection_id,omitempty"`
-	ChatID                      any                         `json:"chat_id"`
+	ChatID                      any                         `json:"chat_id,omitempty"`
 	MessageThreadID             int                         `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID       int                         `json:"direct_messages_topic_id,omitempty"`
 	Document                    string                      `json:"document"`
@@ -64,7 +64,7 @@ func (b *Client) SendDocumentUpload(ctx context.Context, p SendDocumentParams, n
 
 type SendStickerParams struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
 	Sticker                    string                      `json:"sticker"`
@@ -103,7 +103,7 @@ func (b *Client) SendSticker(ctx context.Context, p SendStickerParams) (*Message
 	return b.sendMediaJSON(ctx, "sendSticker", p.ChatID, p.Sticker, p)
 }
 func (b *Client) SendStickerUpload(ctx context.Context, p SendStickerParams, name string, reader io.Reader) (*Message, error) {
-	fields, err := newFormFields(p.ChatID)
+	fields, err := newSendFormFields(p.base(), "sendSticker")
 	if err != nil {
 		return nil, err
 	}

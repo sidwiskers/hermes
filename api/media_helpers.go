@@ -15,7 +15,7 @@ type CaptionParams struct {
 }
 
 func mediaFields(base SendBaseParams, caption CaptionParams) (formFields, error) {
-	fields, err := newFormFields(base.ChatID)
+	fields, err := newSendFormFields(base, "sendMedia")
 	if err != nil {
 		return nil, err
 	}
@@ -28,13 +28,10 @@ func mediaFields(base SendBaseParams, caption CaptionParams) (formFields, error)
 	return fields, nil
 }
 func (b *Client) sendMediaJSON(ctx context.Context, method string, chatID any, media string, params any) (*Message, error) {
-	if err := validateChatID(chatID, method); err != nil {
-		return nil, err
-	}
 	if media == "" {
 		return nil, fmt.Errorf("hermes: %s media is required", method)
 	}
-	normalized, err := normalizeEphemeralSendParams(params)
+	normalized, err := prepareEphemeralSendParams(params, chatID, method)
 	if err != nil {
 		return nil, err
 	}

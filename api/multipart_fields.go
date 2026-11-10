@@ -79,6 +79,24 @@ func (f formFields) JSON(key string, value any) error {
 	return nil
 }
 
+func newSendFormFields(params SendBaseParams, method string) (formFields, error) {
+	ephemeral, err := resolveEphemeralMessageParameters(
+		params.EphemeralMessageParameters,
+		params.ReceiverUserID,
+		params.CallbackQueryID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if err := validateSendChatID(params.ChatID, ephemeral, method); err != nil {
+		return nil, err
+	}
+	if params.ChatID == nil {
+		return make(formFields, 24), nil
+	}
+	return newFormFields(params.ChatID)
+}
+
 func addSendBaseFields(fields formFields, params SendBaseParams) error {
 	fields.String("business_connection_id", params.BusinessConnectionID)
 	fields.Int("message_thread_id", params.MessageThreadID)

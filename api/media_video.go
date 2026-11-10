@@ -7,7 +7,7 @@ import (
 
 type SendVideoParams struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
 	Video                      string                      `json:"video"`
@@ -82,7 +82,7 @@ func (b *Client) SendVideoUpload(ctx context.Context, p SendVideoParams, name st
 
 type SendVideoNoteParams struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
 	VideoNote                  string                      `json:"video_note"`
@@ -123,7 +123,7 @@ func (b *Client) SendVideoNote(ctx context.Context, p SendVideoNoteParams) (*Mes
 	return b.sendMediaJSON(ctx, "sendVideoNote", p.ChatID, p.VideoNote, p)
 }
 func (b *Client) SendVideoNoteUpload(ctx context.Context, p SendVideoNoteParams, name string, reader io.Reader) (*Message, error) {
-	fields, err := newFormFields(p.ChatID)
+	fields, err := newSendFormFields(p.base(), "sendVideoNote")
 	if err != nil {
 		return nil, err
 	}

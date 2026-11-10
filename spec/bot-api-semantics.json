@@ -121,6 +121,16 @@
           "Optional . New incoming callback query"
         ],
         [
+          "widget_query",
+          "[#widgetquery] WidgetQuery",
+          "Optional . New incoming query from a widget in a message sent by the bot or via the bot"
+        ],
+        [
+          "shared_widget_query",
+          "[#sharedwidgetquery] SharedWidgetQuery",
+          "Optional . New incoming query from a forwarded message with a shared widget"
+        ],
+        [
           "shipping_query",
           "[#shippingquery] ShippingQuery",
           "Optional . New incoming shipping query. Only for invoices with flexible price."
@@ -786,6 +796,16 @@
           "community",
           "[#community] Community",
           "Optional . The [#community] Community to which the chat belongs"
+        ],
+        [
+          "ton_wallet_card",
+          "[#tonwalletcard] TonWalletCard",
+          "Optional . For private chats, the TON wallet card of the user, which is shown on their profile page"
+        ],
+        [
+          "share_theme",
+          "[#chatsharetheme] ChatShareTheme",
+          "Optional . For private chats, supergroups and channels, the theme of the screen for sharing a link to the user or the chat; omitted if the default theme is used"
         ]
       ]
     },
@@ -1049,9 +1069,14 @@
           "Optional . Message is a voice message, information about the file"
         ],
         [
+          "widget",
+          "[#widget] Widget",
+          "Optional . Message is an HTML widget, information about the widget"
+        ],
+        [
           "caption",
           "String",
-          "Optional . Caption for the animation, audio, document, paid media, photo, video or voice"
+          "Optional . Caption for the animation, audio, document, live photo, paid media, photo, video, voice, or widget"
         ],
         [
           "caption_entities",
@@ -1061,7 +1086,7 @@
         [
           "show_caption_above_media",
           "True",
-          "Optional . True , if the caption must be shown above the message media"
+          "Optional . True , if the caption must be shown above the message media or the widget"
         ],
         [
           "has_media_spoiler",
@@ -1334,6 +1359,11 @@
           "Optional . Service message: the price for paid messages has changed in the chat"
         ],
         [
+          "paid_messages_waived",
+          "[#paidmessageswaived] PaidMessagesWaived",
+          "Optional . Service message: the sender of the message used a link of the other user, which allows sending messages to the user without paying Telegram Stars"
+        ],
+        [
           "poll_option_added",
           "[#polloptionadded] PollOptionAdded",
           "Optional . Service message: answer option was added to a poll"
@@ -1367,6 +1397,11 @@
           "suggested_post_refunded",
           "[#suggestedpostrefunded] SuggestedPostRefunded",
           "Optional . Service message: payment for a suggested post was refunded"
+        ],
+        [
+          "ton_wallet_transfer",
+          "[#tonwallettransfer] TonWalletTransfer",
+          "Optional . Service message: a transfer with a TON wallet"
         ],
         [
           "video_chat_scheduled",
@@ -1459,7 +1494,7 @@
         [
           "type",
           "String",
-          "Type of the entity. Currently, can be “mention” ( @username ), “hashtag” ( #hashtag or #hashtag@chatusername ), “cashtag” ( $USD or $USD@chatusername ), “bot_command” ( /start@jobs_bot ), “url” ( https://telegram.org ), “email” ( do-not-reply@telegram.org ), “phone_number” ( +1-212-555-0123 ), “bold” ( bold text ), “italic” ( italic text ), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation), “expandable_blockquote” (collapsed-by-default block quotation), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users [https://telegram.org/blog/edit#new-mentions] without usernames ), “custom_emoji” (for inline custom emoji stickers), or “date_time” (for formatted date and time)."
+          "Type of the entity. Currently, can be “mention” ( @username ), “hashtag” ( #hashtag or #hashtag@chatusername ), “cashtag” ( $USD or $USD@chatusername ), “bot_command” ( /start@jobs_bot ), “url” ( https://telegram.org ), “email” ( do-not-reply@telegram.org ), “phone_number” ( +1-212-555-0123 ), “bank_card_number” (bank card number), “ton_address” (address in the TON blockchain), “bold” ( bold text ), “italic” ( italic text ), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation), “expandable_blockquote” (collapsed-by-default block quotation), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users [https://telegram.org/blog/edit#new-mentions] without usernames ), “custom_emoji” (for inline custom emoji stickers), or “date_time” (for formatted date and time)."
         ],
         [
           "offset",
@@ -1515,7 +1550,7 @@
         [
           "text",
           "String",
-          "Text of the quoted part of a message that is replied to by the given message"
+          "Text of the quoted part of a message that is replied to by the given message; may be empty if the quote was chosen from a rich message"
         ],
         [
           "entities",
@@ -1523,9 +1558,14 @@
           "Optional . Special entities that appear in the quote. Currently, only bold , italic , underline , strikethrough , spoiler , custom_emoji , and date_time entities are kept in quotes."
         ],
         [
+          "rich_texts",
+          "Array of [#richtext] RichText",
+          "Optional . Rich text of the quote if it was chosen from a [#richmessage] rich message . May contain only plain text, [#richtextbold] RichTextBold , [#richtextitalic] RichTextItalic , [#richtextunderline] RichTextUnderline , [#richtextstrikethrough] RichTextStrikethrough , [#richtextspoiler] RichTextSpoiler , [#richtextsubscript] RichTextSubscript , [#richtextsuperscript] RichTextSuperscript , [#richtextdatetime] RichTextDateTime , [#richtextcustomemoji] RichTextCustomEmoji , [#richtextmathematicalexpression] RichTextMathematicalExpression , and arrays of them."
+        ],
+        [
           "position",
           "Integer",
-          "Approximate quote position in the original message in UTF-16 code units as specified by the sender"
+          "Approximate quote position in the original message in UTF-16 code units as specified by the sender. For quotes from rich messages, it is the position in the text formed by joining plain texts of all quotable texts of the message, separated by line feeds."
         ],
         [
           "is_manual",
@@ -1619,6 +1659,11 @@
           "Optional . Message is a voice message, information about the file"
         ],
         [
+          "widget",
+          "[#widget] Widget",
+          "Optional . Message is an HTML widget, information about the widget"
+        ],
+        [
           "has_media_spoiler",
           "True",
           "Optional . True , if the message media is covered by a spoiler animation"
@@ -1692,7 +1737,7 @@
         [
           "chat_id",
           "Integer or String",
-          "Optional . If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup or channel in the format @username . Not supported for messages sent on behalf of a business account, messages from channel direct messages chats and ephemeral messages."
+          "Optional . If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup, or channel in the format @username . Not supported for messages sent on behalf of a business account, messages from channel direct messages chats and ephemeral messages."
         ],
         [
           "ephemeral_message_id",
@@ -1720,9 +1765,14 @@
           "Optional . A JSON-serialized list of special entities that appear in the quote. It can be specified instead of quote_parse_mode ."
         ],
         [
+          "quote_rich_texts",
+          "Array of [#richtext] RichText",
+          "Optional . A JSON-serialized list of quoted parts of the [#richmessage] rich message to be replied to. Must contain one element for each quoted text of the message in the order of their appearance. Each of the following is a separate quoted text: the text of a paragraph, a heading, a preformatted block, a footer, or a mathematical expression; the text and the credit of a block quotation or a pull quotation; the summary of a details block; the caption and each cell of a table; the text and the credit of a caption of a media block, a collage, a slideshow, or a map. Texts of blocks nested in lists, block quotations, details, collages, and slideshows are separate quoted texts too. The first and the last elements can contain only a part of the corresponding text; all other elements must contain the whole text. Formatting of the quoted parts must be kept, and rich texts must be nested in the same way as in the message received from the server. Mathematical expressions must be quoted entirely. Buttons in [#richblockbuttons] RichBlockButtons , anchors and dividers can't be quoted. Up to 32 quoted texts with total length up to 1024 characters can be specified. Only plain text, [#richtextbold] RichTextBold , [#richtextitalic] RichTextItalic , [#richtextunderline] RichTextUnderline , [#richtextstrikethrough] RichTextStrikethrough , [#richtextspoiler] RichTextSpoiler , [#richtextsubscript] RichTextSubscript , [#richtextsuperscript] RichTextSuperscript , [#richtextdatetime] RichTextDateTime , [#richtextcustomemoji] RichTextCustomEmoji , [#richtextmathematicalexpression] RichTextMathematicalExpression , and arrays of them are kept in the quote; other rich text types are replaced with their text. If non-empty, then quote , quote_parse_mode and quote_entities are ignored."
+        ],
+        [
           "quote_position",
           "Integer",
-          "Optional . Position of the quote in the original message in UTF-16 code units"
+          "Optional . Position of the quote in the original message in UTF-16 code units. For quotes from rich messages, it is the position in the text formed by joining plain texts of all quotable texts of the message, separated by line feeds."
         ],
         [
           "checklist_task_id",
@@ -1748,12 +1798,12 @@
         [
           "receiver_user_id",
           "Integer",
-          "Identifier of the user who will receive the message. It is not guaranteed that the user will receive the message, especially if they are offline. See [#ephemeral-messages-and-commands] here for more details."
+          "Optional . Identifier of the user who will receive the message; required unless the message is sent as an ephemeral reply to a callback query. If omitted, then the parameter chat_id of the method is ignored. If specified together with callback_query_id , then it must be the identifier of the user who pressed the button. Must be omitted for messages sent in chats where the bot isn't a member, unless the message is a reply to an ephemeral message. It is not guaranteed that the user will receive the message, especially if they are offline. See [#ephemeral-messages-and-commands] here for more details."
         ],
         [
           "callback_query_id",
           "String",
-          "Optional . Identifier of the callback query which triggered the message, if any"
+          "Optional . Identifier of the callback query which triggered the message, if any. If specified and receiver_user_id is omitted, then the message is sent as an ephemeral reply to the callback query and will be shown only to the user who pressed the button. Ephemeral replies can't be sent to callback queries from messages in channel direct messages chats. The bot must still answer the callback query using [#answercallbackquery] answerCallbackQuery ."
         ],
         [
           "replace_callback_query_message",
@@ -2333,6 +2383,47 @@
           "file_size",
           "Integer",
           "Optional . File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value."
+        ]
+      ]
+    },
+    "widget": {
+      "title": "Widget",
+      "body": "This object describes an [/bots/widgets] HTML widget .",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "id",
+          "String",
+          "Optional . Unique identifier of the shared widget, which can be used to send the widget again using the method [#sendsharedwidget] sendSharedWidget ; omitted if the widget isn't shared"
+        ],
+        [
+          "width",
+          "Integer",
+          "Optional . Width of the widget in logical pixels; omitted if the widget must occupy the whole width of the message bubble"
+        ],
+        [
+          "height",
+          "Integer",
+          "Optional . Height of the widget in logical pixels; omitted if the height of the widget isn't fixed"
+        ],
+        [
+          "html",
+          "String",
+          "HTML code of the widget"
+        ],
+        [
+          "public_data",
+          "String",
+          "Optional . Public data of the widget, which is available wherever the widget is shown. All messages with a shared widget have the same public data."
+        ],
+        [
+          "chat_data",
+          "String",
+          "Optional . Data of the widget, which is specific to the message"
         ]
       ]
     },
@@ -4008,6 +4099,42 @@
         ]
       ]
     },
+    "paidmessageswaived": {
+      "title": "PaidMessagesWaived",
+      "body": "Describes a service message about the sender of the message using a link of the other user, which allows sending messages to the user without paying Telegram Stars. Currently holds no information.",
+      "rows": []
+    },
+    "tonwallettransfer": {
+      "title": "TonWalletTransfer",
+      "body": "Describes a service message about a transfer with a TON wallet.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "transaction_id",
+          "String",
+          "Unique identifier of the transaction; may be empty if the transfer hasn't been sent yet"
+        ],
+        [
+          "peer_address",
+          "String",
+          "Address of the transfer peer in the TON blockchain"
+        ],
+        [
+          "amount",
+          "String",
+          "The amount of transferred cryptocurrency, in the smallest units of the cryptocurrency, as a decimal number; negative for outgoing transfers"
+        ],
+        [
+          "comment",
+          "String",
+          "Optional . Comment added to the transfer; omitted if the comment is encrypted"
+        ]
+      ]
+    },
     "giveawaycreated": {
       "title": "GiveawayCreated",
       "body": "This object represents a service message about the creation of a scheduled giveaway.",
@@ -4637,7 +4764,7 @@
         [
           "suggested_username",
           "String",
-          "Optional . Suggested username for the bot"
+          "Optional . Suggested username for the bot. The username must end with “bot”. If the user creating the bot has a Telegram Premium subscription, then the username can also end with “agent”, “ai”, “app”, “game”, or “gay”; in this case, the username will be assigned to the bot as a secondary username, and a regular username ending with “bot” will be assigned to the bot automatically."
         ]
       ]
     },
@@ -4736,7 +4863,7 @@
         [
           "web_app",
           "[#webappinfo] WebAppInfo",
-          "Optional . Description of the [/bots/webapps] Web App that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method [#answerwebappquery] answerWebAppQuery . Available only in private chats between a user and the bot. Not supported for messages sent on behalf of a business account."
+          "Optional . Description of the [/bots/webapps] Web App that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method [#answerwebappquery] answerWebAppQuery . Available only in private chats between a user and the bot. Not supported for messages sent on behalf of a business account and ephemeral messages."
         ],
         [
           "login_url",
@@ -4911,6 +5038,212 @@
           "game_short_name",
           "String",
           "Optional . Short name of a [#game] Game to be returned, serves as the unique identifier for the game"
+        ]
+      ]
+    },
+    "widgetquerytype": {
+      "title": "WidgetQueryType",
+      "body": "This object describes the type of a query from a widget. Currently, it can be one of [#widgetquerytypedata] WidgetQueryTypeData [#widgetquerytypesigndata] WidgetQueryTypeSignData [#widgetquerytypesenttransaction] WidgetQueryTypeSentTransaction",
+      "rows": []
+    },
+    "widgetquerytypedata": {
+      "title": "WidgetQueryTypeData",
+      "body": "The query contains data for the bot.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "type",
+          "String",
+          "Type of the query, always “data”"
+        ],
+        [
+          "wallet_card",
+          "[#tonwalletcard] TonWalletCard",
+          "Optional . TON wallet card of the user who sent the query, if it was sent to the bot along with the query"
+        ]
+      ]
+    },
+    "widgetquerytypesigndata": {
+      "title": "WidgetQueryTypeSignData",
+      "body": "The query contains data signed by a TON wallet of the user who sent the query. The data is signed for the domain bot<bot_id> , where <bot_id> is the identifier of the bot.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "type",
+          "String",
+          "Type of the query, always “sign_data”"
+        ],
+        [
+          "wallet",
+          "[#widgetquerywallet] WidgetQueryWallet",
+          "The wallet that signed the data"
+        ],
+        [
+          "sign_data",
+          "String",
+          "JSON-serialized signed data"
+        ]
+      ]
+    },
+    "widgetquerytypesenttransaction": {
+      "title": "WidgetQueryTypeSentTransaction",
+      "body": "The query notifies the bot about a transaction sent from a TON wallet of the user who sent the query.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "type",
+          "String",
+          "Type of the query, always “sent_transaction”"
+        ],
+        [
+          "wallet",
+          "[#widgetquerywallet] WidgetQueryWallet",
+          "The wallet from which the transaction was sent"
+        ],
+        [
+          "msg_hash",
+          "String",
+          "Value of msg_hash of the transaction"
+        ]
+      ]
+    },
+    "widgetquerywallet": {
+      "title": "WidgetQueryWallet",
+      "body": "This object describes a TON wallet of the user, which is used in a query from a widget.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "address",
+          "String",
+          "Address of the wallet"
+        ],
+        [
+          "amount",
+          "String",
+          "Balance of the wallet, in the smallest units of the cryptocurrency, as a decimal number"
+        ],
+        [
+          "public_key",
+          "String",
+          "Optional . Hex-encoded public key of the wallet; omitted if unknown"
+        ],
+        [
+          "state_init",
+          "String",
+          "Optional . Base64-encoded serialized StateInit of the wallet contract; omitted if and only if public_key is omitted"
+        ]
+      ]
+    },
+    "widgetquery": {
+      "title": "WidgetQuery",
+      "body": "This object represents an incoming query from a widget in a message sent by the bot or via the bot. Use [#answerwidgetquery] answerWidgetQuery to answer the query. Each user can send at most 5 queries per 5 seconds to the bot from all its widgets.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "id",
+          "String",
+          "Unique identifier for this query"
+        ],
+        [
+          "from",
+          "[#user] User",
+          "Sender"
+        ],
+        [
+          "chat",
+          "[#chat] Chat",
+          "Optional . Chat with the message containing the widget; omitted if the widget is in an inline message"
+        ],
+        [
+          "message_id",
+          "Integer",
+          "Optional . Identifier of the message containing the widget; omitted if the widget is in an inline message"
+        ],
+        [
+          "inline_message_id",
+          "String",
+          "Optional . Identifier of the inline message containing the widget"
+        ],
+        [
+          "chat_instance",
+          "String",
+          "Global identifier, uniquely corresponding to the chat to which the message with the widget was sent"
+        ],
+        [
+          "chat_type",
+          "String",
+          "Optional . For widgets in inline messages, type of the chat to which the message was sent. Can be either “sender” for a private chat with the inline query sender, “private”, “group”, “supergroup”, or “channel”."
+        ],
+        [
+          "type",
+          "[#widgetquerytype] WidgetQueryType",
+          "Type of the query"
+        ],
+        [
+          "data",
+          "String",
+          "Data of the query, 1-64 bytes"
+        ],
+        [
+          "widget_id",
+          "String",
+          "Optional . Unique identifier of the shared widget, which sent the query; omitted if the widget isn't shared"
+        ]
+      ]
+    },
+    "sharedwidgetquery": {
+      "title": "SharedWidgetQuery",
+      "body": "This object represents an incoming query from a forwarded message with a shared widget created by the bot. Use [#answerwidgetquery] answerWidgetQuery to answer the query. Each user can send at most 5 queries per 5 seconds to the bot from all its widgets.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "id",
+          "String",
+          "Unique identifier for this query"
+        ],
+        [
+          "from",
+          "[#user] User",
+          "Sender"
+        ],
+        [
+          "type",
+          "[#widgetquerytype] WidgetQueryType",
+          "Type of the query"
+        ],
+        [
+          "data",
+          "String",
+          "Data of the query, 1-64 bytes"
+        ],
+        [
+          "widget_id",
+          "String",
+          "Unique identifier of the shared widget, which sent the query"
         ]
       ]
     },
@@ -5470,7 +5803,7 @@
         [
           "can_send_other_messages",
           "Boolean",
-          "True , if the user is allowed to send animations, games, stickers and use inline bots"
+          "True , if the user is allowed to send animations, games, stickers, widgets and use inline bots"
         ],
         [
           "can_add_web_page_previews",
@@ -5659,7 +5992,7 @@
         [
           "can_send_other_messages",
           "Boolean",
-          "Optional . True , if the user is allowed to send animations, games, stickers and use inline bots"
+          "Optional . True , if the user is allowed to send animations, games, stickers, widgets and use inline bots"
         ],
         [
           "can_add_web_page_previews",
@@ -5844,9 +6177,9 @@
         ]
       ]
     },
-    "storyareaposition": {
-      "title": "StoryAreaPosition",
-      "body": "Describes the position of a clickable area within a story.",
+    "areaposition": {
+      "title": "AreaPosition",
+      "body": "Describes the position of a rectangle area on a story media or a TON wallet card.",
       "rows": [
         [
           "Field",
@@ -5856,22 +6189,22 @@
         [
           "x_percentage",
           "Float",
-          "The abscissa of the area's center, as a percentage of the media width"
+          "The abscissa of the area's center, as a percentage of the media or the card width"
         ],
         [
           "y_percentage",
           "Float",
-          "The ordinate of the area's center, as a percentage of the media height"
+          "The ordinate of the area's center, as a percentage of the media or the card height"
         ],
         [
           "width_percentage",
           "Float",
-          "The width of the area's rectangle, as a percentage of the media width"
+          "The width of the area's rectangle, as a percentage of the media or the card width"
         ],
         [
           "height_percentage",
           "Float",
-          "The height of the area's rectangle, as a percentage of the media height"
+          "The height of the area's rectangle, as a percentage of the media or the card height"
         ],
         [
           "rotation_angle",
@@ -5881,7 +6214,267 @@
         [
           "corner_radius_percentage",
           "Float",
-          "The radius of the rectangle corner rounding, as a percentage of the media width"
+          "The radius of the rectangle corner rounding, as a percentage of the media or the card width"
+        ]
+      ]
+    },
+    "tonnft": {
+      "title": "TonNft",
+      "body": "This object represents an NFT in the TON blockchain.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "address",
+          "String",
+          "Address of the NFT"
+        ],
+        [
+          "collection_address",
+          "String",
+          "Optional . Address of the collection to which the NFT belongs; omitted if unknown"
+        ],
+        [
+          "index",
+          "String",
+          "Index of the NFT among all NFTs from the collection as a decimal number"
+        ],
+        [
+          "name",
+          "String",
+          "Name of the NFT"
+        ],
+        [
+          "description",
+          "String",
+          "Description of the NFT"
+        ],
+        [
+          "attributes",
+          "Array of [#tonnftattribute] TonNftAttribute",
+          "Optional . Attributes of the NFT"
+        ],
+        [
+          "gift",
+          "[#uniquegift] UniqueGift",
+          "Optional . The unique gift corresponding to the NFT"
+        ]
+      ]
+    },
+    "tonnftattribute": {
+      "title": "TonNftAttribute",
+      "body": "This object represents an attribute of an NFT in the TON blockchain.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "trait_type",
+          "String",
+          "Trait type of the attribute"
+        ],
+        [
+          "value",
+          "String",
+          "Value of the attribute"
+        ]
+      ]
+    },
+    "tonwalletcardsticker": {
+      "title": "TonWalletCardSticker",
+      "body": "This object describes a sticker on a TON wallet card.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "position",
+          "[#areaposition] AreaPosition",
+          "Position of the sticker on the card"
+        ],
+        [
+          "nft",
+          "[#tonnft] TonNft",
+          "The NFT shown as the sticker"
+        ]
+      ]
+    },
+    "tonwalletcard": {
+      "title": "TonWalletCard",
+      "body": "This object describes a TON wallet card, which is shown on the profile page of a user to everyone.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "address",
+          "String",
+          "Address of the wallet"
+        ],
+        [
+          "amount",
+          "String",
+          "Balance of the wallet, in the smallest units of the cryptocurrency, as a decimal number"
+        ],
+        [
+          "stickers",
+          "Array of [#tonwalletcardsticker] TonWalletCardSticker",
+          "Stickers placed on the card"
+        ],
+        [
+          "background_nft_address",
+          "String",
+          "Optional . Address of the NFT of one of the stickers, whose colors must be used for the card background; omitted if the default background must be used"
+        ]
+      ]
+    },
+    "emojitype": {
+      "title": "EmojiType",
+      "body": "This object describes an emoji. Currently, it can be one of [#emojitypeemoji] EmojiTypeEmoji [#emojitypecustomemoji] EmojiTypeCustomEmoji",
+      "rows": []
+    },
+    "emojitypeemoji": {
+      "title": "EmojiTypeEmoji",
+      "body": "A regular emoji.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "type",
+          "String",
+          "Type of the emoji, always “emoji”"
+        ],
+        [
+          "emoji",
+          "String",
+          "The emoji"
+        ]
+      ]
+    },
+    "emojitypecustomemoji": {
+      "title": "EmojiTypeCustomEmoji",
+      "body": "A custom emoji.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "type",
+          "String",
+          "Type of the emoji, always “custom_emoji”"
+        ],
+        [
+          "custom_emoji_id",
+          "String",
+          "Identifier of the custom emoji. Use [#getcustomemojistickers] getCustomEmojiStickers to get full information about the sticker."
+        ]
+      ]
+    },
+    "chatsharetheme": {
+      "title": "ChatShareTheme",
+      "body": "This object describes the theme of the screen for sharing a link to a user or a chat. Currently, it can be one of [#chatsharethemeemoji] ChatShareThemeEmoji [#chatsharethemeuniquegift] ChatShareThemeUniqueGift",
+      "rows": []
+    },
+    "chatsharethemeemoji": {
+      "title": "ChatShareThemeEmoji",
+      "body": "The theme with emoji placed on a background.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "type",
+          "String",
+          "Type of the theme, always “emoji”"
+        ],
+        [
+          "emojis",
+          "Array of [#emojitype] EmojiType",
+          "The emoji; 0-6 regular or custom emoji"
+        ],
+        [
+          "background_backdrop_id",
+          "Integer",
+          "Optional . Identifier of the backdrop used as the background; omitted if the default background is used. Use [#getchatsharethemebackdrops] getChatShareThemeBackdrops to get details about the backdrop."
+        ]
+      ]
+    },
+    "chatsharethemeuniquegift": {
+      "title": "ChatShareThemeUniqueGift",
+      "body": "The theme based on a unique gift owned by the user or the chat.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "type",
+          "String",
+          "Type of the theme, always “unique_gift”"
+        ],
+        [
+          "gift",
+          "[#uniquegift] UniqueGift",
+          "The gift"
+        ]
+      ]
+    },
+    "chatsharethemebackdrops": {
+      "title": "ChatShareThemeBackdrops",
+      "body": "This object contains a list of backdrops, which can be used as the background of a theme of the screen for sharing a link to a user or a chat.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "backdrops",
+          "Array of [#chatsharethemebackdrop] ChatShareThemeBackdrop",
+          "The list of backdrops"
+        ]
+      ]
+    },
+    "chatsharethemebackdrop": {
+      "title": "ChatShareThemeBackdrop",
+      "body": "This object describes a backdrop, which can be used as the background of a theme of the screen for sharing a link to a user or a chat.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "id",
+          "Integer",
+          "Unique identifier of the backdrop"
+        ],
+        [
+          "name",
+          "String",
+          "Name of the backdrop"
+        ],
+        [
+          "colors",
+          "[#uniquegiftbackdropcolors] UniqueGiftBackdropColors",
+          "Colors of the backdrop"
         ]
       ]
     },
@@ -6067,7 +6660,7 @@
         ],
         [
           "position",
-          "[#storyareaposition] StoryAreaPosition",
+          "[#areaposition] AreaPosition",
           "Position of the area"
         ],
         [
@@ -8717,8 +9310,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -8835,7 +9428,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username"
         ],
         [
           "message_thread_id",
@@ -8853,7 +9446,7 @@
           "from_chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username )"
+          "Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup, or channel in the format @username )"
         ],
         [
           "video_start_timestamp",
@@ -8907,7 +9500,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username"
         ],
         [
           "message_thread_id",
@@ -8925,7 +9518,7 @@
           "from_chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username )"
+          "Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup, or channel in the format @username )"
         ],
         [
           "message_ids",
@@ -8949,7 +9542,7 @@
     },
     "copymessage": {
       "title": "copyMessage",
-      "body": "Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz [#poll] poll can be copied only if the value of the field correct_option_ids is known to the bot. The method is analogous to the method [#forwardmessage] forwardMessage , but the copied message doesn't have a link to the original message. Returns the [#messageid] MessageId of the sent message on success.",
+      "body": "Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, invoice messages, and widget messages can't be copied. A quiz [#poll] poll can be copied only if the value of the field correct_option_ids is known to the bot. The method is analogous to the method [#forwardmessage] forwardMessage , but the copied message doesn't have a link to the original message. Returns the [#messageid] MessageId of the sent message on success.",
       "rows": [
         [
           "Parameter",
@@ -8961,7 +9554,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username"
         ],
         [
           "message_thread_id",
@@ -8979,7 +9572,7 @@
           "from_chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username )"
+          "Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup, or channel in the format @username )"
         ],
         [
           "message_id",
@@ -9063,7 +9656,7 @@
     },
     "copymessages": {
       "title": "copyMessages",
-      "body": "Use this method to copy messages of any kind. If some of the specified messages can't be found or copied, they are skipped. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz [#poll] poll can be copied only if the value of the field correct_option_ids is known to the bot. The method is analogous to the method [#forwardmessages] forwardMessages , but the copied messages don't have a link to the original message. Album grouping is kept for copied messages. On success, an Array of [#messageid] MessageId of the sent messages is returned.",
+      "body": "Use this method to copy messages of any kind. If some of the specified messages can't be found or copied, they are skipped. Service messages, paid media messages, giveaway messages, giveaway winners messages, invoice messages, and widget messages can't be copied. A quiz [#poll] poll can be copied only if the value of the field correct_option_ids is known to the bot. The method is analogous to the method [#forwardmessages] forwardMessages , but the copied messages don't have a link to the original message. Album grouping is kept for copied messages. On success, an Array of [#messageid] MessageId of the sent messages is returned.",
       "rows": [
         [
           "Parameter",
@@ -9075,7 +9668,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username"
         ],
         [
           "message_thread_id",
@@ -9093,7 +9686,7 @@
           "from_chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username )"
+          "Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup, or channel in the format @username )"
         ],
         [
           "message_ids",
@@ -9140,8 +9733,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -9260,8 +9853,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target channel (in the format @channelusername )"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -9386,8 +9979,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -9518,8 +10111,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -9638,8 +10231,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -9800,8 +10393,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -9944,8 +10537,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -10058,8 +10651,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -10147,6 +10740,228 @@
         ]
       ]
     },
+    "sendwidget": {
+      "title": "sendWidget",
+      "body": "Use this method to send a message with an [/bots/widgets] HTML widget . Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded. On success, the sent [#message] Message is returned.",
+      "rows": [
+        [
+          "Parameter",
+          "Type",
+          "Required",
+          "Description"
+        ],
+        [
+          "chat_id",
+          "Integer or String",
+          "Yes",
+          "Unique identifier for the target chat or username of the target supergroup in the format @username"
+        ],
+        [
+          "message_thread_id",
+          "Integer",
+          "Optional",
+          "Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only"
+        ],
+        [
+          "html",
+          "String",
+          "Yes",
+          "HTML code of the widget, 1-32768 bytes. The code must not exceed 4096 bytes when compressed by zlib with the maximum compression level."
+        ],
+        [
+          "width",
+          "Integer",
+          "Optional",
+          "Width of the widget in logical pixels; omit if the widget must occupy the whole width of the message bubble. The width is clamped by the app to the range from 200 to the maximum width of the message bubble."
+        ],
+        [
+          "height",
+          "Integer",
+          "Optional",
+          "Height of the widget in logical pixels; omit if the height of the widget isn't fixed. The height is clamped by the app to the range 50-600."
+        ],
+        [
+          "public_data",
+          "String",
+          "Optional",
+          "Public data of the widget, 0-1024 bytes, which will be available wherever the widget is shown. If the widget is shared, then all messages with it will have the same public data."
+        ],
+        [
+          "chat_data",
+          "String",
+          "Optional",
+          "Data of the widget, which is specific to the message, 0-1024 bytes"
+        ],
+        [
+          "caption",
+          "String",
+          "Optional",
+          "Widget caption, 0-1024 characters after entities parsing"
+        ],
+        [
+          "parse_mode",
+          "String",
+          "Optional",
+          "Mode for parsing entities in the widget caption. See [#formatting-options] formatting options for more details."
+        ],
+        [
+          "caption_entities",
+          "Array of [#messageentity] MessageEntity",
+          "Optional",
+          "A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode"
+        ],
+        [
+          "show_caption_above_media",
+          "Boolean",
+          "Optional",
+          "Pass True if the caption must be shown above the widget"
+        ],
+        [
+          "allow_queries",
+          "Boolean",
+          "Optional",
+          "Pass True to allow the widget to send queries to the bot"
+        ],
+        [
+          "is_shared",
+          "Boolean",
+          "Optional",
+          "Pass True to create a shared widget, which can be sent again using the method [#sendsharedwidget] sendSharedWidget"
+        ],
+        [
+          "disable_notification",
+          "Boolean",
+          "Optional",
+          "Sends the message [https://telegram.org/blog/channels-2-0#silent-messages] silently . Users will receive a notification with no sound."
+        ],
+        [
+          "protect_content",
+          "Boolean",
+          "Optional",
+          "Protects the contents of the sent message from forwarding and saving"
+        ],
+        [
+          "allow_paid_broadcast",
+          "Boolean",
+          "Optional",
+          "Pass True to allow up to 1000 messages per second, ignoring [https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once] broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance."
+        ],
+        [
+          "message_effect_id",
+          "String",
+          "Optional",
+          "Unique identifier of the message effect to be added to the message; for private chats only"
+        ],
+        [
+          "reply_parameters",
+          "[#replyparameters] ReplyParameters",
+          "Optional",
+          "Description of the message to reply to"
+        ],
+        [
+          "reply_markup",
+          "[#inlinekeyboardmarkup] InlineKeyboardMarkup or [#replykeyboardmarkup] ReplyKeyboardMarkup or [#replykeyboardremove] ReplyKeyboardRemove or [#forcereply] ForceReply",
+          "Optional",
+          "Additional interface options. A JSON-serialized object for an [/bots/features#inline-keyboards] inline keyboard , [/bots/features#keyboards] custom reply keyboard , instructions to remove a reply keyboard or to force a reply from the user."
+        ]
+      ]
+    },
+    "sendsharedwidget": {
+      "title": "sendSharedWidget",
+      "body": "Use this method to send again a shared widget created by the bot. Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded. On success, the sent [#message] Message is returned.",
+      "rows": [
+        [
+          "Parameter",
+          "Type",
+          "Required",
+          "Description"
+        ],
+        [
+          "chat_id",
+          "Integer or String",
+          "Yes",
+          "Unique identifier for the target chat or username of the target supergroup in the format @username"
+        ],
+        [
+          "message_thread_id",
+          "Integer",
+          "Optional",
+          "Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only"
+        ],
+        [
+          "widget_id",
+          "String",
+          "Yes",
+          "Unique identifier of the shared widget"
+        ],
+        [
+          "chat_data",
+          "String",
+          "Optional",
+          "Data of the widget, which is specific to the message, 0-1024 bytes"
+        ],
+        [
+          "caption",
+          "String",
+          "Optional",
+          "Widget caption, 0-1024 characters after entities parsing"
+        ],
+        [
+          "parse_mode",
+          "String",
+          "Optional",
+          "Mode for parsing entities in the widget caption. See [#formatting-options] formatting options for more details."
+        ],
+        [
+          "caption_entities",
+          "Array of [#messageentity] MessageEntity",
+          "Optional",
+          "A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode"
+        ],
+        [
+          "show_caption_above_media",
+          "Boolean",
+          "Optional",
+          "Pass True if the caption must be shown above the widget"
+        ],
+        [
+          "disable_notification",
+          "Boolean",
+          "Optional",
+          "Sends the message [https://telegram.org/blog/channels-2-0#silent-messages] silently . Users will receive a notification with no sound."
+        ],
+        [
+          "protect_content",
+          "Boolean",
+          "Optional",
+          "Protects the contents of the sent message from forwarding and saving"
+        ],
+        [
+          "allow_paid_broadcast",
+          "Boolean",
+          "Optional",
+          "Pass True to allow up to 1000 messages per second, ignoring [https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once] broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance."
+        ],
+        [
+          "message_effect_id",
+          "String",
+          "Optional",
+          "Unique identifier of the message effect to be added to the message; for private chats only"
+        ],
+        [
+          "reply_parameters",
+          "[#replyparameters] ReplyParameters",
+          "Optional",
+          "Description of the message to reply to"
+        ],
+        [
+          "reply_markup",
+          "[#inlinekeyboardmarkup] InlineKeyboardMarkup or [#replykeyboardmarkup] ReplyKeyboardMarkup or [#replykeyboardremove] ReplyKeyboardRemove or [#forcereply] ForceReply",
+          "Optional",
+          "Additional interface options. A JSON-serialized object for an [/bots/features#inline-keyboards] inline keyboard , [/bots/features#keyboards] custom reply keyboard , instructions to remove a reply keyboard or to force a reply from the user."
+        ]
+      ]
+    },
     "sendpaidmedia": {
       "title": "sendPaidMedia",
       "body": "Use this method to send paid media. On success, the sent [#message] Message is returned.",
@@ -10167,7 +10982,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username . If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat's balance. Otherwise, they will be credited to the bot's balance."
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username . If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat's balance. Otherwise, they will be credited to the bot's balance."
         ],
         [
           "message_thread_id",
@@ -10281,7 +11096,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username"
         ],
         [
           "message_thread_id",
@@ -10352,8 +11167,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -10472,8 +11287,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -10604,8 +11419,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -10713,7 +11528,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username . Polls can't be sent to channel direct messages chats."
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username . Polls can't be sent to channel direct messages chats."
         ],
         [
           "message_thread_id",
@@ -10989,7 +11804,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username"
         ],
         [
           "message_thread_id",
@@ -11163,7 +11978,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username"
         ],
         [
           "message_id",
@@ -12241,6 +13056,11 @@
         ]
       ]
     },
+    "getchatsharethemebackdrops": {
+      "title": "getChatShareThemeBackdrops",
+      "body": "Use this method to get the list of backdrops, which can be used as the background of a theme of the screen for sharing a link to a user or a chat. Requires no parameters. Returns a [#chatsharethemebackdrops] ChatShareThemeBackdrops object.",
+      "rows": []
+    },
     "getuserpersonalchatmessages": {
       "title": "getUserPersonalChatMessages",
       "body": "Use this method to get the last messages from the personal chat (i.e., the chat currently added to their profile) of a given user. On success, an Array of [#message] Message objects is returned.",
@@ -12314,7 +13134,7 @@
     },
     "createforumtopic": {
       "title": "createForumTopic",
-      "body": "Use this method to create a topic in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right. Returns information about the created topic as a [#forumtopic] ForumTopic object.",
+      "body": "Use this method to create a topic in a forum supergroup chat or a private chat with a user. In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right. In the case of a private chat, a link to the topic can be created in the format https://t.me/<bot_username>/<message_thread_id> ; the link opens the topic only for the user. Returns information about the created topic as a [#forumtopic] ForumTopic object.",
       "rows": [
         [
           "Parameter",
@@ -12633,6 +13453,30 @@
           "Integer",
           "Optional",
           "The maximum amount of time in seconds that the result of the callback query may be cached client-side. Defaults to 0."
+        ]
+      ]
+    },
+    "answerwidgetquery": {
+      "title": "answerWidgetQuery",
+      "body": "Use this method to send an answer to a query from a widget. The query must be answered within 15 seconds. The answer is received only by the widget that sent the query and doesn't change data of the widget; use [#editmessagewidgetdata] editMessageWidgetData or [#editsharedwidgetdata] editSharedWidgetData to change it. On success, True is returned.",
+      "rows": [
+        [
+          "Parameter",
+          "Type",
+          "Required",
+          "Description"
+        ],
+        [
+          "widget_query_id",
+          "String",
+          "Yes",
+          "Unique identifier for the query to be answered"
+        ],
+        [
+          "data",
+          "String",
+          "Optional",
+          "Data to be returned to the widget, 0-1024 bytes"
         ]
       ]
     },
@@ -13122,7 +13966,7 @@
           "chat_id",
           "Integer or String",
           "Optional",
-          "Required if user_id is not specified. Unique identifier for the chat or username of the channel (in the format @username ) that will receive the gift."
+          "Required if user_id is not specified. Unique identifier for the chat that will receive the gift or username of the channel in the format @username ."
         ],
         [
           "gift_id",
@@ -13225,6 +14069,18 @@
           "String",
           "Optional",
           "Custom description for the verification; 0-70 characters. Must be empty if the organization isn't allowed to provide a custom verification description."
+        ],
+        [
+          "custom_description_parse_mode",
+          "String",
+          "Optional",
+          "Mode for parsing entities in the custom description. See [#formatting-options] formatting options for more details. Only “text_link” entities are supported."
+        ],
+        [
+          "custom_description_entities",
+          "Array of [#messageentity] MessageEntity",
+          "Optional",
+          "A JSON-serialized list of special entities that appear in the custom description, which can be specified instead of custom_description_parse_mode . Only “text_link” entities are supported."
         ]
       ]
     },
@@ -13242,13 +14098,25 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username . Channel direct messages chats can't be verified."
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username . Channel direct messages chats can't be verified."
         ],
         [
           "custom_description",
           "String",
           "Optional",
           "Custom description for the verification; 0-70 characters. Must be empty if the organization isn't allowed to provide a custom verification description."
+        ],
+        [
+          "custom_description_parse_mode",
+          "String",
+          "Optional",
+          "Mode for parsing entities in the custom description. See [#formatting-options] formatting options for more details. Only “text_link” entities are supported."
+        ],
+        [
+          "custom_description_entities",
+          "Array of [#messageentity] MessageEntity",
+          "Optional",
+          "A JSON-serialized list of special entities that appear in the custom description, which can be specified instead of custom_description_parse_mode . Only “text_link” entities are supported."
         ]
       ]
     },
@@ -13768,6 +14636,24 @@
         ]
       ]
     },
+    "getuniquegift": {
+      "title": "getUniqueGift",
+      "body": "Use this method to get information about a unique gift by its name. Returns a [#uniquegift] UniqueGift object on success.",
+      "rows": [
+        [
+          "Parameter",
+          "Type",
+          "Required",
+          "Description"
+        ],
+        [
+          "name",
+          "String",
+          "Yes",
+          "Unique name of the gift"
+        ]
+      ]
+    },
     "convertgifttostars": {
       "title": "convertGiftToStars",
       "body": "Converts a given regular gift to Telegram Stars. Requires the can_convert_gifts_to_stars business bot right. Returns True on success.",
@@ -13861,6 +14747,30 @@
           "Integer",
           "Optional",
           "The amount of Telegram Stars that will be paid for the transfer from the business account balance. If positive, then the can_transfer_stars business bot right is required."
+        ]
+      ]
+    },
+    "deletebusinessaccountgift": {
+      "title": "deleteBusinessAccountGift",
+      "body": "Deletes a regular gift owned by a managed business account without receiving Telegram Stars for it. Requires the can_convert_gifts_to_stars business bot right. The gift can be deleted only if it isn't limited (the field total_count of the [#gift] Gift is omitted) and wasn't refunded. Returns True on success.",
+      "rows": [
+        [
+          "Parameter",
+          "Type",
+          "Required",
+          "Description"
+        ],
+        [
+          "business_connection_id",
+          "String",
+          "Yes",
+          "Unique identifier of the business connection"
+        ],
+        [
+          "owned_gift_id",
+          "String",
+          "Yes",
+          "Unique identifier of the regular gift that should be deleted"
         ]
       ]
     },
@@ -14182,7 +15092,7 @@
           "chat_id",
           "Integer or String",
           "Optional",
-          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username ."
+          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ."
         ],
         [
           "message_id",
@@ -14254,7 +15164,7 @@
           "chat_id",
           "Integer or String",
           "Optional",
-          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username ."
+          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ."
         ],
         [
           "message_id",
@@ -14320,7 +15230,7 @@
           "chat_id",
           "Integer or String",
           "Optional",
-          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username ."
+          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ."
         ],
         [
           "message_id",
@@ -14368,7 +15278,7 @@
           "chat_id",
           "Integer or String",
           "Optional",
-          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username ."
+          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ."
         ],
         [
           "message_id",
@@ -14446,7 +15356,7 @@
           "chat_id",
           "Integer or String",
           "Optional",
-          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username ."
+          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ."
         ],
         [
           "message_id",
@@ -14510,6 +15420,78 @@
         ]
       ]
     },
+    "editmessagewidgetdata": {
+      "title": "editMessageWidgetData",
+      "body": "Use this method to edit data of a widget in a message sent by the bot or via the bot (for inline bots). Public data of a shared widget can be changed at most once per second. On success, True is returned.",
+      "rows": [
+        [
+          "Parameter",
+          "Type",
+          "Required",
+          "Description"
+        ],
+        [
+          "chat_id",
+          "Integer or String",
+          "Optional",
+          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target supergroup in the format @username ."
+        ],
+        [
+          "message_id",
+          "Integer",
+          "Optional",
+          "Required if inline_message_id is not specified. Identifier of the message with the widget."
+        ],
+        [
+          "inline_message_id",
+          "String",
+          "Optional",
+          "Required if chat_id and message_id are not specified. Identifier of the inline message."
+        ],
+        [
+          "public_data",
+          "String",
+          "Optional",
+          "New public data of the widget, 0-1024 bytes; pass an empty string to remove the public data. If omitted, then the public data isn't changed."
+        ],
+        [
+          "chat_data",
+          "String",
+          "Optional",
+          "New data of the widget, which is specific to the message, 0-1024 bytes; pass an empty string to remove the data. If omitted, then the data isn't changed."
+        ]
+      ]
+    },
+    "editsharedwidgetdata": {
+      "title": "editSharedWidgetData",
+      "body": "Use this method to edit public data of a shared widget created by the bot. A shared widget can be edited at most once per second. On success, True is returned.",
+      "rows": [
+        [
+          "Parameter",
+          "Type",
+          "Required",
+          "Description"
+        ],
+        [
+          "widget_id",
+          "String",
+          "Yes",
+          "Unique identifier of the shared widget"
+        ],
+        [
+          "public_data",
+          "String",
+          "Yes",
+          "New public data of the widget, 0-1024 bytes; pass an empty string to remove the public data"
+        ],
+        [
+          "cache_time",
+          "Integer",
+          "Optional",
+          "The maximum amount of time in seconds that the public data of the widget may be cached client-side; 5-3600. If omitted, then the current value is kept, which is 30 by default."
+        ]
+      ]
+    },
     "editmessagereplymarkup": {
       "title": "editMessageReplyMarkup",
       "body": "Use this method to edit only the reply markup of messages. On success, if the edited message is not an inline message, the edited [#message] Message is returned, otherwise True is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.",
@@ -14530,7 +15512,7 @@
           "chat_id",
           "Integer or String",
           "Optional",
-          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username ."
+          "Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ."
         ],
         [
           "message_id",
@@ -14572,7 +15554,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username"
         ],
         [
           "message_id",
@@ -14866,7 +15848,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username"
         ],
         [
           "message_id",
@@ -14890,7 +15872,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username"
         ],
         [
           "message_ids",
@@ -15209,8 +16191,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -15794,8 +16776,8 @@
         [
           "chat_id",
           "Integer or String",
-          "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Optional",
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username ; required unless the message is sent as an ephemeral reply to a callback query"
         ],
         [
           "message_thread_id",
@@ -15981,7 +16963,7 @@
     },
     "richtext": {
       "title": "RichText",
-      "body": "This object represents a rich formatted text. Currently, it can be either a String for plain text, an Array of [#richtext] RichText , or any of the following types: [#richtextbold] RichTextBold [#richtextitalic] RichTextItalic [#richtextunderline] RichTextUnderline [#richtextstrikethrough] RichTextStrikethrough [#richtextspoiler] RichTextSpoiler [#richtextdatetime] RichTextDateTime [#richtexttextmention] RichTextTextMention [#richtextsubscript] RichTextSubscript [#richtextsuperscript] RichTextSuperscript [#richtextmarked] RichTextMarked [#richtextcode] RichTextCode [#richtextcustomemoji] RichTextCustomEmoji [#richtextmathematicalexpression] RichTextMathematicalExpression [#richtexturl] RichTextUrl [#richtextemailaddress] RichTextEmailAddress [#richtextphonenumber] RichTextPhoneNumber [#richtextbankcardnumber] RichTextBankCardNumber [#richtextmention] RichTextMention [#richtexthashtag] RichTextHashtag [#richtextcashtag] RichTextCashtag [#richtextbotcommand] RichTextBotCommand [#richtextbutton] RichTextButton [#richtextanchor] RichTextAnchor [#richtextanchorlink] RichTextAnchorLink [#richtextreference] RichTextReference [#richtextreferencelink] RichTextReferenceLink",
+      "body": "This object represents a rich formatted text. Currently, it can be either a String for plain text, an Array of [#richtext] RichText , or any of the following types: [#richtextbold] RichTextBold [#richtextitalic] RichTextItalic [#richtextunderline] RichTextUnderline [#richtextstrikethrough] RichTextStrikethrough [#richtextspoiler] RichTextSpoiler [#richtextdatetime] RichTextDateTime [#richtexttextmention] RichTextTextMention [#richtextsubscript] RichTextSubscript [#richtextsuperscript] RichTextSuperscript [#richtextmarked] RichTextMarked [#richtextcode] RichTextCode [#richtextcustomemoji] RichTextCustomEmoji [#richtextmathematicalexpression] RichTextMathematicalExpression [#richtexturl] RichTextUrl [#richtextemailaddress] RichTextEmailAddress [#richtextphonenumber] RichTextPhoneNumber [#richtextbankcardnumber] RichTextBankCardNumber [#richtexttonaddress] RichTextTonAddress [#richtextmention] RichTextMention [#richtexthashtag] RichTextHashtag [#richtextcashtag] RichTextCashtag [#richtextbotcommand] RichTextBotCommand [#richtextbutton] RichTextButton [#richtextanchor] RichTextAnchor [#richtextanchorlink] RichTextAnchorLink [#richtextreference] RichTextReference [#richtextreferencelink] RichTextReferenceLink",
       "rows": []
     },
     "richtextbold": {
@@ -16378,6 +17360,32 @@
           "bank_card_number",
           "String",
           "The bank card number"
+        ]
+      ]
+    },
+    "richtexttonaddress": {
+      "title": "RichTextTonAddress",
+      "body": "An address in the TON blockchain.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "type",
+          "String",
+          "Type of the rich text, always “ton_address”"
+        ],
+        [
+          "text",
+          "[#richtext] RichText",
+          "Text of the address"
+        ],
+        [
+          "address",
+          "String",
+          "The address"
         ]
       ]
     },
@@ -19469,7 +20477,7 @@
     },
     "inputmessagecontent": {
       "title": "InputMessageContent",
-      "body": "This object represents the content of a message to be sent as a result of an inline query. Telegram clients currently support the following types: [#inputtextmessagecontent] InputTextMessageContent [#inputrichmessagecontent] InputRichMessageContent [#inputlocationmessagecontent] InputLocationMessageContent [#inputvenuemessagecontent] InputVenueMessageContent [#inputcontactmessagecontent] InputContactMessageContent [#inputinvoicemessagecontent] InputInvoiceMessageContent",
+      "body": "This object represents the content of a message to be sent as a result of an inline query. Telegram clients currently support the following types: [#inputtextmessagecontent] InputTextMessageContent [#inputrichmessagecontent] InputRichMessageContent [#inputlocationmessagecontent] InputLocationMessageContent [#inputvenuemessagecontent] InputVenueMessageContent [#inputcontactmessagecontent] InputContactMessageContent [#inputinvoicemessagecontent] InputInvoiceMessageContent [#inputwidgetmessagecontent] InputWidgetMessageContent [#inputsharedwidgetmessagecontent] InputSharedWidgetMessageContent",
       "rows": []
     },
     "inputtextmessagecontent": {
@@ -19753,6 +20761,113 @@
         ]
       ]
     },
+    "inputwidgetmessagecontent": {
+      "title": "InputWidgetMessageContent",
+      "body": "Represents the [#inputmessagecontent] content of a message with an [/bots/widgets] HTML widget to be sent as the result of an inline query. Currently, widgets can't be sent in response to inline queries in the production environment.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "html",
+          "String",
+          "HTML code of the widget, 1-32768 bytes. The code must not exceed 4096 bytes when compressed by zlib with the maximum compression level."
+        ],
+        [
+          "width",
+          "Integer",
+          "Optional . Width of the widget in logical pixels; omit if the widget must occupy the whole width of the message bubble. The width is clamped by the app to the range from 200 to the maximum width of the message bubble."
+        ],
+        [
+          "height",
+          "Integer",
+          "Optional . Height of the widget in logical pixels; omit if the height of the widget isn't fixed. The height is clamped by the app to the range 50-600."
+        ],
+        [
+          "public_data",
+          "String",
+          "Optional . Public data of the widget, 0-1024 bytes, which will be available wherever the widget is shown. If the widget is shared, then all messages with it will have the same public data."
+        ],
+        [
+          "chat_data",
+          "String",
+          "Optional . Data of the widget, which is specific to the message, 0-1024 bytes"
+        ],
+        [
+          "caption",
+          "String",
+          "Optional . Widget caption, 0-1024 characters after entities parsing"
+        ],
+        [
+          "parse_mode",
+          "String",
+          "Optional . Mode for parsing entities in the widget caption. See [#formatting-options] formatting options for more details."
+        ],
+        [
+          "caption_entities",
+          "Array of [#messageentity] MessageEntity",
+          "Optional . List of special entities that appear in the caption, which can be specified instead of parse_mode"
+        ],
+        [
+          "show_caption_above_media",
+          "Boolean",
+          "Optional . Pass True if the caption must be shown above the widget"
+        ],
+        [
+          "allow_queries",
+          "Boolean",
+          "Optional . Pass True to allow the widget to send queries to the bot"
+        ],
+        [
+          "is_shared",
+          "Boolean",
+          "Optional . Pass True to create a shared widget. Each message sent from the result creates a separate shared widget, whose identifier is received by the bot only in the field widget_id of queries from the widget. To send an existing shared widget in response to an inline query, use [#inputsharedwidgetmessagecontent] InputSharedWidgetMessageContent instead."
+        ]
+      ]
+    },
+    "inputsharedwidgetmessagecontent": {
+      "title": "InputSharedWidgetMessageContent",
+      "body": "Represents the [#inputmessagecontent] content of a message with a shared widget to be sent as the result of an inline query. Currently, widgets can't be sent in response to inline queries in the production environment.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "widget_id",
+          "String",
+          "Unique identifier of the shared widget created by the bot"
+        ],
+        [
+          "chat_data",
+          "String",
+          "Optional . Data of the widget, which is specific to the message, 0-1024 bytes"
+        ],
+        [
+          "caption",
+          "String",
+          "Optional . Widget caption, 0-1024 characters after entities parsing"
+        ],
+        [
+          "parse_mode",
+          "String",
+          "Optional . Mode for parsing entities in the widget caption. See [#formatting-options] formatting options for more details."
+        ],
+        [
+          "caption_entities",
+          "Array of [#messageentity] MessageEntity",
+          "Optional . List of special entities that appear in the caption, which can be specified instead of parse_mode"
+        ],
+        [
+          "show_caption_above_media",
+          "Boolean",
+          "Optional . Pass True if the caption must be shown above the widget"
+        ]
+      ]
+    },
     "choseninlineresult": {
       "title": "ChosenInlineResult",
       "body": "Represents a [#inlinequeryresult] result of an inline query that was chosen by the user and sent to their chat partner. Note: It is necessary to enable [/bots/inline#collecting-feedback] inline feedback via [https://t.me/botfather] @BotFather in order to receive these objects in updates.",
@@ -19808,7 +20923,7 @@
           "chat_id",
           "Integer or String",
           "Yes",
-          "Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username"
+          "Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username"
         ],
         [
           "message_thread_id",
@@ -21681,9 +22796,8 @@
     }
   },
   "announcements": {
+    "November 9, 2026": "Bot API 10.4 Widgets Added the class [#widget] Widget and the field widget to the classes [#message] Message and [#externalreplyinfo] ExternalReplyInfo for messages with [/bots/widgets] HTML widgets . Added the method [#sendwidget] sendWidget , allowing bots to send messages with HTML widgets. Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded. Added the method [#sendsharedwidget] sendSharedWidget , allowing bots to send again shared widgets created by the bot. Added the class [#widgetquery] WidgetQuery and the field widget_query to the class [#update] Update for queries sent to the bot by widgets in messages sent by the bot or via the bot. Added the class [#sharedwidgetquery] SharedWidgetQuery and the field shared_widget_query to the class [#update] Update for queries sent to the bot from forwarded messages with shared widgets. Added the classes [#widgetquerytype] WidgetQueryType , [#widgetquerytypedata] WidgetQueryTypeData , [#widgetquerytypesigndata] WidgetQueryTypeSignData , [#widgetquerytypesenttransaction] WidgetQueryTypeSentTransaction and [#widgetquerywallet] WidgetQueryWallet , describing the type of a query from a widget. A query can contain data for the bot together with the TON wallet card of the user, data signed by a TON wallet of the user, or a notification about a transaction sent from a TON wallet of the user. Added the method [#answerwidgetquery] answerWidgetQuery , allowing bots to answer queries from widgets. Added the method [#editmessagewidgetdata] editMessageWidgetData , allowing bots to change data of a widget in a message. Added the method [#editsharedwidgetdata] editSharedWidgetData , allowing bots to change public data of a shared widget. Added the classes [#inputwidgetmessagecontent] InputWidgetMessageContent and [#inputsharedwidgetmessagecontent] InputSharedWidgetMessageContent , allowing bots to send widgets in response to inline queries. Currently, widgets can't be sent in response to inline queries in the production environment. Widget messages can't be copied using the methods [#copymessage] copyMessage and [#copymessages] copyMessages . The right can_send_other_messages in the classes [#chatpermissions] ChatPermissions and [#chatmemberrestricted] ChatMemberRestricted now also allows sending widgets. Ephemeral messages Allowed bots to send ephemeral replies to callback queries in any chat except channel direct messages chats by specifying callback_query_id without receiver_user_id in the parameter ephemeral_message_parameters of the methods [#sendmessage] sendMessage , [#sendrichmessage] sendRichMessage , [#sendanimation] sendAnimation , [#sendaudio] sendAudio , [#sendcontact] sendContact , [#senddocument] sendDocument , [#sendlivephoto] sendLivePhoto , [#sendlocation] sendLocation , [#sendphoto] sendPhoto , [#sendsticker] sendSticker , [#sendvenue] sendVenue , [#sendvideo] sendVideo , [#sendvideonote] sendVideoNote and [#sendvoice] sendVoice . The field receiver_user_id of the class [#ephemeralmessageparameters] EphemeralMessageParameters and the parameter chat_id of the mentioned methods are optional now. Quotes from rich messages Added the field rich_texts to the class [#textquote] TextQuote for quotes chosen from a [#richmessage] RichMessage . Added the field quote_rich_texts to the class [#replyparameters] ReplyParameters , allowing bots to quote rich messages. TON wallet Added the classes [#tonwalletcard] TonWalletCard , [#tonwalletcardsticker] TonWalletCardSticker , [#tonnft] TonNft and [#tonnftattribute] TonNftAttribute , and the field ton_wallet_card to the class [#chatfullinfo] ChatFullInfo . Added the class [#tonwallettransfer] TonWalletTransfer and the field ton_wallet_transfer to the class [#message] Message for service messages about transfers with a TON wallet. Renamed the class StoryAreaPosition to [#areaposition] AreaPosition , because it is now also used to describe the position of stickers on TON wallet cards. Chat share themes Added the classes [#chatsharetheme] ChatShareTheme , [#chatsharethemeemoji] ChatShareThemeEmoji and [#chatsharethemeuniquegift] ChatShareThemeUniqueGift , and the field share_theme to the class [#chatfullinfo] ChatFullInfo , describing the theme of the screen for sharing a link to a user or a chat. Added the classes [#emojitype] EmojiType , [#emojitypeemoji] EmojiTypeEmoji and [#emojitypecustomemoji] EmojiTypeCustomEmoji . Added the classes [#chatsharethemebackdrop] ChatShareThemeBackdrop and [#chatsharethemebackdrops] ChatShareThemeBackdrops and the method [#getchatsharethemebackdrops] getChatShareThemeBackdrops . Gifts Added the method [#getuniquegift] getUniqueGift , allowing bots to get information about a unique gift by its name. Added the method [#deletebusinessaccountgift] deleteBusinessAccountGift , allowing bots to delete regular gifts owned by a managed business account without receiving Telegram Stars for them. General Allowed users with a Telegram Premium subscription to assign secondary usernames ending with “agent”, “ai”, “app”, “game”, or “gay” to up to 2 owned bots. Such usernames can be suggested in the field suggested_username of the class [#keyboardbuttonrequestmanagedbot] KeyboardButtonRequestManagedBot . Added the class [#richtexttonaddress] RichTextTonAddress representing an address in the TON blockchain in a [#richmessage] RichMessage . Added the type “ton_address” to the class [#messageentity] MessageEntity for addresses in the TON blockchain. Added the type “bank_card_number” to the class [#messageentity] MessageEntity for bank card numbers. Added the parameters custom_description_parse_mode and custom_description_entities to the methods [#verifyuser] verifyUser and [#verifychat] verifyChat . Added the class [#paidmessageswaived] PaidMessagesWaived and the field paid_messages_waived to the class [#message] Message for service messages about the sender using a link which allows sending messages without paying Telegram Stars. Added the ability to create links to topics in private chats with the bot in the format https://t.me/<bot_username>/<message_thread_id> . Such a link opens the topic only for the user in the private chat with whom the topic exists.",
     "August 24, 2026": "Bot API 10.3 Rich Messages Added the class [#richmessagebutton] RichMessageButton representing a button in a [#richmessage] RichMessage . Added the class [#richtextbutton] RichTextButton . Added the classes [#richblockbuttons] RichBlockButtons and [#inputrichblockbuttons] InputRichBlockButtons . Added the field is_compact to the classes [#richblocktable] RichBlockTable and [#inputrichblocktable] InputRichBlockTable . Added the classes [#richblockexpandableblockquotation] RichBlockExpandableBlockQuotation and [#inputrichblockexpandableblockquotation] InputRichBlockExpandableBlockQuotation representing a block quotation, which can be expanded or collapsed back. Added the classes [#richblockdocument] RichBlockDocument and [#inputrichblockdocument] InputRichBlockDocument , containing a file. Added support for links of the form tg://document?id= for general file uploads in rich messages. Ephemeral messages Added the class [#ephemeralmessageparameters] EphemeralMessageParameters and replaced the parameters receiver_user_id and callback_query_id in the methods [#sendmessage] sendMessage , [#sendanimation] sendAnimation , [#sendaudio] sendAudio , [#senddocument] sendDocument , [#sendlivephoto] sendLivePhoto , [#sendphoto] sendPhoto , [#sendsticker] sendSticker , [#sendvideo] sendVideo , [#sendvideonote] sendVideoNote , [#sendvoice] sendVoice , [#sendcontact] sendContact , [#sendlocation] sendLocation and [#sendvenue] sendVenue with the parameter ephemeral_message_parameters . Added the parameter ephemeral_message_parameters to the method [#sendrichmessage] sendRichMessage . Added the field replace_callback_query_message to the class [#ephemeralmessageparameters] EphemeralMessageParameters , which allows bots to show an ephemeral message in place of the original message. Supported upload of new files in [#editephemeralmessagemedia] editEphemeralMessageMedia . Added the parameter show_caption_above_media to the method [#editephemeralmessagecaption] editEphemeralMessageCaption . Added the parameter rich_message to the method [#editephemeralmessagetext] editEphemeralMessageText . Added the field can_send_welcome_messages to the classes [#chatadministratorrights] ChatAdministratorRights and [#chatmemberadministrator] ChatMemberAdministrator . Added the parameter can_send_welcome_messages to the method [#promotechatmember] promoteChatMember . Reply markup Added the class [#disabledbutton] DisabledButton and the field disabled to the class [#inlinekeyboardbutton] InlineKeyboardButton . Added the field force_reply to the classes [#inlinekeyboardmarkup] InlineKeyboardMarkup and [#replykeyboardmarkup] ReplyKeyboardMarkup . General Added the parameters can_stop and keep_on_stop to the methods [#sendmessagedraft] sendMessageDraft and [#sendrichmessagedraft] sendRichMessageDraft . Added updates about user stopping message generation, represented by the class [#messagegenerationstopped] MessageGenerationStopped and the field stopped_message_generation in the class [#update] Update . Added the class [#communitychatjoined] CommunityChatJoined and the field community_chat_joined to the class [#message] Message for service messages about join of a chat from a community. Added the fields text , entities and is_private to the class [#uniquegiftinfo] UniqueGiftInfo .",
-    "July 14, 2026": "Bot API 10.2 Rich Messages Added the class [#inputrichmessagemedia] InputRichMessageMedia and the field media to the class [#inputrichmessage] InputRichMessage , allowing bots to explicitly specify media used in markdown or html formatting when sending a rich message. Added the class [#inputmediavoicenote] InputMediaVoiceNote , representing a voice message to be sent. Added the class [#inputrichblocklistitem] InputRichBlockListItem , which represents an item in a list to be sent. Added the classes [#inputrichblockparagraph] InputRichBlockParagraph , [#inputrichblocksectionheading] InputRichBlockSectionHeading , [#inputrichblockpreformatted] InputRichBlockPreformatted , [#inputrichblockfooter] InputRichBlockFooter , [#inputrichblockdivider] InputRichBlockDivider , [#inputrichblockmathematicalexpression] InputRichBlockMathematicalExpression , [#inputrichblockanchor] InputRichBlockAnchor , [#inputrichblocklist] InputRichBlockList , [#inputrichblockblockquotation] InputRichBlockBlockQuotation , [#inputrichblockpullquotation] InputRichBlockPullQuotation , [#inputrichblockcollage] InputRichBlockCollage , [#inputrichblockslideshow] InputRichBlockSlideshow , [#inputrichblocktable] InputRichBlockTable , [#inputrichblockdetails] InputRichBlockDetails , [#inputrichblockmap] InputRichBlockMap , [#inputrichblockanimation] InputRichBlockAnimation , [#inputrichblockaudio] InputRichBlockAudio , [#inputrichblockphoto] InputRichBlockPhoto , [#inputrichblockvideo] InputRichBlockVideo , [#inputrichblockvoicenote] InputRichBlockVoiceNote and [#inputrichblockthinking] InputRichBlockThinking , which represent different types of blocks available to format an outgoing rich message. Added the field blocks to the class [#inputrichmessage] InputRichMessage , allowing bots to specify rich message formatting via block entities. Ephemeral Messages Introduced support for [/bots/features#ephemeral-messages] Ephemeral Messages , allowing bots to send group messages and receive commands that are visible only to a specific user and the bot. Added the field is_ephemeral to the class [#botcommand] BotCommand . Added the field receiver_user to the class [#message] Message . Added the field ephemeral_message_id to the class [#message] Message . Added the parameters receiver_user_id and callback_query_id to the methods [#sendmessage] sendMessage , [#sendanimation] sendAnimation , [#sendaudio] sendAudio , [#senddocument] sendDocument , [#sendlivephoto] sendLivePhoto , [#sendphoto] sendPhoto , [#sendsticker] sendSticker , [#sendvideo] sendVideo , [#sendvideonote] sendVideoNote , [#sendvoice] sendVoice , [#sendcontact] sendContact , [#sendlocation] sendLocation , [#sendvenue] sendVenue . Added the field ephemeral_message_id to the class [#replyparameters] ReplyParameters , allowing bots to reply to ephemeral messages. Marked the field message_id in the class [#replyparameters] ReplyParameters as optional if the field ephemeral_message_id is present. Added the methods [#editephemeralmessagetext] editEphemeralMessageText , [#editephemeralmessagemedia] editEphemeralMessageMedia , [#editephemeralmessagecaption] editEphemeralMessageCaption , and [#editephemeralmessagereplymarkup] editEphemeralMessageReplyMarkup allowing bots to edit ephemeral messages. Added the method [#deleteephemeralmessage] deleteEphemeralMessage allowing bots to delete ephemeral messages. Communities Introduced initial support for Communities - several supergroups, channels, and bots linked together around a shared topic or audience. Added the class [#community] Community which represents a community. Added the class [#communitychatadded] CommunityChatAdded and the field community_chat_added to the class [#message] Message . Added the class [#communitychatremoved] CommunityChatRemoved and the field community_chat_removed to the class [#message] Message . Added the field community to the class [#chatfullinfo] ChatFullInfo . General Added updates about changes to a user payment subscription, represented by the class [#botsubscriptionupdated] BotSubscriptionUpdated and the field subscription in the class [#update] Update . Hardened the security of Mini Apps by disallowing the usage of Mini App methods from origins different from the original Mini App domain. The protection will be automatically enabled for all Mini Apps on July 20, 2026. You can opt-out from the protection through the [https://t.me/BotFather] @BotFather Mini App. If you do so, you acknowledge that it is the responsibility of the bot to ensure that the Mini App has no links to untrusted sites.",
-    "June 11, 2026": "Bot API 10.1 Rich Messages Added support for [/bots/features#rich-messages] Rich Messages , allowing bots to send highly structured text and stream AI-generated replies with seamless rich formatting. Added the classes [#richtextbold] RichTextBold , [#richtextitalic] RichTextItalic , [#richtextunderline] RichTextUnderline , [#richtextstrikethrough] RichTextStrikethrough , [#richtextspoiler] RichTextSpoiler , [#richtextdatetime] RichTextDateTime , [#richtexttextmention] RichTextTextMention , [#richtextsubscript] RichTextSubscript , [#richtextsuperscript] RichTextSuperscript , [#richtextmarked] RichTextMarked , [#richtextcode] RichTextCode , [#richtextcustomemoji] RichTextCustomEmoji , [#richtextmathematicalexpression] RichTextMathematicalExpression , [#richtexturl] RichTextUrl , [#richtextemailaddress] RichTextEmailAddress , [#richtextphonenumber] RichTextPhoneNumber , [#richtextbankcardnumber] RichTextBankCardNumber , [#richtextmention] RichTextMention , [#richtexthashtag] RichTextHashtag , [#richtextcashtag] RichTextCashtag , [#richtextbotcommand] RichTextBotCommand , [#richtextanchor] RichTextAnchor , [#richtextanchorlink] RichTextAnchorLink , [#richtextreference] RichTextReference and [#richtextreferencelink] RichTextReferenceLink , which represent different types of rich formatted text. Added the class [#richtext] RichText , which represents rich formatted text. Added the class [#richblockcaption] RichBlockCaption , which represents the caption of a rich formatted text. Added the class [#richblocktablecell] RichBlockTableCell , which represents a cell in a table. Added the class [#richblocklistitem] RichBlockListItem , which represents an item in a list. Added the classes [#richblockparagraph] RichBlockParagraph , [#richblocksectionheading] RichBlockSectionHeading , [#richblockpreformatted] RichBlockPreformatted , [#richblockfooter] RichBlockFooter , [#richblockdivider] RichBlockDivider , [#richblockmathematicalexpression] RichBlockMathematicalExpression , [#richblockanchor] RichBlockAnchor , [#richblocklist] RichBlockList , [#richblockblockquotation] RichBlockBlockQuotation , [#richblockpullquotation] RichBlockPullQuotation , [#richblockcollage] RichBlockCollage , [#richblockslideshow] RichBlockSlideshow , [#richblocktable] RichBlockTable , [#richblockdetails] RichBlockDetails , [#richblockmap] RichBlockMap , [#richblockanimation] RichBlockAnimation , [#richblockaudio] RichBlockAudio , [#richblockphoto] RichBlockPhoto , [#richblockvideo] RichBlockVideo , [#richblockvoicenote] RichBlockVoiceNote and [#richblockthinking] RichBlockThinking , which represent different types of blocks in a rich formatted message. Added the class [#richblock] RichBlock , which represents a block in a rich formatted message. Added the class [#richmessage] RichMessage , which represents a rich formatted message. Added the field rich_message to the class [#message] Message . Added the class [#inputrichmessage] InputRichMessage , describing a rich message to send. Added the class [#inputrichmessagecontent] InputRichMessageContent and allowed it to be used as [#inputmessagecontent] InputMessageContent in results of inline, guest, and Web App queries. Added the method [#sendrichmessage] sendRichMessage , allowing bots to send rich messages. Added the method [#sendrichmessagedraft] sendRichMessageDraft , allowing bots to stream partial rich messages. Added the parameter rich_message to the method [#editmessagetext] editMessageText , allowing bots to edit rich messages. Join Request Queries Added the field supports_join_request_queries to the class [#user] User . Added the field guard_bot to the class [#chatfullinfo] ChatFullInfo . Added the field query_id to the class [#chatjoinrequest] ChatJoinRequest . Added the method [#answerchatjoinrequestquery] answerChatJoinRequestQuery . Added the method [#sendchatjoinrequestwebapp] sendChatJoinRequestWebApp . Polls Added the class [#link] Link and the field link to the class [#pollmedia] PollMedia . Added the class [#inputmedialink] InputMediaLink and allowed it to be used as [#inputpolloptionmedia] InputPollOptionMedia .",
-    "May 8, 2026": "Bot API 10.0 Guest Mode Introduced support for [/bots/features#guest-bots] guest mode , allowing bots to receive certain messages and issue replies within chats they are not a member of. Added the field supports_guest_queries to the class [#user] User . Added the fields guest_bot_caller_user and guest_bot_caller_chat to the class [#message] Message . Added the field guest_query_id to the class [#message] Message . Added the field guest_message to the class [#update] Update . Added the class [#sentguestmessage] SentGuestMessage and the method [#answerguestquery] answerGuestQuery . Chat Management Added the field can_react_to_messages to the classes [#chatmemberrestricted] ChatMemberRestricted and [#chatpermissions] ChatPermissions . Added the parameter return_bots to the method [#getchatadministrators] getChatAdministrators . Added the method [#deleteallmessagereactions] deleteAllMessageReactions . Added the method [#deletemessagereaction] deleteMessageReaction . Added the ability to see certain messages sent by other bots in groups. Polls Added the classes [#inputmediasticker] InputMediaSticker , [#inputmedialocation] InputMediaLocation , and [#inputmediavenue] InputMediaVenue . Added the class [#pollmedia] PollMedia , representing a media in a poll. Added the field media to the class [#poll] Poll , allowing bots to see media in polls. Added the field explanation_media to the class [#poll] Poll , allowing bots to see media in quiz explanations. Added the field media to the class [#polloption] PollOption , allowing bots to see media in poll options. Added the class [#inputpollmedia] InputPollMedia and the parameters media and explanation_media to the method [#sendpoll] sendPoll , allowing bots to add media to polls. Added the class [#inputpolloptionmedia] InputPollOptionMedia and the field media to the class [#inputpolloption] InputPollOption , allowing bots to add media to poll options. Added the field members_only to the class [#poll] Poll . Added the parameter members_only to the method [#sendpoll] sendPoll . Added the field country_codes to the class [#poll] Poll . Added the parameter country_codes to the method [#sendpoll] sendPoll . Decreased the minimum number of poll options from 2 to 1. Live photos Added the class [#livephoto] LivePhoto , which represents a photo with a short video. Added the class [#inputmedialivephoto] InputMediaLivePhoto . Added the field live_photo to the classes [#message] Message and [#externalreplyinfo] ExternalReplyInfo . Added the method [#sendlivephoto] sendLivePhoto , allowing bots to send live photos. Added the class [#paidmedialivephoto] PaidMediaLivePhoto , which describes a paid media with a live photo. Added the class [#inputpaidmedialivephoto] InputPaidMediaLivePhoto , allowing bots to send live photos as paid media. Allowed to use live photos in [#sendmediagroup] sendMediaGroup and [#editmessagemedia] editMessageMedia , General Allowed [https://core.telegram.org/bots/features#secretary-bots] Secretary Bots to manage accounts of users without a Telegram Premium subscription. Added the ability to send messages to other bots via username if both bots enabled bot-to-bot communication. Added the ability to reply to other bots from a business bot if the business bot enabled bot-to-bot communication. Allowed bots to pass an empty text in the method [#sendmessagedraft] sendMessageDraft . Added the class [#botaccesssettings] BotAccessSettings and the method [#getmanagedbotaccesssettings] getManagedBotAccessSettings . Added the method [#setmanagedbotaccesssettings] setManagedBotAccessSettings . Added the method [#getuserpersonalchatmessages] getUserPersonalChatMessages . [/bots/api-changelog] See earlier changes »"
+    "July 14, 2026": "Bot API 10.2 Rich Messages Added the class [#inputrichmessagemedia] InputRichMessageMedia and the field media to the class [#inputrichmessage] InputRichMessage , allowing bots to explicitly specify media used in markdown or html formatting when sending a rich message. Added the class [#inputmediavoicenote] InputMediaVoiceNote , representing a voice message to be sent. Added the class [#inputrichblocklistitem] InputRichBlockListItem , which represents an item in a list to be sent. Added the classes [#inputrichblockparagraph] InputRichBlockParagraph , [#inputrichblocksectionheading] InputRichBlockSectionHeading , [#inputrichblockpreformatted] InputRichBlockPreformatted , [#inputrichblockfooter] InputRichBlockFooter , [#inputrichblockdivider] InputRichBlockDivider , [#inputrichblockmathematicalexpression] InputRichBlockMathematicalExpression , [#inputrichblockanchor] InputRichBlockAnchor , [#inputrichblocklist] InputRichBlockList , [#inputrichblockblockquotation] InputRichBlockBlockQuotation , [#inputrichblockpullquotation] InputRichBlockPullQuotation , [#inputrichblockcollage] InputRichBlockCollage , [#inputrichblockslideshow] InputRichBlockSlideshow , [#inputrichblocktable] InputRichBlockTable , [#inputrichblockdetails] InputRichBlockDetails , [#inputrichblockmap] InputRichBlockMap , [#inputrichblockanimation] InputRichBlockAnimation , [#inputrichblockaudio] InputRichBlockAudio , [#inputrichblockphoto] InputRichBlockPhoto , [#inputrichblockvideo] InputRichBlockVideo , [#inputrichblockvoicenote] InputRichBlockVoiceNote and [#inputrichblockthinking] InputRichBlockThinking , which represent different types of blocks available to format an outgoing rich message. Added the field blocks to the class [#inputrichmessage] InputRichMessage , allowing bots to specify rich message formatting via block entities. Ephemeral Messages Introduced support for [/bots/features#ephemeral-messages] Ephemeral Messages , allowing bots to send group messages and receive commands that are visible only to a specific user and the bot. Added the field is_ephemeral to the class [#botcommand] BotCommand . Added the field receiver_user to the class [#message] Message . Added the field ephemeral_message_id to the class [#message] Message . Added the parameters receiver_user_id and callback_query_id to the methods [#sendmessage] sendMessage , [#sendanimation] sendAnimation , [#sendaudio] sendAudio , [#senddocument] sendDocument , [#sendlivephoto] sendLivePhoto , [#sendphoto] sendPhoto , [#sendsticker] sendSticker , [#sendvideo] sendVideo , [#sendvideonote] sendVideoNote , [#sendvoice] sendVoice , [#sendcontact] sendContact , [#sendlocation] sendLocation , [#sendvenue] sendVenue . Added the field ephemeral_message_id to the class [#replyparameters] ReplyParameters , allowing bots to reply to ephemeral messages. Marked the field message_id in the class [#replyparameters] ReplyParameters as optional if the field ephemeral_message_id is present. Added the methods [#editephemeralmessagetext] editEphemeralMessageText , [#editephemeralmessagemedia] editEphemeralMessageMedia , [#editephemeralmessagecaption] editEphemeralMessageCaption , and [#editephemeralmessagereplymarkup] editEphemeralMessageReplyMarkup allowing bots to edit ephemeral messages. Added the method [#deleteephemeralmessage] deleteEphemeralMessage allowing bots to delete ephemeral messages. Communities Introduced initial support for Communities - several supergroups, channels, and bots linked together around a shared topic or audience. Added the class [#community] Community which represents a community. Added the class [#communitychatadded] CommunityChatAdded and the field community_chat_added to the class [#message] Message . Added the class [#communitychatremoved] CommunityChatRemoved and the field community_chat_removed to the class [#message] Message . Added the field community to the class [#chatfullinfo] ChatFullInfo . General Added updates about changes to a user payment subscription, represented by the class [#botsubscriptionupdated] BotSubscriptionUpdated and the field subscription in the class [#update] Update . Hardened the security of Mini Apps by disallowing the usage of Mini App methods from origins different from the original Mini App domain. The protection will be automatically enabled for all Mini Apps on July 20, 2026. You can opt-out from the protection through the [https://t.me/BotFather] @BotFather Mini App. If you do so, you acknowledge that it is the responsibility of the bot to ensure that the Mini App has no links to untrusted sites. [/bots/api-changelog] See earlier changes »"
   }
 }

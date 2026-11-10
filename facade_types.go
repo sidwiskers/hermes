@@ -177,6 +177,8 @@ const (
 	UpdateMessageReaction          = telegram.UpdateMessageReaction
 	UpdateMessageReactionCount     = telegram.UpdateMessageReactionCount
 	UpdateInlineQuery              = telegram.UpdateInlineQuery
+	UpdateWidgetQuery              = telegram.UpdateWidgetQuery
+	UpdateSharedWidgetQuery        = telegram.UpdateSharedWidgetQuery
 	UpdateChosenInlineResult       = telegram.UpdateChosenInlineResult
 	UpdateCallbackQuery            = telegram.UpdateCallbackQuery
 	UpdateShippingQuery            = telegram.UpdateShippingQuery

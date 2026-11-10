@@ -15,7 +15,7 @@ const (
 // SendBaseParams contains options shared by most send methods.
 type SendBaseParams struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
 	DisableNotification        bool                        `json:"disable_notification,omitempty"`
@@ -36,7 +36,7 @@ type SendBaseParams struct {
 
 type SendMessageParams struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
 	Text                       string                      `json:"text"`
@@ -81,8 +81,8 @@ func resolveEphemeralMessageParameters(
 		}
 		resolved.CallbackQueryID = callbackQueryID
 	}
-	if resolved.ReceiverUserID == 0 {
-		return nil, fmt.Errorf("hermes: ephemeral receiver_user_id is required")
+	if resolved.ReceiverUserID == 0 && resolved.CallbackQueryID == "" {
+		return nil, fmt.Errorf("hermes: ephemeral receiver_user_id or callback_query_id is required")
 	}
 	if resolved.ReplaceCallbackQueryMessage && resolved.CallbackQueryID == "" {
 		return nil, fmt.Errorf("hermes: replace_callback_query_message requires callback_query_id")
@@ -90,8 +90,64 @@ func resolveEphemeralMessageParameters(
 	return &resolved, nil
 }
 
-// normalizeEphemeralSendParams performs the Bot API 10.2-to-10.3 wire
-// translation for the send parameter structs that retain legacy fields.
+// validateSendChatID enforces the ordinary chat target and Bot API 10.4's
+// callback-scoped exception for ephemeral sends.
+func validateSendChatID(chatID any, ephemeral *EphemeralMessageParameters, method string) error {
+	if chatID != nil {
+		return validateChatID(chatID, method)
+	}
+	if ephemeral != nil && strings.TrimSpace(ephemeral.CallbackQueryID) != "" {
+		return nil
+	}
+	return fmt.Errorf("hermes: %s requires chat_id unless callback_query_id is set for an ephemeral reply", method)
+}
+
+func ephemeralSendParameters(params any) *EphemeralMessageParameters {
+	switch value := params.(type) {
+	case SendPhotoParams:
+		return value.EphemeralMessageParameters
+	case SendAnimationParams:
+		return value.EphemeralMessageParameters
+	case SendAudioParams:
+		return value.EphemeralMessageParameters
+	case SendDocumentParams:
+		return value.EphemeralMessageParameters
+	case SendStickerParams:
+		return value.EphemeralMessageParameters
+	case SendVideoParams:
+		return value.EphemeralMessageParameters
+	case SendVideoNoteParams:
+		return value.EphemeralMessageParameters
+	case SendVoiceParams:
+		return value.EphemeralMessageParameters
+	case SendContactParams:
+		return value.EphemeralMessageParameters
+	case SendLocationParams:
+		return value.EphemeralMessageParameters
+	case SendVenueParams:
+		return value.EphemeralMessageParameters
+	case SendLivePhotoParams:
+		return value.EphemeralMessageParameters
+	case SendRichMessageParams:
+		return value.EphemeralMessageParameters
+	default:
+		return nil
+	}
+}
+
+func prepareEphemeralSendParams(params any, chatID any, method string) (any, error) {
+	normalized, err := normalizeEphemeralSendParams(params)
+	if err != nil {
+		return nil, err
+	}
+	if err := validateSendChatID(chatID, ephemeralSendParameters(normalized), method); err != nil {
+		return nil, err
+	}
+	return normalized, nil
+}
+
+// normalizeEphemeralSendParams maps legacy convenience fields to the nested
+// ephemeral-send object while preserving explicit Bot API 10.4 callback targets.
 func normalizeEphemeralSendParams(params any) (any, error) {
 	normalize := func(current *EphemeralMessageParameters, receiver int64, callback string) (*EphemeralMessageParameters, error) {
 		return resolveEphemeralMessageParameters(current, receiver, callback)
@@ -151,9 +207,6 @@ func normalizeEphemeralSendParams(params any) (any, error) {
 }
 
 func (b *Client) SendMessage(ctx context.Context, params SendMessageParams) (*Message, error) {
-	if err := validateChatID(params.ChatID, "sendMessage"); err != nil {
-		return nil, err
-	}
 	if params.Text == "" {
 		return nil, fmt.Errorf("hermes: sendMessage text is required")
 	}
@@ -164,6 +217,9 @@ func (b *Client) SendMessage(ctx context.Context, params SendMessageParams) (*Me
 		params.CallbackQueryID,
 	)
 	if err != nil {
+		return nil, err
+	}
+	if err := validateSendChatID(params.ChatID, params.EphemeralMessageParameters, "sendMessage"); err != nil {
 		return nil, err
 	}
 	return callMessage(ctx, b, "sendMessage", params)

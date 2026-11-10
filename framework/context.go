@@ -37,10 +37,12 @@ type contextState struct {
 // Update for convenient access.
 type Context struct {
 	context.Context
-	Bot      *api.Client
-	Update   *Update
-	Message  *Message
-	Callback *CallbackQuery
+	Bot               *api.Client
+	Update            *Update
+	Message           *Message
+	Callback          *CallbackQuery
+	WidgetQuery       *WidgetQuery
+	SharedWidgetQuery *SharedWidgetQuery
 
 	command string
 	args    string
@@ -65,6 +67,8 @@ func (c *Context) reset(ctx context.Context, bot *api.Client, update *Update, us
 	}
 	c.Message = update.PrimaryMessage()
 	c.Callback = update.CallbackQuery
+	c.WidgetQuery = update.WidgetQuery
+	c.SharedWidgetQuery = update.SharedWidgetQuery
 	if update.CallbackQuery == nil {
 		c.command, c.args = parseCommand(c.Message, username)
 	}
@@ -321,20 +325,27 @@ func (c *Context) Ephemeral(text string, options ...SendOption) error {
 
 // EphemeralMessage sends private text and returns Telegram's message.
 func (c *Context) EphemeralMessage(text string, options ...SendOption) (*Message, error) {
-	chatID, ok := c.ChatID()
-	if !ok {
-		return nil, fmt.Errorf("hermes: update has no chat")
+	if c == nil || c.Bot == nil {
+		return nil, fmt.Errorf("hermes: ephemeral send requires a Bot API client")
+	}
+	chatID, hasChat := c.ChatID()
+	callbackOnly := !hasChat && c.Callback != nil
+	if !hasChat && !callbackOnly {
+		return nil, fmt.Errorf("hermes: update has no chat or callback query")
 	}
 	sender := c.Sender()
 	if sender == nil {
 		return nil, fmt.Errorf("hermes: update has no sender")
 	}
-	params := SendMessageParams{
-		ChatID:                     chatID,
-		Text:                       text,
-		EphemeralMessageParameters: &EphemeralMessageParameters{ReceiverUserID: sender.ID},
+	parameters := &EphemeralMessageParameters{}
+	params := SendMessageParams{Text: text, EphemeralMessageParameters: parameters}
+	if hasChat {
+		params.ChatID = chatID
 	}
-	c.applyEphemeralTarget(params.EphemeralMessageParameters, &params.ReplyParameters)
+	if !callbackOnly {
+		parameters.ReceiverUserID = sender.ID
+	}
+	c.applyEphemeralTarget(parameters, &params.ReplyParameters)
 	applyTextOptions(&params, resolveSendOptions(options))
 	return c.Bot.SendMessage(c.Context, params)
 }
@@ -349,6 +360,26 @@ func (c *Context) Answer(text string) error {
 
 // Acknowledge silently answers the current callback query.
 func (c *Context) Acknowledge() error { return c.Answer("") }
+
+// AnswerWidgetQuery responds to the current widget or shared-widget query.
+func (c *Context) AnswerWidgetQuery(data string) error {
+	if c == nil || c.Bot == nil {
+		return fmt.Errorf("hermes: widget query response requires a Bot API client")
+	}
+	var queryID string
+	switch {
+	case c.WidgetQuery != nil:
+		queryID = c.WidgetQuery.ID
+	case c.SharedWidgetQuery != nil:
+		queryID = c.SharedWidgetQuery.ID
+	default:
+		return fmt.Errorf("hermes: update has no widget query")
+	}
+	return c.Bot.AnswerWidgetQuery(c.Context, api.AnswerWidgetQueryParams{
+		WidgetQueryID: queryID,
+		Data:          data,
+	})
+}
 
 // Alert responds to the current callback query with an alert dialog.
 func (c *Context) Alert(text string) error {

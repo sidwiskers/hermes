@@ -8,7 +8,7 @@ import (
 
 type SendLivePhotoParams struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
 	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
@@ -31,13 +31,40 @@ type SendLivePhotoParams struct {
 }
 
 func validateSendLivePhoto(params SendLivePhotoParams) error {
-	if err := validateChatID(params.ChatID, "sendLivePhoto"); err != nil {
+	ephemeral, err := resolveEphemeralMessageParameters(
+		params.EphemeralMessageParameters,
+		params.ReceiverUserID,
+		params.CallbackQueryID,
+	)
+	if err != nil {
+		return err
+	}
+	if err := validateSendChatID(params.ChatID, ephemeral, "sendLivePhoto"); err != nil {
 		return err
 	}
 	if strings.TrimSpace(params.LivePhoto) == "" || strings.TrimSpace(params.Photo) == "" {
 		return fmt.Errorf("hermes: sendLivePhoto live_photo and photo are required")
 	}
 	return nil
+}
+
+func (params SendLivePhotoParams) base() SendBaseParams {
+	return SendBaseParams{
+		BusinessConnectionID:       params.BusinessConnectionID,
+		ChatID:                     params.ChatID,
+		MessageThreadID:            params.MessageThreadID,
+		DirectMessagesTopicID:      params.DirectMessagesTopicID,
+		DisableNotification:        params.DisableNotification,
+		ProtectContent:             params.ProtectContent,
+		AllowPaidBroadcast:         params.AllowPaidBroadcast,
+		MessageEffectID:            params.MessageEffectID,
+		SuggestedPostParameters:    params.SuggestedPostParameters,
+		ReplyParameters:            params.ReplyParameters,
+		ReplyMarkup:                params.ReplyMarkup,
+		EphemeralMessageParameters: params.EphemeralMessageParameters,
+		ReceiverUserID:             params.ReceiverUserID,
+		CallbackQueryID:            params.CallbackQueryID,
+	}
 }
 
 func (client *Client) SendLivePhoto(ctx context.Context, params SendLivePhotoParams) (*Message, error) {
@@ -64,7 +91,12 @@ func (client *Client) SendLivePhotoUpload(ctx context.Context, params SendLivePh
 	if err := validateAttachmentUploads(params, uploads, "sendLivePhoto"); err != nil {
 		return nil, err
 	}
-	fields, err := newFormFields(params.ChatID)
+	normalized, err := normalizeEphemeralSendParams(params)
+	if err != nil {
+		return nil, err
+	}
+	params = normalized.(SendLivePhotoParams)
+	fields, err := newSendFormFields(params.base(), "sendLivePhoto")
 	if err != nil {
 		return nil, err
 	}

@@ -24,7 +24,7 @@ can therefore produce a review even when Telegram's actual behavior is unchanged
 Both inventories determine a stable source identity. Version rollback, duplicate
 names, incomplete documents and large schema losses stop the update. A missing
 semantic baseline requires review; it is never silently accepted. The checked-in
-10.3 baseline was captured from the official document alongside this change.
+10.4 baseline was captured from the official document alongside this change.
 
 ## Generation and repair
 

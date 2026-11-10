@@ -568,7 +568,7 @@ func validateRichMessage(message InputRichMessage, draft bool) error {
 
 type SendRichMessageParams struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	MessageThreadID            int                         `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int                         `json:"direct_messages_topic_id,omitempty"`
 	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
@@ -583,7 +583,7 @@ type SendRichMessageParams struct {
 }
 
 func validateSendRichMessage(params SendRichMessageParams, uploads []Upload) error {
-	if err := validateChatID(params.ChatID, "sendRichMessage"); err != nil {
+	if err := validateSendChatID(params.ChatID, params.EphemeralMessageParameters, "sendRichMessage"); err != nil {
 		return err
 	}
 	if err := validateRichMessage(params.RichMessage, false); err != nil {
@@ -619,7 +619,20 @@ func (client *Client) SendRichMessageUpload(
 	if err := validateSendRichMessage(params, uploads); err != nil {
 		return nil, err
 	}
-	fields, err := newFormFields(params.ChatID)
+	fields, err := newSendFormFields(SendBaseParams{
+		BusinessConnectionID:       params.BusinessConnectionID,
+		ChatID:                     params.ChatID,
+		MessageThreadID:            params.MessageThreadID,
+		DirectMessagesTopicID:      params.DirectMessagesTopicID,
+		DisableNotification:        params.DisableNotification,
+		ProtectContent:             params.ProtectContent,
+		AllowPaidBroadcast:         params.AllowPaidBroadcast,
+		MessageEffectID:            params.MessageEffectID,
+		SuggestedPostParameters:    params.SuggestedPostParameters,
+		ReplyParameters:            params.ReplyParameters,
+		ReplyMarkup:                params.ReplyMarkup,
+		EphemeralMessageParameters: params.EphemeralMessageParameters,
+	}, "sendRichMessage")
 	if err != nil {
 		return nil, err
 	}

@@ -3,24 +3,32 @@ package framework
 import "fmt"
 
 type contextSendTarget struct {
-	chatID    int64
+	chatID    any
 	ephemeral *EphemeralMessageParameters
 	reply     *ReplyParameters
 	options   sendOptions
 }
 
 func (c *Context) mediaTarget(ephemeral bool, options []SendOption) (contextSendTarget, error) {
-	chatID, ok := c.ChatID()
-	if !ok {
+	chatID, hasChat := c.ChatID()
+	callbackOnly := ephemeral && !hasChat && c != nil && c.Callback != nil
+	if !hasChat && !callbackOnly {
 		return contextSendTarget{}, fmt.Errorf("hermes: update has no chat")
 	}
-	target := contextSendTarget{chatID: chatID, options: resolveSendOptions(options)}
+
+	target := contextSendTarget{options: resolveSendOptions(options)}
+	if hasChat {
+		target.chatID = chatID
+	}
 	if ephemeral {
 		sender := c.Sender()
 		if sender == nil {
 			return contextSendTarget{}, fmt.Errorf("hermes: update has no sender")
 		}
-		target.ephemeral = &EphemeralMessageParameters{ReceiverUserID: sender.ID}
+		target.ephemeral = &EphemeralMessageParameters{}
+		if !callbackOnly {
+			target.ephemeral.ReceiverUserID = sender.ID
+		}
 		c.applyEphemeralTarget(target.ephemeral, &target.reply)
 	}
 	return target, nil
