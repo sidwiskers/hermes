@@ -26,6 +26,9 @@
   the generated protocol models.
 - Add request/response, discriminator, unknown-variant, payload-limit, and
   ephemeral-send regression tests for the new protocol surface.
+- Verify the release with zero schema gaps, race and shuffled tests, package
+  coverage floors, security/dependency checks, competitor builds, examples,
+  integration compilation, benchmarks, and Windows/macOS/Linux cross-builds.
 - Document production widget restrictions, query deadlines, and Telegram's
   UTF-8 byte-based limits. Premium bot username changes remain managed through
   Telegram's account tooling rather than a Bot API method.
