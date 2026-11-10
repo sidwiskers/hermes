@@ -39,8 +39,9 @@ go run ./internal/cmd/botapi-audit
 go run ./internal/cmd/botapi-audit -json
 ```
 
-CI requires the complete report to remain at zero and verifies that generated
-models, facade aliases, and `spec/api-surface.txt` are byte-for-byte current.
+The release gate (`scripts/release-check.sh`) requires the complete report to
+remain at zero. CI also verifies that generated models, facade aliases, and
+`spec/api-surface.txt` are byte-for-byte current.
 
 The scheduled [Hermes Guardian](maintenance.md) parses the same source daily.
 It ignores documentation-only HTML changes, classifies protocol changes into a

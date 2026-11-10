@@ -62,10 +62,17 @@ bot.On(hermes.UpdateIs(hermes.UpdateWidgetQuery), func(c *hermes.Context) error 
 `Data`, `SignData`, or `SentTransaction`. Unknown future variants are
 retained in `Raw` and can be re-emitted without being discarded.
 
-A widget request contains 1-64 bytes of data. Answer every received query within
-15 seconds, including failed requests. The optional answer data is limited to
-1,024 bytes. `AnswerWidgetQuery` sends the result only to the requesting
-widget; it does not modify widget state.
+A widget request contains 1-64 bytes of UTF-8 data. Telegram accepts at most
+five requests per user and bot in a five-second window, with only one request
+in flight per widget. In production, a visible widget in the private chat can
+also make a background request when it appears and then no more than once every
+five seconds.
+
+Answer every received query within 15 seconds, including failed requests. The
+optional answer data is limited to 1,024 bytes. Answer promptly before doing
+slow work, and use the state-edit methods separately. `AnswerWidgetQuery`
+sends the result only to the requesting widget; it does not modify widget
+state.
 
 For direct client use, call `AnswerWidgetQuery` to return a query result,
 `EditMessageWidgetData` to change state for one widget message,
@@ -74,6 +81,12 @@ For direct client use, call `AnswerWidgetQuery` to return a query result,
 Widget state fields use byte limits, not character limits. Passing an empty
 string to either edit method clears the corresponding state; omitting a pointer
 field in `EditMessageWidgetDataParams` leaves it unchanged.
+
+Telegram counts `editMessageWidgetData` as a sent message against the bot's
+sending limits and permits at most one shared-widget edit per second.
+`editSharedWidgetData` defaults to a 30-second refresh period; `cache_time`
+values below five seconds are rejected and values above 3,600 seconds are
+clamped by Telegram. Hermes passes the configured value through unchanged.
 
 ## TON Wallet events
 
