@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	maxWidgetHTMLBytes = 32 * 1024
+	maxWidgetHTMLBytes     = 32 * 1024
 	maxWidgetHTMLZlibBytes = 4 * 1024
-	maxWidgetStateBytes = 1024
+	maxWidgetStateBytes    = 1024
 )
 
 func validateWidgetState(value, field string) error {
