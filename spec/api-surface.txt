@@ -718,7 +718,7 @@ const StoryActive24Hours untyped int = 86400
 const StoryActive48Hours untyped int = 172800
 const StoryActive6Hours untyped int = 21600
 type StoryArea = github.com/sidwiskers/hermes/api.StoryArea
-type StoryAreaPosition = github.com/sidwiskers/hermes/api.StoryAreaPosition
+type StoryAreaPosition = github.com/sidwiskers/hermes/types.AreaPosition
 type StoryAreaType = github.com/sidwiskers/hermes/api.StoryAreaType
 type StoryAreaTypeLink = github.com/sidwiskers/hermes/types.StoryAreaTypeLink
 type StoryAreaTypeLocation = github.com/sidwiskers/hermes/types.StoryAreaTypeLocation
@@ -1745,8 +1745,8 @@ const StoryActive12Hours untyped int = 43200
 const StoryActive24Hours untyped int = 86400
 const StoryActive48Hours untyped int = 172800
 const StoryActive6Hours untyped int = 21600
-type StoryArea struct{Position StoryAreaPosition `json:"position"`; Type StoryAreaType `json:"type"`}
-type StoryAreaPosition struct{XPercentage float64 `json:"x_percentage"`; YPercentage float64 `json:"y_percentage"`; WidthPercentage float64 `json:"width_percentage"`; HeightPercentage float64 `json:"height_percentage"`; RotationAngle float64 `json:"rotation_angle"`; CornerRadiusPercentage float64 `json:"corner_radius_percentage"`}
+type StoryArea struct{Position AreaPosition `json:"position"`; Type StoryAreaType `json:"type"`}
+type StoryAreaPosition = github.com/sidwiskers/hermes/types.AreaPosition
 type StoryAreaType struct{Type string `json:"type"`; Latitude float64 `json:"latitude,omitempty"`; Longitude float64 `json:"longitude,omitempty"`; Address *LocationAddress `json:"address,omitempty"`; ReactionType *ReactionType `json:"reaction_type,omitempty"`; IsDark bool `json:"is_dark,omitempty"`; IsFlipped bool `json:"is_flipped,omitempty"`; URL string `json:"url,omitempty"`; Temperature float64 `json:"temperature,omitempty"`; Emoji string `json:"emoji,omitempty"`; BackgroundColor int `json:"background_color,omitempty"`; Name string `json:"name,omitempty"`}
 type StoryAreaTypeLink = github.com/sidwiskers/hermes/types.StoryAreaTypeLink
 type StoryAreaTypeLocation = github.com/sidwiskers/hermes/types.StoryAreaTypeLocation
