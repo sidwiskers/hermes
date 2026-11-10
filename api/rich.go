@@ -620,17 +620,17 @@ func (client *Client) SendRichMessageUpload(
 		return nil, err
 	}
 	fields, err := newSendFormFields(SendBaseParams{
-		BusinessConnectionID: params.BusinessConnectionID,
-		ChatID: params.ChatID,
-		MessageThreadID: params.MessageThreadID,
-		DirectMessagesTopicID: params.DirectMessagesTopicID,
-		DisableNotification: params.DisableNotification,
-		ProtectContent: params.ProtectContent,
-		AllowPaidBroadcast: params.AllowPaidBroadcast,
-		MessageEffectID: params.MessageEffectID,
-		SuggestedPostParameters: params.SuggestedPostParameters,
-		ReplyParameters: params.ReplyParameters,
-		ReplyMarkup: params.ReplyMarkup,
+		BusinessConnectionID:       params.BusinessConnectionID,
+		ChatID:                     params.ChatID,
+		MessageThreadID:            params.MessageThreadID,
+		DirectMessagesTopicID:      params.DirectMessagesTopicID,
+		DisableNotification:        params.DisableNotification,
+		ProtectContent:             params.ProtectContent,
+		AllowPaidBroadcast:         params.AllowPaidBroadcast,
+		MessageEffectID:            params.MessageEffectID,
+		SuggestedPostParameters:    params.SuggestedPostParameters,
+		ReplyParameters:            params.ReplyParameters,
+		ReplyMarkup:                params.ReplyMarkup,
 		EphemeralMessageParameters: params.EphemeralMessageParameters,
 	}, "sendRichMessage")
 	if err != nil {

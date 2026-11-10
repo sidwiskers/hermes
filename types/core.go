@@ -49,7 +49,7 @@ const (
 // configured API/runtime decoder. The zero-value fast path avoids copying the
 // original payload for every update.
 type Update struct {
-	UpdateID                 int64                        `json:"update_id"`
+	UpdateID int64 `json:"update_id"`
 	UpdateBotAPIFields
 	Message                  *Message                     `json:"message,omitempty"`
 	EditedMessage            *Message                     `json:"edited_message,omitempty"`

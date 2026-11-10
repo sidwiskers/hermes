@@ -37,9 +37,9 @@ type contextState struct {
 // Update for convenient access.
 type Context struct {
 	context.Context
-	Bot      *api.Client
-	Update   *Update
-	Message  *Message
+	Bot               *api.Client
+	Update            *Update
+	Message           *Message
 	Callback          *CallbackQuery
 	WidgetQuery       *WidgetQuery
 	SharedWidgetQuery *SharedWidgetQuery

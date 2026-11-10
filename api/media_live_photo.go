@@ -50,20 +50,20 @@ func validateSendLivePhoto(params SendLivePhotoParams) error {
 
 func (params SendLivePhotoParams) base() SendBaseParams {
 	return SendBaseParams{
-		BusinessConnectionID: params.BusinessConnectionID,
-		ChatID: params.ChatID,
-		MessageThreadID: params.MessageThreadID,
-		DirectMessagesTopicID: params.DirectMessagesTopicID,
-		DisableNotification: params.DisableNotification,
-		ProtectContent: params.ProtectContent,
-		AllowPaidBroadcast: params.AllowPaidBroadcast,
-		MessageEffectID: params.MessageEffectID,
-		SuggestedPostParameters: params.SuggestedPostParameters,
-		ReplyParameters: params.ReplyParameters,
-		ReplyMarkup: params.ReplyMarkup,
+		BusinessConnectionID:       params.BusinessConnectionID,
+		ChatID:                     params.ChatID,
+		MessageThreadID:            params.MessageThreadID,
+		DirectMessagesTopicID:      params.DirectMessagesTopicID,
+		DisableNotification:        params.DisableNotification,
+		ProtectContent:             params.ProtectContent,
+		AllowPaidBroadcast:         params.AllowPaidBroadcast,
+		MessageEffectID:            params.MessageEffectID,
+		SuggestedPostParameters:    params.SuggestedPostParameters,
+		ReplyParameters:            params.ReplyParameters,
+		ReplyMarkup:                params.ReplyMarkup,
 		EphemeralMessageParameters: params.EphemeralMessageParameters,
-		ReceiverUserID: params.ReceiverUserID,
-		CallbackQueryID: params.CallbackQueryID,
+		ReceiverUserID:             params.ReceiverUserID,
+		CallbackQueryID:            params.CallbackQueryID,
 	}
 }
 

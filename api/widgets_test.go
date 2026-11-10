@@ -135,7 +135,7 @@ func TestSendMessageEphemeralCallbackDoesNotRequireChatID(t *testing.T) {
 
 	client := New("TOKEN", WithBaseURL(server.URL), WithHTTPClient(server.Client()))
 	_, err := client.SendMessage(context.Background(), SendMessageParams{
-		Text: "ephemeral",
+		Text:                       "ephemeral",
 		EphemeralMessageParameters: &EphemeralMessageParameters{CallbackQueryID: "callback-1"},
 	})
 	if err != nil {
@@ -169,7 +169,7 @@ func TestSendPhotoUploadEphemeralCallbackDoesNotRequireChatID(t *testing.T) {
 
 	client := New("TOKEN", WithBaseURL(server.URL), WithHTTPClient(server.Client()))
 	_, err := client.SendPhotoUpload(context.Background(), SendPhotoParams{
-		Photo: "attach://photo",
+		Photo:                      "attach://photo",
 		EphemeralMessageParameters: &EphemeralMessageParameters{CallbackQueryID: "callback-2"},
 	}, "photo.jpg", strings.NewReader("image"))
 	if err != nil {
