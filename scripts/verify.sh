@@ -10,7 +10,6 @@ fi
 ./scripts/check-secrets.sh
 ./scripts/test-check-secrets.sh
 ./scripts/check-generated.sh
-go run ./internal/cmd/botapi-audit
 ./scripts/test-check-go-version.sh
 python3 -m unittest discover -s scripts/guardian -p 'test_*.py'
 

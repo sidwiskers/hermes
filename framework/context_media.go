@@ -11,13 +11,13 @@ type contextSendTarget struct {
 
 func (c *Context) mediaTarget(ephemeral bool, options []SendOption) (contextSendTarget, error) {
 	chatID, hasChat := c.ChatID()
-	hasCallback := c != nil && c.Callback != nil
-	if !hasChat && (!ephemeral || !hasCallback) {
+	callbackOnly := ephemeral && !hasChat && c != nil && c.Callback != nil
+	if !hasChat && !callbackOnly {
 		return contextSendTarget{}, fmt.Errorf("hermes: update has no chat")
 	}
 
 	target := contextSendTarget{options: resolveSendOptions(options)}
-	if hasChat && (!ephemeral || !hasCallback) {
+	if hasChat {
 		target.chatID = chatID
 	}
 	if ephemeral {
@@ -26,7 +26,7 @@ func (c *Context) mediaTarget(ephemeral bool, options []SendOption) (contextSend
 			return contextSendTarget{}, fmt.Errorf("hermes: update has no sender")
 		}
 		target.ephemeral = &EphemeralMessageParameters{}
-		if !hasCallback {
+		if !callbackOnly {
 			target.ephemeral.ReceiverUserID = sender.ID
 		}
 		c.applyEphemeralTarget(target.ephemeral, &target.reply)

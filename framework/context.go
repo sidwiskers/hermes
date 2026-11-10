@@ -329,7 +329,8 @@ func (c *Context) EphemeralMessage(text string, options ...SendOption) (*Message
 		return nil, fmt.Errorf("hermes: ephemeral send requires a Bot API client")
 	}
 	chatID, hasChat := c.ChatID()
-	if !hasChat && c.Callback == nil {
+	callbackOnly := !hasChat && c.Callback != nil
+	if !hasChat && !callbackOnly {
 		return nil, fmt.Errorf("hermes: update has no chat or callback query")
 	}
 	sender := c.Sender()
@@ -338,8 +339,10 @@ func (c *Context) EphemeralMessage(text string, options ...SendOption) (*Message
 	}
 	parameters := &EphemeralMessageParameters{}
 	params := SendMessageParams{Text: text, EphemeralMessageParameters: parameters}
-	if c.Callback == nil && hasChat {
+	if hasChat {
 		params.ChatID = chatID
+	}
+	if !callbackOnly {
 		parameters.ReceiverUserID = sender.ID
 	}
 	c.applyEphemeralTarget(parameters, &params.ReplyParameters)
