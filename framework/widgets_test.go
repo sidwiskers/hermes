@@ -67,3 +67,38 @@ func TestSharedWidgetQueryContext(t *testing.T) {
 		t.Fatal("expected missing-client validation error")
 	}
 }
+
+func TestEphemeralMessageUsesCallbackTargetWithoutChat(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		var body map[string]any
+		if err := json.NewDecoder(request.Body).Decode(&body); err != nil {
+			t.Fatal(err)
+		}
+		if _, exists := body["chat_id"]; exists {
+			t.Fatalf("chat_id should be omitted for callback-targeted ephemeral send: %#v", body)
+		}
+		parameters, ok := body["ephemeral_message_parameters"].(map[string]any)
+		if !ok || parameters["callback_query_id"] != "inline-callback-1" {
+			t.Fatalf("ephemeral_message_parameters = %#v", body["ephemeral_message_parameters"])
+		}
+		if _, exists := parameters["receiver_user_id"]; exists {
+			t.Fatalf("receiver_user_id should be omitted when the callback identifies the recipient: %#v", parameters)
+		}
+		_, _ = io.WriteString(writer, `{"ok":true,"result":{"message_id":9,"chat":{"id":42,"type":"private"}}}`)
+	}))
+	defer server.Close()
+
+	client := api.New("TOKEN", api.WithBaseURL(server.URL), api.WithHTTPClient(server.Client()))
+	update := &telegram.Update{}
+	update.CallbackQuery = &telegram.CallbackQuery{
+		ID:              "inline-callback-1",
+		From:            telegram.User{ID: 42, FirstName: "User"},
+		InlineMessageID: "inline-message-1",
+	}
+	ctx := NewContext(context.Background(), client, update, "")
+	if _, err := ctx.EphemeralMessage("private response"); err != nil {
+		t.Fatal(err)
+	}
+}

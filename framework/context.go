@@ -325,20 +325,24 @@ func (c *Context) Ephemeral(text string, options ...SendOption) error {
 
 // EphemeralMessage sends private text and returns Telegram's message.
 func (c *Context) EphemeralMessage(text string, options ...SendOption) (*Message, error) {
-	chatID, ok := c.ChatID()
-	if !ok {
-		return nil, fmt.Errorf("hermes: update has no chat")
+	if c == nil || c.Bot == nil {
+		return nil, fmt.Errorf("hermes: ephemeral send requires a Bot API client")
+	}
+	chatID, hasChat := c.ChatID()
+	if !hasChat && c.Callback == nil {
+		return nil, fmt.Errorf("hermes: update has no chat or callback query")
 	}
 	sender := c.Sender()
 	if sender == nil {
 		return nil, fmt.Errorf("hermes: update has no sender")
 	}
-	params := SendMessageParams{
-		ChatID:                     chatID,
-		Text:                       text,
-		EphemeralMessageParameters: &EphemeralMessageParameters{ReceiverUserID: sender.ID},
+	parameters := &EphemeralMessageParameters{}
+	params := SendMessageParams{Text: text, EphemeralMessageParameters: parameters}
+	if hasChat {
+		params.ChatID = chatID
+		parameters.ReceiverUserID = sender.ID
 	}
-	c.applyEphemeralTarget(params.EphemeralMessageParameters, &params.ReplyParameters)
+	c.applyEphemeralTarget(parameters, &params.ReplyParameters)
 	applyTextOptions(&params, resolveSendOptions(options))
 	return c.Bot.SendMessage(c.Context, params)
 }
