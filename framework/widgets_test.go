@@ -28,11 +28,10 @@ func TestWidgetQueryContextAndAnswer(t *testing.T) {
 	defer server.Close()
 
 	client := api.New("TOKEN", api.WithBaseURL(server.URL), api.WithHTTPClient(server.Client()))
-	update := &telegram.Update{
-		WidgetQuery: &telegram.WidgetQuery{
-			ID:   "widget-query-1",
-			From: telegram.User{ID: 42, FirstName: "Widget"},
-		},
+	update := &telegram.Update{}
+	update.WidgetQuery = &telegram.WidgetQuery{
+		ID:   "widget-query-1",
+		From: telegram.User{ID: 42, FirstName: "Widget"},
 	}
 	ctx := NewContext(context.Background(), client, update, "")
 	if ctx.Type() != UpdateWidgetQuery {
@@ -52,11 +51,10 @@ func TestWidgetQueryContextAndAnswer(t *testing.T) {
 func TestSharedWidgetQueryContext(t *testing.T) {
 	t.Parallel()
 
-	update := &telegram.Update{
-		SharedWidgetQuery: &telegram.SharedWidgetQuery{
-			ID:   "shared-query-1",
-			From: telegram.User{ID: 99, FirstName: "Shared"},
-		},
+	update := &telegram.Update{}
+	update.SharedWidgetQuery = &telegram.SharedWidgetQuery{
+		ID:   "shared-query-1",
+		From: telegram.User{ID: 99, FirstName: "Shared"},
 	}
 	ctx := NewContext(context.Background(), nil, update, "")
 	if ctx.Type() != UpdateSharedWidgetQuery || !UpdateIs(UpdateSharedWidgetQuery)(ctx) {
