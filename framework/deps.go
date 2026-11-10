@@ -9,6 +9,8 @@ import (
 // aliases of their canonical types and remain assignment-compatible.
 type (
 	Update                     = telegram.Update
+	WidgetQuery                = telegram.WidgetQuery
+	SharedWidgetQuery          = telegram.SharedWidgetQuery
 	UpdateType                 = telegram.UpdateType
 	User                       = telegram.User
 	Chat                       = telegram.Chat
@@ -55,7 +57,9 @@ type (
 
 // Common update and parse-mode constants used by Context helpers.
 const (
-	UpdateUnknown           = telegram.UpdateUnknown
+	UpdateUnknown            = telegram.UpdateUnknown
+	UpdateWidgetQuery        = telegram.UpdateWidgetQuery
+	UpdateSharedWidgetQuery  = telegram.UpdateSharedWidgetQuery
 	UpdateWidgetQuery       = telegram.UpdateWidgetQuery
 	UpdateSharedWidgetQuery = telegram.UpdateSharedWidgetQuery
 	ParseModeHTML       = api.ParseModeHTML

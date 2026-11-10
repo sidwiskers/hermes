@@ -40,7 +40,9 @@ type Context struct {
 	Bot      *api.Client
 	Update   *Update
 	Message  *Message
-	Callback *CallbackQuery
+	Callback          *CallbackQuery
+	WidgetQuery       *WidgetQuery
+	SharedWidgetQuery *SharedWidgetQuery
 
 	command string
 	args    string
@@ -65,6 +67,8 @@ func (c *Context) reset(ctx context.Context, bot *api.Client, update *Update, us
 	}
 	c.Message = update.PrimaryMessage()
 	c.Callback = update.CallbackQuery
+	c.WidgetQuery = update.WidgetQuery
+	c.SharedWidgetQuery = update.SharedWidgetQuery
 	if update.CallbackQuery == nil {
 		c.command, c.args = parseCommand(c.Message, username)
 	}
@@ -349,6 +353,26 @@ func (c *Context) Answer(text string) error {
 
 // Acknowledge silently answers the current callback query.
 func (c *Context) Acknowledge() error { return c.Answer("") }
+
+// AnswerWidgetQuery responds to the current widget or shared-widget query.
+func (c *Context) AnswerWidgetQuery(data string) error {
+	if c == nil || c.Bot == nil {
+		return fmt.Errorf("hermes: widget query response requires a Bot API client")
+	}
+	var queryID string
+	switch {
+	case c.WidgetQuery != nil:
+		queryID = c.WidgetQuery.ID
+	case c.SharedWidgetQuery != nil:
+		queryID = c.SharedWidgetQuery.ID
+	default:
+		return fmt.Errorf("hermes: update has no widget query")
+	}
+	return c.Bot.AnswerWidgetQuery(c.Context, api.AnswerWidgetQueryParams{
+		WidgetQueryID: queryID,
+		Data:          data,
+	})
+}
 
 // Alert responds to the current callback query with an alert dialog.
 func (c *Context) Alert(text string) error {

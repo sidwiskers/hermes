@@ -30,19 +30,15 @@ HTML unless it is safely escaped and validated by the application.
 
 ## Handle widget queries
 
-Widget and shared-widget events are decoded on `Update`:
+Widget and shared-widget events are decoded on `Update` and are also exposed
+as `Context.WidgetQuery` and `Context.SharedWidgetQuery`:
 
 ```go
 bot.On(hermes.UpdateIs(hermes.UpdateWidgetQuery), func(c *hermes.Context) error {
-    query := c.Update.WidgetQuery
-    if query == nil {
+    if c.WidgetQuery == nil {
         return nil
     }
-
-    return c.AnswerWidgetQuery(hermes.AnswerWidgetQueryParams{
-        WidgetQueryID: query.ID,
-        Data:          "current-state",
-    })
+    return c.AnswerWidgetQuery("current-state")
 })
 ```
 
@@ -51,13 +47,10 @@ bot.On(hermes.UpdateIs(hermes.UpdateWidgetQuery), func(c *hermes.Context) error 
 `Data`, `SignData`, or `SentTransaction`. Unknown future variants are
 retained in `Raw` and can be re-emitted without being discarded.
 
-For direct client use, call:
-
-- `AnswerWidgetQuery` to return a query result.
-- `EditMessageWidgetData` to change state for one widget message.
-- `EditSharedWidgetData` to change the public state of a shared widget.
-- `SendSharedWidget` to place an already registered widget in another
-  message.
+For direct client use, call `AnswerWidgetQuery` to return a query result,
+`EditMessageWidgetData` to change state for one widget message,
+`EditSharedWidgetData` to change the public state of a shared widget, or
+`SendSharedWidget` to place an already registered widget in another message.
 
 The pointer-valued `PublicData` and `ChatData` arguments on
 `EditMessageWidgetDataParams` distinguish an omitted update from an explicit
