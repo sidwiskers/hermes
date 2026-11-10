@@ -281,6 +281,8 @@ type (
 	WriteAccessAllowed                   = telegram.WriteAccessAllowed
 	BackgroundFill                       = telegram.BackgroundFill
 	BackgroundType                       = telegram.BackgroundType
+	ChatShareTheme                       = telegram.ChatShareTheme
+	EmojiType                            = telegram.EmojiType
 	InlineQueryResult                    = telegram.InlineQueryResult
 	InputMessageContent                  = telegram.InputMessageContent
 	MaybeInaccessibleMessage             = telegram.MaybeInaccessibleMessage
@@ -289,4 +291,5 @@ type (
 	PassportElementError                 = telegram.PassportElementError
 	RevenueWithdrawalState               = telegram.RevenueWithdrawalState
 	TransactionPartner                   = telegram.TransactionPartner
+	WidgetQueryType                      = telegram.WidgetQueryType
 )

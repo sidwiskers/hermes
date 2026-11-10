@@ -209,7 +209,10 @@ type (
 	WriteAccessAllowed                     = lowlevel.WriteAccessAllowed
 	BackgroundFill                         = lowlevel.BackgroundFill
 	BackgroundType                         = lowlevel.BackgroundType
+	ChatShareTheme                         = lowlevel.ChatShareTheme
+	EmojiType                              = lowlevel.EmojiType
 	InputMessageContent                    = lowlevel.InputMessageContent
 	MaybeInaccessibleMessage               = lowlevel.MaybeInaccessibleMessage
 	MessageOrigin                          = lowlevel.MessageOrigin
+	WidgetQueryType                        = lowlevel.WidgetQueryType
 )
