@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.4.0 - 2026-11-10
 
 ### Telegram Bot API 10.4
 
@@ -29,8 +29,6 @@
 - Document production widget restrictions, query deadlines, and Telegram's
   UTF-8 byte-based limits. Premium bot username changes remain managed through
   Telegram's account tooling rather than a Bot API method.
-
-## 1.4.0 - 2026-09-10
 
 ### Self-maintenance
 

@@ -4,6 +4,12 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      release_gate:
+        description: 'Run the complete release gate, including cross-platform builds'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -56,6 +62,10 @@ jobs:
 
       - name: Compile live conformance suite
         run: go test -tags=integration -run '^$' ./integration
+
+      - name: Full release gate
+        if: github.event_name == 'workflow_dispatch' && inputs.release_gate
+        run: ./scripts/release-check.sh
 
   minimum-go:
     name: Test (Go 1.25)
