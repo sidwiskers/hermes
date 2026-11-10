@@ -96,6 +96,10 @@ func TestEphemeralMessageUsesCallbackTargetWithoutChat(t *testing.T) {
 		ID:              "inline-callback-1",
 		From:            telegram.User{ID: 42, FirstName: "User"},
 		InlineMessageID: "inline-message-1",
+		Message: telegram.AccessibleMessage(&telegram.Message{
+			MessageID: 17,
+			Chat: telegram.Chat{ID: -100, Type: "supergroup"},
+		}),
 	}
 	ctx := NewContext(context.Background(), client, update, "")
 	if _, err := ctx.EphemeralMessage("private response"); err != nil {

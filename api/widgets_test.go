@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -108,6 +109,58 @@ func TestBotAPI104WidgetAndGiftMethods(t *testing.T) {
 	}
 	if err := client.VerifyChat(ctx, VerifyChatParams{ChatID: 7, CustomDescription: "Verified", CustomDescriptionParseMode: "HTML", CustomDescriptionEntities: entities}); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestEditSharedWidgetDataAllowsEmptyValueToClearState(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		var body map[string]any
+		if err := json.NewDecoder(request.Body).Decode(&body); err != nil {
+			t.Fatal(err)
+		}
+		if body["widget_id"] != "shared-1" || body["public_data"] != "" {
+			t.Fatalf("editSharedWidgetData body = %#v", body)
+		}
+		_, _ = io.WriteString(writer, `{"ok":true,"result":true}`)
+	}))
+	defer server.Close()
+
+	client := New("TOKEN", WithBaseURL(server.URL), WithHTTPClient(server.Client()))
+	if err := client.EditSharedWidgetData(context.Background(), EditSharedWidgetDataParams{
+		WidgetID: "shared-1", PublicData: "",
+	}); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestWidgetPayloadLimitsUseUTF8Bytes(t *testing.T) {
+	t.Parallel()
+
+	if err := validateWidgetState(strings.Repeat("é", 512), "state"); err != nil {
+		t.Fatalf("1024-byte UTF-8 state rejected: %v", err)
+	}
+	if err := validateWidgetState(strings.Repeat("é", 513), "state"); err == nil {
+		t.Fatal("expected state larger than 1024 UTF-8 bytes to fail")
+	}
+	if err := validateWidgetState("bad\x00state", "state"); err == nil {
+		t.Fatal("expected NUL byte to fail")
+	}
+	if err := validateWidgetHTML("<main>valid</main>"); err != nil {
+		t.Fatalf("valid widget HTML rejected: %v", err)
+	}
+	if err := validateWidgetHTML(strings.Repeat("x", maxWidgetHTMLBytes+1)); err == nil {
+		t.Fatal("expected HTML larger than 32768 bytes to fail")
+	}
+
+	random := rand.New(rand.NewSource(104))
+	data := make([]byte, 8192)
+	for index := range data {
+		data[index] = byte(32 + random.Intn(95))
+	}
+	if err := validateWidgetHTML(string(data)); err == nil {
+		t.Fatal("expected HTML over the 4096-byte compressed limit to fail")
 	}
 }
 

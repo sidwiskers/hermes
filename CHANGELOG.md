@@ -21,7 +21,10 @@
   paths. Make `receiver_user_id` optional as specified by Bot API 10.4.
 - Add rich-text quote fields and formatted verification descriptions, plus
   lookup of unique gifts by name and deletion of business-account gifts.
-- Add request/response, discriminator, unknown-variant, and ephemeral-send
-  regression tests for the new protocol surface.
+- Add request/response, discriminator, unknown-variant, payload-limit, and
+  ephemeral-send regression tests for the new protocol surface.
+- Document production widget restrictions, query deadlines, and Telegram's
+  UTF-8 byte-based limits. Premium bot username changes remain managed through
+  Telegram's account tooling rather than a Bot API method.
 
 ## 1.4.0 - 2026-09-10
