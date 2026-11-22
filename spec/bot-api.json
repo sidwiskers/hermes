@@ -1,8 +1,8 @@
 {
-  "version": "10.4",
-  "released": "November 9, 2026",
+  "version": "10.5",
+  "released": "November 22, 2026",
   "source": "https://core.telegram.org/bots/api",
-  "source_sha256": "5202d27210e96a729764cadc82bf1dc14c990c20ab381acf8b5b443a3097706f",
+  "source_sha256": "24d579b5b464d9830a50b274b6c8784ab9ab54182d5b43464ca639a0c27ffbae",
   "methods": [
     {
       "name": "addStickerToSet",
@@ -5559,6 +5559,87 @@
       ]
     },
     {
+      "name": "setMySettings",
+      "anchor": "setmysettings",
+      "parameters": [
+        {
+          "name": "supports_inline_queries",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "inline_query_placeholder",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "needs_inline_query_location",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "inline_feedback_share_denominator",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "can_join_groups",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "can_read_all_group_messages",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "can_connect_to_business",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "can_manage_bots",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "supports_guest_queries",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "supports_join_request_queries",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "has_topics_enabled",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "allows_users_to_create_topics",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "has_topic_sidebar",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "can_communicate_with_bots",
+          "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "callback_query_mode",
+          "type": "String",
+          "required": false
+        }
+      ]
+    },
+    {
       "name": "setMyShortDescription",
       "anchor": "setmyshortdescription",
       "parameters": [
@@ -6589,6 +6670,102 @@
         {
           "name": "description",
           "type": "String",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "BotFullInfo",
+      "anchor": "botfullinfo",
+      "fields": [
+        {
+          "name": "id",
+          "type": "Integer",
+          "required": true
+        },
+        {
+          "name": "is_bot",
+          "type": "True",
+          "required": true
+        },
+        {
+          "name": "first_name",
+          "type": "String",
+          "required": true
+        },
+        {
+          "name": "username",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "active_usernames",
+          "type": "Array of String",
+          "required": false
+        },
+        {
+          "name": "can_join_groups",
+          "type": "Boolean",
+          "required": true
+        },
+        {
+          "name": "can_read_all_group_messages",
+          "type": "Boolean",
+          "required": true
+        },
+        {
+          "name": "supports_guest_queries",
+          "type": "Boolean",
+          "required": true
+        },
+        {
+          "name": "supports_inline_queries",
+          "type": "Boolean",
+          "required": true
+        },
+        {
+          "name": "inline_query_placeholder",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "needs_inline_query_location",
+          "type": "Boolean",
+          "required": true
+        },
+        {
+          "name": "can_connect_to_business",
+          "type": "Boolean",
+          "required": true
+        },
+        {
+          "name": "has_main_web_app",
+          "type": "Boolean",
+          "required": true
+        },
+        {
+          "name": "has_topics_enabled",
+          "type": "Boolean",
+          "required": true
+        },
+        {
+          "name": "allows_users_to_create_topics",
+          "type": "Boolean",
+          "required": true
+        },
+        {
+          "name": "has_topic_sidebar",
+          "type": "Boolean",
+          "required": true
+        },
+        {
+          "name": "can_manage_bots",
+          "type": "Boolean",
+          "required": true
+        },
+        {
+          "name": "supports_join_request_queries",
+          "type": "Boolean",
           "required": true
         }
       ]
@@ -11710,8 +11887,8 @@
           "required": true
         },
         {
-          "name": "text",
-          "type": "RichText",
+          "name": "blocks",
+          "type": "Array of InputRichBlock",
           "required": true
         },
         {
@@ -15226,8 +15403,8 @@
           "required": true
         },
         {
-          "name": "text",
-          "type": "RichText",
+          "name": "blocks",
+          "type": "Array of RichBlock",
           "required": true
         },
         {
@@ -17685,56 +17862,6 @@
           "name": "added_to_attachment_menu",
           "type": "True",
           "required": false
-        },
-        {
-          "name": "can_join_groups",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "can_read_all_group_messages",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "supports_guest_queries",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "supports_inline_queries",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "can_connect_to_business",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "has_main_web_app",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "has_topics_enabled",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "allows_users_to_create_topics",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "can_manage_bots",
-          "type": "Boolean",
-          "required": false
-        },
-        {
-          "name": "supports_join_request_queries",
-          "type": "Boolean",
-          "required": false
         }
       ]
     },
@@ -18342,6 +18469,11 @@
         {
           "name": "from_attachment_menu",
           "type": "Boolean",
+          "required": false
+        },
+        {
+          "name": "inviter",
+          "type": "User",
           "required": false
         }
       ]

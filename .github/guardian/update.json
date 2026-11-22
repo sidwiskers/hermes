@@ -1,15 +1,15 @@
 {
-  "identity": "92d94099ee36d4b25f6fc165b41597a26929b3a046249d481f97bd44be4274bb",
+  "identity": "9df4446612edaf7921cf73494cf1ed465e01064e39e2d65a0309fe428d54a835",
   "repair_runs": 0,
   "repair": {
     "status": "disabled",
     "summary": "Coding repair is disabled."
   },
   "status": "needs_attention",
-  "last_base": "50e4e6a1527eeb8679af9f4d4850dbdb6e172756",
-  "candidate_digest": "673c54d54eb4459193d0807bc60f7aff7df6da63895c07d295192dab38a6366f",
+  "last_base": "176cbe34426ef4e8bc4be660da1b2970f87cfb93",
+  "candidate_digest": "99f7a6256315544ff2a8ff2726415a437b0f3f135dcd1872a64a30812fbb0b08",
   "validation": {
     "passed": false,
-    "output": "Superseded initial Guardian scan: its 78-gap audit ran before the Bot API 10.4 implementation was completed and does not describe the current branch.\nStatic audit on c65078e21b057d5a34b5996b456c5ea32692cdb7:\nBot API 10.4: 193 methods, 982 parameters, 396 objects, 1983 fields, 29 unions, 204 variants\nparity gaps: 0\nLatest PR head 1a492774fcb1790c66e48cc69588520386d02db2: all CI jobs passed (main verification, Go 1.25, macOS, Windows).\nThe full scripts/release-check.sh release gate has not been run. Maintainer review remains required.\n"
+    "output": "release toolchain accepted: go1.27.4\nBot API 10.5: 194 methods, 997 parameters, 397 objects, 1992 fields, 29 unions, 204 variants\nparity gaps: 17\n  missing method bindings: 1\n  missing method parameters: 15\n  mismatched method optionality: 0\n  mismatched method types: 0\n  non-nilable optional method objects: 0\n  missing object types: 0\n  missing object fields: 1\n  mismatched object optionality: 0\n  mismatched object types: 0\n  non-nilable optional object fields: 0\n  missing union types: 0\n  missing union variants: 0\nexit status 1\n"
   }
 }
