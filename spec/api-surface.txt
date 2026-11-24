@@ -108,10 +108,9 @@ method (CallbackCodec[T]) Parse(data string) (T, error)
 func CallbackDataPrefix(prefixes ...string) Filter
 type CallbackGame = github.com/sidwiskers/hermes/types.CallbackGame
 type CallbackQuery = github.com/sidwiskers/hermes/types.CallbackQuery
-type CallbackQueryMode = github.com/sidwiskers/hermes/api.CallbackQueryMode
-const CallbackQueryModeAuto github.com/sidwiskers/hermes/api.CallbackQueryMode = "auto"
-const CallbackQueryModeDefault github.com/sidwiskers/hermes/api.CallbackQueryMode = "default"
-const CallbackQueryModeInline github.com/sidwiskers/hermes/api.CallbackQueryMode = "inline"
+const CallbackQueryModeAuto string = "auto"
+const CallbackQueryModeDefault string = "default"
+const CallbackQueryModeInline string = "inline"
 func CallbackUpdate(c *Context) bool
 var CaptionAbove github.com/sidwiskers/hermes/framework.SendOption
 type CaptionParams = github.com/sidwiskers/hermes/api.CaptionParams
@@ -941,10 +940,9 @@ const CallMultipart CallKind = "multipart"
 type CallResult struct{Duration time.Duration; Err error}
 type CallbackGame = github.com/sidwiskers/hermes/types.CallbackGame
 type CallbackQuery = github.com/sidwiskers/hermes/types.CallbackQuery
-type CallbackQueryMode = string
-const CallbackQueryModeAuto CallbackQueryMode = "auto"
-const CallbackQueryModeDefault CallbackQueryMode = "default"
-const CallbackQueryModeInline CallbackQueryMode = "inline"
+const CallbackQueryModeAuto string = "auto"
+const CallbackQueryModeDefault string = "default"
+const CallbackQueryModeInline string = "inline"
 type CaptionParams struct{Caption string `json:"caption,omitempty"`; ParseMode string `json:"parse_mode,omitempty"`; CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`; ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`}
 type Chat = github.com/sidwiskers/hermes/types.Chat
 type ChatAdministratorRights = github.com/sidwiskers/hermes/types.ChatAdministratorRights
