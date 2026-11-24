@@ -84,21 +84,21 @@ func TestSetMySettingsEncodesEveryOptionalSetting(t *testing.T) {
 			t.Fatal(err)
 		}
 		want := map[string]string{
-			"supports_inline_queries": "true",
-			"inline_query_placeholder": `""`,
-			"needs_inline_query_location": "false",
+			"supports_inline_queries":           "true",
+			"inline_query_placeholder":          `""`,
+			"needs_inline_query_location":       "false",
 			"inline_feedback_share_denominator": "0",
-			"can_join_groups": "false",
-			"can_read_all_group_messages": "true",
-			"can_connect_to_business": "false",
-			"can_manage_bots": "true",
-			"supports_guest_queries": "true",
-			"supports_join_request_queries": "false",
-			"has_topics_enabled": "true",
-			"allows_users_to_create_topics": "false",
-			"has_topic_sidebar": "true",
-			"can_communicate_with_bots": "true",
-			"callback_query_mode": `"inline"`,
+			"can_join_groups":                   "false",
+			"can_read_all_group_messages":       "true",
+			"can_connect_to_business":           "false",
+			"can_manage_bots":                   "true",
+			"supports_guest_queries":            "true",
+			"supports_join_request_queries":     "false",
+			"has_topics_enabled":                "true",
+			"allows_users_to_create_topics":     "false",
+			"has_topic_sidebar":                 "true",
+			"can_communicate_with_bots":         "true",
+			"callback_query_mode":               `"inline"`,
 		}
 		if len(body) != len(want) {
 			t.Fatalf("encoded %d settings, want %d: %#v", len(body), len(want), body)
@@ -116,7 +116,7 @@ func TestSetMySettingsEncodesEveryOptionalSetting(t *testing.T) {
 	placeholder := ""
 	zero := 0
 	if err := client.SetMySettings(context.Background(), SetMySettingsParams{
-		SupportsInlineQueries:         Bool(true),
+		SupportsInlineQueries:          Bool(true),
 		InlineQueryPlaceholder:         &placeholder,
 		NeedsInlineQueryLocation:       Bool(false),
 		InlineFeedbackShareDenominator: &zero,
@@ -147,7 +147,7 @@ func TestSetMySettingsRejectsInvalidEnumeratedValues(t *testing.T) {
 		t.Fatal("expected invalid inline_feedback_share_denominator to fail")
 	}
 	if err := client.SetMySettings(context.Background(), SetMySettingsParams{
-		CallbackQueryMode: CallbackQueryMode("sometimes"),
+		CallbackQueryMode: "sometimes",
 	}); err == nil {
 		t.Fatal("expected invalid callback_query_mode to fail")
 	}

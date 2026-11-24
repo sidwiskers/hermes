@@ -21,7 +21,7 @@ func (client *Client) Close(ctx context.Context) error {
 
 // CallbackQueryMode controls how callback queries from the bot's own messages
 // identify their originating message.
-type CallbackQueryMode string
+type CallbackQueryMode = string
 
 const (
 	// CallbackQueryModeDefault always includes Message, using an inaccessible
@@ -54,7 +54,7 @@ type SetMySettingsParams struct {
 	AllowsUsersToCreateTopics       *bool              `json:"allows_users_to_create_topics,omitempty"`
 	HasTopicSidebar                 *bool              `json:"has_topic_sidebar,omitempty"`
 	CanCommunicateWithBots          *bool              `json:"can_communicate_with_bots,omitempty"`
-	CallbackQueryMode               CallbackQueryMode  `json:"callback_query_mode,omitempty"`
+	CallbackQueryMode               string             `json:"callback_query_mode,omitempty"`
 }
 
 // SetMySettings updates the bot's settings. Unspecified fields remain
