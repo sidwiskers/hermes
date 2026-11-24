@@ -62,7 +62,9 @@ and answering the callback remain available.
 
 `Client.GetMeFullInfo` returns the complete official `*BotFullInfo` result,
 including bot identity and configuration fields, active usernames, inline
-query placeholder/location settings, and topic-sidebar state. The existing
+query placeholder/location settings, and topic-sidebar state. Bot IDs use
+`int64` on every architecture, matching the library’s other Telegram ID types.
+The existing
 `Client.GetMe` signature remains available as a deprecated compatibility
 projection to `*User`; its historical bot-setting fields are retained as
 `json:"-"` fields and are populated only by that method. New code should

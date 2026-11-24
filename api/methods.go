@@ -429,7 +429,7 @@ func (b *Client) GetMe(ctx context.Context) (*User, error) {
 		return nil, err
 	}
 	return &User{
-		ID:                         int64(info.ID),
+		ID:                         info.ID,
 		IsBot:                      info.IsBot,
 		FirstName:                  info.FirstName,
 		Username:                   info.Username,

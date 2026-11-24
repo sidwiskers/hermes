@@ -32,7 +32,8 @@ func TestBotAPI105BotFullInfoDecode(t *testing.T) {
 	if err := json.Unmarshal(payload, &info); err != nil {
 		t.Fatal(err)
 	}
-	if info.ID != 42 || !info.IsBot || info.Username != "hermes_bot" {
+	var botID int64 = info.ID
+	if info.ID != 42 || botID != 42 || !info.IsBot || info.Username != "hermes_bot" {
 		t.Fatalf("identity fields = %#v", info)
 	}
 	if len(info.ActiveUsernames) != 2 || info.ActiveUsernames[1] != "hermes_agent" {
@@ -52,7 +53,7 @@ func TestBotAPI105InviterOnWriteAccessAllowed(t *testing.T) {
 		"message":{
 			"message_id":9,
 			"date":1,
-			"chat":{"id":-100,"type":"private"},
+			"chat":{"id":100,"type":"private"},
 			"write_access_allowed":{
 				"inviter":{"id":7,"is_bot":false,"first_name":"Owner"}
 			}
