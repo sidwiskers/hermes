@@ -45,3 +45,41 @@ func TestLivePhotoAndEditTagDecoding(t *testing.T) {
 		t.Fatalf("permissions = %#v", permissions)
 	}
 }
+
+
+func TestCallbackQueryInlineMessageIDDecoding(t *testing.T) {
+	t.Parallel()
+
+	var update Update
+	payload := []byte(`{"update_id":9,"callback_query":{"id":"callback-1","from":{"id":7,"is_bot":false,"first_name":"Ada"},"inline_message_id":"inline-message-42","chat_instance":"chat-instance","data":"next"}}`)
+	if err := json.Unmarshal(payload, &update); err != nil {
+		t.Fatal(err)
+	}
+	if update.CallbackQuery == nil || update.CallbackQuery.Message != nil ||
+		update.CallbackQuery.InlineMessageID != "inline-message-42" ||
+		update.CallbackQuery.Data != "next" {
+		t.Fatalf("callback query = %#v", update.CallbackQuery)
+	}
+}
+
+func TestBotAPI105ExpandableQuotationAndInviterDecoding(t *testing.T) {
+	t.Parallel()
+
+	var block RichBlockExpandableBlockQuotation
+	payload := []byte(`{"type":"expandable_blockquote","blocks":[{"type":"paragraph","text":"Quote"},{"type":"divider"}],"credit":"Author"}`)
+	if err := json.Unmarshal(payload, &block); err != nil {
+		t.Fatal(err)
+	}
+	if block.Type != "expandable_blockquote" || len(block.Blocks) != 2 ||
+		block.Blocks[0].Type != "paragraph" || block.Blocks[1].Type != "divider" {
+		t.Fatalf("expandable quotation = %#v", block)
+	}
+
+	var allowed WriteAccessAllowed
+	if err := json.Unmarshal([]byte(`{"inviter":{"id":55,"is_bot":false,"first_name":"Owner"}}`), &allowed); err != nil {
+		t.Fatal(err)
+	}
+	if allowed.Inviter == nil || allowed.Inviter.ID != 55 || allowed.Inviter.FirstName != "Owner" {
+		t.Fatalf("write access inviter = %#v", allowed.Inviter)
+	}
+}

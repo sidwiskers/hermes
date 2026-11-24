@@ -261,7 +261,7 @@ func baseType(name, fieldName string) string {
 	case "Float", "Float number":
 		return "float64"
 	case "Integer":
-		if fieldName == "date" || strings.HasSuffix(fieldName, "_date") ||
+		if fieldName == "id" || fieldName == "date" || strings.HasSuffix(fieldName, "_date") ||
 			strings.HasSuffix(fieldName, "_timestamp") || fieldName == "unix_time" ||
 			strings.HasSuffix(fieldName, "_user_id") || fieldName == "user_id" ||
 			strings.HasSuffix(fieldName, "_chat_id") || fieldName == "chat_id" ||

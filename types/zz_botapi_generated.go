@@ -73,7 +73,7 @@ type Birthdate struct {
 
 // BotFullInfo mirrors the object defined by the Telegram Bot API.
 type BotFullInfo struct {
-	ID                         int      `json:"id"`
+	ID                         int64    `json:"id"`
 	IsBot                      bool     `json:"is_bot"`
 	FirstName                  string   `json:"first_name"`
 	Username                   string   `json:"username,omitempty"`
@@ -301,7 +301,7 @@ type ChatPhoto struct {
 
 // ChatShareThemeBackdrop mirrors the object defined by the Telegram Bot API.
 type ChatShareThemeBackdrop struct {
-	ID     int                      `json:"id"`
+	ID     int64                    `json:"id"`
 	Name   string                   `json:"name"`
 	Colors UniqueGiftBackdropColors `json:"colors"`
 }
@@ -1078,11 +1078,6 @@ type InputLocationMessageContent struct {
 }
 
 func (InputLocationMessageContent) inputMessageContent() {}
-
-// InputRichBlockExpandableBlockQuotationBotAPIFields mirrors the object defined by the Telegram Bot API.
-type InputRichBlockExpandableBlockQuotationBotAPIFields struct {
-	Blocks []InputRichBlock `json:"blocks"`
-}
 
 // InputSharedWidgetMessageContent mirrors the object defined by the Telegram Bot API.
 type InputSharedWidgetMessageContent struct {

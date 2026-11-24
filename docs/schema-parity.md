@@ -4,14 +4,14 @@ Hermes measures compatibility against deterministic inventories derived from
 Telegram's official Bot API documentation and the compiled Go packages. Each
 release pins its audited Bot API version in `spec/bot-api.json` and its exported
 Go declarations in `spec/api-surface.txt`. The current manifest records Bot
-API 10.4, released on 2026-11-09, and contains:
+API 10.5, released on 2026-11-22, and contains:
 
 | Surface | Official count | Missing in Hermes |
 | --- | ---: | ---: |
-| Methods | 193 | 0 |
-| Method parameters | 982 | 0 |
-| Concrete objects | 396 | 0 |
-| Object fields | 1,983 | 0 |
+| Methods | 194 | 0 |
+| Method parameters | 997 | 0 |
+| Concrete objects | 397 | 0 |
+| Object fields | 1,992 | 0 |
 | Union roots | 29 | 0 |
 | Union variants | 204 | 0 |
 
@@ -49,6 +49,31 @@ machine-readable diff, regenerates safe declarations, and opens a draft pull
 request. If new Telegram semantics cannot be completed mechanically, Guardian
 keeps the exact parity report in the pull request instead of guessing or
 weakening this audit.
+
+## Bot API 10.5: bot settings and callback queries
+
+The typed client exposes `SetMySettings` with all 15 official settings.
+Optional booleans, the inline-feedback denominator, placeholder, and
+`callback_query_mode` use pointers so callers can explicitly send `false`,
+`0`, or an empty placeholder without accidentally omitting a change. The
+client validates feedback denominators (`0`, `1`, `10`, `100`, `1000`)
+and callback modes (`default`, `auto`, `inline`) before making a request.
+
+Callback queries already expose both `message` and `inline_message_id`.
+Bot API 10.5 allows the selected `callback_query_mode` to determine which is
+present for buttons in messages sent by the bot. Applications should therefore
+handle both fields and must not assume every callback has a `message`.
+
+Bot API 10.5 moves bot-only data into `BotFullInfo`: `GetMe` now returns
+that type, while `User` contains only common user/bot identity fields. The
+new bot model carries active usernames, inline-query configuration, topic
+settings, the topic-sidebar setting, and the 52-bit bot identifier. The new
+`WriteAccessAllowed.Inviter` field identifies the owner who invited a user
+through a bot-invite link.
+
+Expandable rich-message quotations now contain arbitrary nested blocks on
+both input and response paths. This is distinct from the ordinary rich-block
+quotation, which already used the `blocks` field.
 
 ## Bot API 10.4: widgets and Wallet
 

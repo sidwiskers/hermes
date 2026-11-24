@@ -159,7 +159,15 @@ func TestBotAPI103RichMessageShapes(t *testing.T) {
 				return button
 			}()},
 		},
-		InputRichBlockExpandableBlockQuotation{Text: "Long quote", Credit: "Author"},
+		InputRichBlockExpandableBlockQuotation{
+			Blocks: []InputRichBlock{
+				InputRichBlockParagraph{Text: "Long quote"},
+				InputRichBlockDetails{Summary: "More", Blocks: []InputRichBlock{
+					InputRichBlockParagraph{Text: "Nested quote"},
+				}},
+			},
+			Credit: "Author",
+		},
 		InputRichBlockDocument{
 			Document: InputMediaDocument{Media: "tg://document?id=42"},
 			Caption:  &RichBlockCaption{Text: "File"},
@@ -178,6 +186,7 @@ func TestBotAPI103RichMessageShapes(t *testing.T) {
 		`"type":"buttons"`,
 		`"callback_data":"open"`,
 		`"type":"expandable_blockquote"`,
+		`"text":"Nested quote"`,
 		`"type":"document"`,
 		`"media":"tg://document?id=42"`,
 		`"is_compact":true`,

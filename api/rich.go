@@ -392,8 +392,8 @@ func (value InputRichBlockButtons) MarshalJSON() ([]byte, error) {
 }
 
 type InputRichBlockExpandableBlockQuotation struct {
-	Text   RichText `json:"text"`
-	Credit RichText `json:"credit,omitempty"`
+	Blocks []InputRichBlock `json:"blocks"`
+	Credit RichText         `json:"credit,omitempty"`
 }
 
 func (InputRichBlockExpandableBlockQuotation) inputRichBlock()       {}
