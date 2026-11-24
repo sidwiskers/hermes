@@ -9,6 +9,12 @@ import (
 )
 
 // Low-level API request and error types are re-exported from the root facade.
+const (
+	CallbackQueryModeDefault = api.CallbackQueryModeDefault
+	CallbackQueryModeAuto    = api.CallbackQueryModeAuto
+	CallbackQueryModeInline  = api.CallbackQueryModeInline
+)
+
 type (
 	APIClient      = api.Client
 	APIError       = api.APIError

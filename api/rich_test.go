@@ -159,7 +159,7 @@ func TestBotAPI103RichMessageShapes(t *testing.T) {
 				return button
 			}()},
 		},
-		InputRichBlockExpandableBlockQuotation{Text: "Long quote", Credit: "Author"},
+		InputRichBlockExpandableBlockQuotation{Blocks: []InputRichBlock{InputRichBlockParagraph{Text: "Long quote"}}, Credit: "Author"},
 		InputRichBlockDocument{
 			Document: InputMediaDocument{Media: "tg://document?id=42"},
 			Caption:  &RichBlockCaption{Text: "File"},
@@ -193,6 +193,48 @@ func TestBotAPI103RichMessageShapes(t *testing.T) {
 	}
 	if string(inline) != `{"type":"button","button":{"text":"Unavailable","disabled":{}}}` {
 		t.Fatalf("rich text button = %s", inline)
+	}
+}
+
+func TestExpandableQuotationAcceptsNestedRichBlocks(t *testing.T) {
+	t.Parallel()
+
+	quote := InputRichBlockExpandableBlockQuotation{
+		Credit: "Hermes",
+		Blocks: []InputRichBlock{
+			InputRichBlockParagraph{Text: "A nested paragraph"},
+			InputRichBlockTable{Cells: [][]RichBlockTableCell{{{Text: "A"}, {Text: "B"}}}},
+			InputRichBlockPhoto{Photo: InputMediaPhoto{Media: "photo-id"}},
+			InputRichBlockDocument{Document: InputMediaDocument{Media: "document-id"}},
+		},
+	}
+	message := InputRichMessage{Blocks: []InputRichBlock{quote}}
+	if err := validateRichMessage(message, false); err != nil {
+		t.Fatalf("valid nested quote rejected: %v", err)
+	}
+	data, err := json.Marshal(message)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, fragment := range []string{
+		`"type":"expandable_blockquote"`,
+		`"blocks":[{"type":"paragraph"`,
+		`"type":"table"`,
+		`"type":"photo"`,
+		`"type":"document"`,
+	} {
+		if !strings.Contains(string(data), fragment) {
+			t.Errorf("encoded quote %s does not contain %s", data, fragment)
+		}
+	}
+
+	invalid := InputRichMessage{Blocks: []InputRichBlock{
+		InputRichBlockExpandableBlockQuotation{Blocks: []InputRichBlock{
+			InputRichBlockButtons{Buttons: []RichMessageButton{{Text: "Missing action"}}},
+		}},
+	}}
+	if err := validateRichMessage(invalid, false); err == nil {
+		t.Fatal("nested invalid button block should be rejected")
 	}
 }
 
