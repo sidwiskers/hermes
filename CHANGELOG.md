@@ -12,8 +12,8 @@
   all callback-query delivery modes.
 - Model `BotFullInfo` and expose the full official result through
   `GetMeFullInfo`. Retain the existing `GetMe` signature as a deprecated
-  source-compatible projection, with legacy bot-setting fields excluded from
-  User JSON.
+  source-compatible projection, preserving its ten legacy bot-setting fields
+  and their existing `omitempty` JSON behavior.
 - Add `WriteAccessAllowed.Inviter` and support arbitrary nested blocks in
   sent and received expandable quotations.
 - Expose `Context.InlineMessageID()`; retain edit, caption, and keyboard

@@ -66,9 +66,10 @@ query placeholder/location settings, and topic-sidebar state. Bot IDs use
 `int64` on every architecture, matching the library’s other Telegram ID types.
 The existing
 `Client.GetMe` signature remains available as a deprecated compatibility
-projection to `*User`; its historical bot-setting fields are retained as
-`json:"-"` fields and are populated only by that method. New code should
-prefer `GetMeFullInfo`.
+projection to `*User`; its ten historical bot-setting fields remain on
+`User` with their original `omitempty` JSON tags and are populated by that
+method. Zero-valued flags remain omitted for ordinary `User` values. New code
+should prefer `GetMeFullInfo`.
 
 A user joining through the bot owner's dedicated invite link is reported with
 a `WriteAccessAllowed` service message. Its new `Inviter` field identifies

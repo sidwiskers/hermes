@@ -28,9 +28,11 @@ has not yet been audited.
 Telegram changed the official `getMe` result to `BotFullInfo` in Bot API
 10.5. Hermes exposes the exact result through `Client.GetMeFullInfo`. The
 existing `Client.GetMe` signature remains available as a deprecated
-source-compatible projection to `*User`; its historical bot-setting fields
-are kept as `json:"-"` compatibility fields and are populated only by that
-method. New code should use `GetMeFullInfo` and `BotFullInfo`. This avoids a
+source-compatible projection to `*User`. Its ten historical bot-setting
+fields remain on `User` with their original `omitempty` JSON tags, and the
+legacy method populates them. Ordinary `User` values keep those flags false
+and therefore omit the fields when marshalled. New code should use
+`GetMeFullInfo` and `BotFullInfo`. This avoids a
 breaking signature change in the 1.x line while retaining the complete 10.5
 wire model.
 

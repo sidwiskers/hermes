@@ -223,13 +223,31 @@ func TestGetMeRetainsLegacyUserProjection(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	for _, field := range []string{
+		`"can_join_groups":true`, `"can_read_all_group_messages":true`,
+		`"supports_guest_queries":true`, `"supports_inline_queries":true`,
+		`"can_connect_to_business":true`, `"has_main_web_app":true`,
+		`"has_topics_enabled":true`, `"allows_users_to_create_topics":true`,
+		`"can_manage_bots":true`, `"supports_join_request_queries":true`,
+	} {
+		if !strings.Contains(string(encoded), field) {
+			t.Fatalf("legacy GetMe JSON omitted %s: %s", field, encoded)
+		}
+	}
+
+	ordinary, err := json.Marshal(User{ID: 43, IsBot: false, FirstName: "Ordinary"})
+	if err != nil {
+		t.Fatal(err)
+	}
 	for _, key := range []string{
 		`"can_join_groups"`, `"can_read_all_group_messages"`,
 		`"supports_guest_queries"`, `"supports_inline_queries"`,
+		`"can_connect_to_business"`, `"has_main_web_app"`,
+		`"has_topics_enabled"`, `"allows_users_to_create_topics"`,
 		`"can_manage_bots"`, `"supports_join_request_queries"`,
 	} {
-		if strings.Contains(string(encoded), key) {
-			t.Fatalf("legacy compatibility field leaked into User JSON: %s", encoded)
+		if strings.Contains(string(ordinary), key) {
+			t.Fatalf("zero-value legacy field leaked into ordinary User JSON: %s", ordinary)
 		}
 	}
 }
