@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased
+
+### Telegram Bot API 10.5
+
+- Update the official schema to Bot API 10.5 (2026-11-22): 194 methods, 997
+  parameters, 397 objects, 1,992 object fields, 29 union roots, and 204
+  variants, with no removed methods or union variants.
+- Add typed `setMySettings` support for the complete Bot API settings surface,
+  including explicit-false handling, validated inline feedback sampling, and
+  all callback-query delivery modes.
+- Model `BotFullInfo`, update `GetMe` to the official result type, and remove
+  bot-only settings from the ordinary `User` model.
+- Add `WriteAccessAllowed.Inviter` and support arbitrary nested blocks in
+  sent and received expandable quotations.
+- Expose `Context.InlineMessageID()`; retain edit, caption, and keyboard
+  context operations when callback queries arrive without an ordinary message.
+- Add request/response contract tests for settings, getMe, invited users,
+  nested expandable quotations, and inline callback editing.
+- Document that the `GetMe` result type is source-incompatible and must follow
+  a deliberate major-version or compatibility-bridge decision before release.
+
 ## 1.4.0 - 2026-11-10
 
 ### Telegram Bot API 10.4

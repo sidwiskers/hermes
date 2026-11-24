@@ -4,14 +4,14 @@ Hermes measures compatibility against deterministic inventories derived from
 Telegram's official Bot API documentation and the compiled Go packages. Each
 release pins its audited Bot API version in `spec/bot-api.json` and its exported
 Go declarations in `spec/api-surface.txt`. The current manifest records Bot
-API 10.4, released on 2026-11-09, and contains:
+API 10.5, released on 2026-11-22, and contains:
 
 | Surface | Official count | Missing in Hermes |
 | --- | ---: | ---: |
-| Methods | 193 | 0 |
-| Method parameters | 982 | 0 |
-| Concrete objects | 396 | 0 |
-| Object fields | 1,983 | 0 |
+| Methods | 194 | 0 |
+| Method parameters | 997 | 0 |
+| Concrete objects | 397 | 0 |
+| Object fields | 1,992 | 0 |
 | Union roots | 29 | 0 |
 | Union variants | 204 | 0 |
 
@@ -88,6 +88,41 @@ the optional `suggested_username` on managed-bot keyboard requests, and the
 new `ton_address` and `bank_card_number` message-entity type values.
 The new private-bot-topic link form uses the existing message-thread/topic
 identifiers; it does not require another Bot API method.
+
+
+## Bot API 10.5: settings, callbacks, and invitations
+
+The 10.5 schema diff from 10.4 is limited to the documented changes:
+
+- Add `setMySettings` with 15 optional settings, including the
+  `callback_query_mode` switch, bot-to-bot communication, and private-chat
+  topic sidebar controls.
+- Add `BotFullInfo`; change `getMe` to return it and move ten bot-only
+  capabilities out of `User`. `BotFullInfo` also exposes active usernames,
+  inline query placeholder/location settings, and topic sidebar state.
+- Add `WriteAccessAllowed.Inviter` for owner-invited users entering a bot's
+  private chat through the dedicated invite link.
+- Replace `text` with `blocks` in both input and received expandable
+  block quotations.
+
+Hermes exposes `SetMySettings` with pointer-valued booleans so callers can
+distinguish an omitted setting from an explicit `false`. The inline feedback
+share denominator is validated against Telegram's allowed values (0, 1, 10,
+100, or 1000), and callback mode is validated against `default`, `auto`, and
+`inline`.
+
+When callback mode supplies `inline_message_id`, Telegram may omit the
+callback's `message`. In that update, `Context.Message`, `ChatID()`, and
+`MessageID()` are unavailable. `InlineMessageID()` exposes the alternate
+identifier, and `Edit`, `EditCaption`, and `EditKeyboard` already support
+it. Operations whose Bot API methods require `chat_id` and `message_id`
+(such as deletion, reactions, and pinning) cannot be performed from that
+callback alone. The sender, callback data, callback-query ID, and callback
+answer flow remain available.
+
+This setting changes the callback update shape globally for the bot. Existing
+handlers should be reviewed before enabling `auto` or `inline`; handlers must
+not assume every callback query contains a message or chat identifier.
 
 ## Completion strategy
 

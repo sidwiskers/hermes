@@ -8,9 +8,9 @@ deprecation must identify a direct migration path.
 
 - Each Hermes release targets the Bot API version recorded in the checked-in
   `spec/bot-api.json` manifest.
-- The current Hermes manifest targets Bot API 10.3. Its inventory covers all
-  185 methods, 932 parameters, 374 objects, 1,888 object fields, 26 unions, and
-  194 variants in that version.
+- The current Hermes manifest targets Bot API 10.5. Its inventory covers all
+  194 methods, 997 parameters, 397 objects, 1,992 object fields, 29 unions, and
+  204 variants in that version.
 - Source-audit tests require zero missing methods, parameters, objects, fields,
   union roots, or union variants. They also verify requiredness, Go wire types,
   JSON optionality, and optional-object nilability.
@@ -23,6 +23,15 @@ publishes a Bot API release, a Hermes typed update requires a regenerated
 manifest, models, aliases, and reviewed source audit. Until then, the raw call
 layers provide forward-compatible access without claiming typed support that
 has not yet been audited.
+
+
+The Bot API 10.5 change to `getMe` is a source-compatibility boundary:
+Telegram now returns `BotFullInfo`, not `User`, and Hermes reflects that
+return type in `Client.GetMe`. Call sites that explicitly assign the result to
+`*User` must migrate to `*BotFullInfo`. Do not publish this signature change
+as a patch or minor release under the existing 1.x compatibility promise; the
+release must use a deliberate major-version path or an explicitly designed
+compatibility bridge.
 
 ## Go compatibility
 
