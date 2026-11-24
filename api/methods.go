@@ -418,10 +418,10 @@ func (b *Client) SendChatAction(ctx context.Context, params SendChatActionParams
 	return b.callTrue(ctx, "sendChatAction", params)
 }
 
-func (b *Client) GetMe(ctx context.Context) (*User, error) {
-	var user User
-	if err := b.Call(ctx, "getMe", nil, &user); err != nil {
+func (b *Client) GetMe(ctx context.Context) (*BotFullInfo, error) {
+	var info BotFullInfo
+	if err := b.Call(ctx, "getMe", nil, &info); err != nil {
 		return nil, err
 	}
-	return &user, nil
+	return &info, nil
 }

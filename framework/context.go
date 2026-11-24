@@ -140,6 +140,18 @@ func (c *Context) Data() string {
 	return c.Callback.Data
 }
 
+// InlineMessageID returns the inline identifier carried by a callback query.
+// It is available for callbacks from inline-mode messages and, when
+// callback_query_mode is configured as "auto" or "inline", from messages sent
+// directly by the bot. In this case Context.Message and Context.ChatID may be
+// unavailable; Edit, EditCaption, and EditKeyboard use this identifier.
+func (c *Context) InlineMessageID() (string, bool) {
+	if c == nil || c.Callback == nil || c.Callback.InlineMessageID == "" {
+		return "", false
+	}
+	return c.Callback.InlineMessageID, true
+}
+
 // Chat returns the primary message chat.
 func (c *Context) Chat() *Chat {
 	if c == nil || c.Message == nil {

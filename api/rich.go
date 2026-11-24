@@ -392,8 +392,8 @@ func (value InputRichBlockButtons) MarshalJSON() ([]byte, error) {
 }
 
 type InputRichBlockExpandableBlockQuotation struct {
-	Text   RichText `json:"text"`
-	Credit RichText `json:"credit,omitempty"`
+	Blocks []InputRichBlock `json:"blocks"`
+	Credit RichText         `json:"credit,omitempty"`
 }
 
 func (InputRichBlockExpandableBlockQuotation) inputRichBlock()       {}
@@ -470,7 +470,7 @@ func validateRichBlocks(blocks []InputRichBlock, draft bool) error {
 					return fmt.Errorf("hermes: rich list item %d: %w", itemIndex, err)
 				}
 			}
-		case InputRichBlockBlockQuotation:
+		case InputRichBlockBlockQuotation, InputRichBlockExpandableBlockQuotation:
 			if err := validateRichBlocks(value.Blocks, draft); err != nil {
 				return err
 			}

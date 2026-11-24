@@ -19,6 +19,63 @@ func (client *Client) Close(ctx context.Context) error {
 	return client.callTrue(ctx, "close", nil)
 }
 
+// CallbackQueryMode controls how callback queries from the bot's own messages
+// identify their originating message.
+type CallbackQueryMode string
+
+const (
+	// CallbackQueryModeDefault always includes Message, using an inaccessible
+	// message when Telegram cannot provide the full message.
+	CallbackQueryModeDefault CallbackQueryMode = "default"
+	// CallbackQueryModeAuto prefers InlineMessageID when the originating
+	// message is inaccessible, but may still include an inaccessible Message
+	// immediately after deletion.
+	CallbackQueryModeAuto CallbackQueryMode = "auto"
+	// CallbackQueryModeInline always uses InlineMessageID instead of Message
+	// for callback queries from messages sent directly by the bot.
+	CallbackQueryModeInline CallbackQueryMode = "inline"
+)
+
+// SetMySettingsParams contains the optional bot settings that can be changed
+// with setMySettings. Pointer fields preserve explicit false and zero values;
+// nil leaves the corresponding setting unchanged.
+type SetMySettingsParams struct {
+	SupportsInlineQueries          *bool              `json:"supports_inline_queries,omitempty"`
+	InlineQueryPlaceholder          *string            `json:"inline_query_placeholder,omitempty"`
+	NeedsInlineQueryLocation        *bool              `json:"needs_inline_query_location,omitempty"`
+	InlineFeedbackShareDenominator  *int               `json:"inline_feedback_share_denominator,omitempty"`
+	CanJoinGroups                   *bool              `json:"can_join_groups,omitempty"`
+	CanReadAllGroupMessages         *bool              `json:"can_read_all_group_messages,omitempty"`
+	CanConnectToBusiness            *bool              `json:"can_connect_to_business,omitempty"`
+	CanManageBots                   *bool              `json:"can_manage_bots,omitempty"`
+	SupportsGuestQueries            *bool              `json:"supports_guest_queries,omitempty"`
+	SupportsJoinRequestQueries      *bool              `json:"supports_join_request_queries,omitempty"`
+	HasTopicsEnabled                *bool              `json:"has_topics_enabled,omitempty"`
+	AllowsUsersToCreateTopics       *bool              `json:"allows_users_to_create_topics,omitempty"`
+	HasTopicSidebar                 *bool              `json:"has_topic_sidebar,omitempty"`
+	CanCommunicateWithBots          *bool              `json:"can_communicate_with_bots,omitempty"`
+	CallbackQueryMode               CallbackQueryMode  `json:"callback_query_mode,omitempty"`
+}
+
+// SetMySettings updates the bot's settings. Unspecified fields remain
+// unchanged. Use Bool(false) to explicitly disable a boolean setting and a
+// non-nil pointer to zero to disable inline feedback.
+func (client *Client) SetMySettings(ctx context.Context, params SetMySettingsParams) error {
+	if params.InlineFeedbackShareDenominator != nil {
+		switch *params.InlineFeedbackShareDenominator {
+		case 0, 1, 10, 100, 1000:
+		default:
+			return fmt.Errorf("hermes: setMySettings inline_feedback_share_denominator must be 0, 1, 10, 100, or 1000")
+		}
+	}
+	switch params.CallbackQueryMode {
+	case "", CallbackQueryModeDefault, CallbackQueryModeAuto, CallbackQueryModeInline:
+	default:
+		return fmt.Errorf("hermes: setMySettings callback_query_mode must be default, auto, or inline")
+	}
+	return client.callTrue(ctx, "setMySettings", params)
+}
+
 type ForwardMessagesParams struct {
 	ChatID                any   `json:"chat_id"`
 	MessageThreadID       int   `json:"message_thread_id,omitempty"`

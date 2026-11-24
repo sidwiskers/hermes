@@ -78,6 +78,8 @@ type (
 	InputRichBlockVoiceNote                 = api.InputRichBlockVoiceNote
 	InputRichBlockThinking                  = api.InputRichBlockThinking
 	SendRichMessageParams                   = api.SendRichMessageParams
+	CallbackQueryMode                       = api.CallbackQueryMode
+	SetMySettingsParams                     = api.SetMySettingsParams
 	SendWidgetParams                        = api.SendWidgetParams
 	SendSharedWidgetParams                  = api.SendSharedWidgetParams
 	AnswerWidgetQueryParams                 = api.AnswerWidgetQueryParams
