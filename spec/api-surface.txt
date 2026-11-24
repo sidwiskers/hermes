@@ -1076,7 +1076,8 @@ method (*Client) GetForumTopicIconStickers(ctx context.Context) ([]Sticker, erro
 method (*Client) GetGameHighScores(ctx context.Context, params GetGameHighScoresParams) ([]GameHighScore, error)
 method (*Client) GetManagedBotAccessSettings(ctx context.Context, params ManagedBotParams) (BotAccessSettings, error)
 method (*Client) GetManagedBotToken(ctx context.Context, params ManagedBotParams) (string, error)
-method (*Client) GetMe(ctx context.Context) (*BotFullInfo, error)
+method (*Client) GetMe(ctx context.Context) (*User, error)
+method (*Client) GetMeFullInfo(ctx context.Context) (*BotFullInfo, error)
 method (*Client) GetMyCommands(ctx context.Context, params GetMyCommandsParams) ([]BotCommand, error)
 method (*Client) GetMyDefaultAdministratorRights(ctx context.Context, params GetMyDefaultAdministratorRightsParams) (ChatAdministratorRights, error)
 method (*Client) GetMyDescription(ctx context.Context, params GetMyDescriptionParams) (BotDescription, error)
@@ -2853,7 +2854,7 @@ const UpdateSubscription UpdateType = "subscription"
 type UpdateType string
 const UpdateUnknown UpdateType = "unknown"
 const UpdateWidgetQuery UpdateType = "widget_query"
-type User struct{ID int64 `json:"id"`; IsBot bool `json:"is_bot"`; FirstName string `json:"first_name"`; LastName string `json:"last_name,omitempty"`; Username string `json:"username,omitempty"`; LanguageCode string `json:"language_code,omitempty"`; IsPremium bool `json:"is_premium,omitempty"`; AddedToAttachmentMenu bool `json:"added_to_attachment_menu,omitempty"`}
+type User struct{ID int64 `json:"id"`; IsBot bool `json:"is_bot"`; FirstName string `json:"first_name"`; LastName string `json:"last_name,omitempty"`; Username string `json:"username,omitempty"`; LanguageCode string `json:"language_code,omitempty"`; IsPremium bool `json:"is_premium,omitempty"`; AddedToAttachmentMenu bool `json:"added_to_attachment_menu,omitempty"`; CanJoinGroups bool `json:"-"`; CanReadAllGroupMessages bool `json:"-"`; SupportsGuestQueries bool `json:"-"`; SupportsInlineQueries bool `json:"-"`; CanConnectToBusiness bool `json:"-"`; HasMainWebApp bool `json:"-"`; HasTopicsEnabled bool `json:"-"`; AllowsUsersToCreateTopics bool `json:"-"`; CanManageBots bool `json:"-"`; SupportsJoinRequestQueries bool `json:"-"`}
 type UserChatBoosts struct{Boosts []ChatBoost `json:"boosts"`}
 type UserProfileAudios struct{TotalCount int `json:"total_count"`; Audios []Audio `json:"audios"`}
 type UserProfilePhotos struct{TotalCount int `json:"total_count"`; Photos [][]PhotoSize `json:"photos"`}

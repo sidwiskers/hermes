@@ -188,3 +188,47 @@ func TestGetMeDecodesBotFullInfo(t *testing.T) {
 		t.Fatalf("Bot API 10.5 fields missing from getMe: %#v", me)
 	}
 }
+
+func TestGetMeRetainsLegacyUserProjection(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.URL.Path != "/botTOKEN/getMe" {
+			t.Fatalf("path = %s", request.URL.Path)
+		}
+		_, _ = io.WriteString(writer, `{"ok":true,"result":{
+			"id":42,"is_bot":true,"first_name":"Hermes","username":"hermes_bot",
+			"can_join_groups":true,"can_read_all_group_messages":true,
+			"supports_guest_queries":true,"supports_inline_queries":true,
+			"can_connect_to_business":true,"has_main_web_app":true,
+			"has_topics_enabled":true,"allows_users_to_create_topics":true,
+			"can_manage_bots":true,"supports_join_request_queries":true,
+			"has_topic_sidebar":true,"active_usernames":["hermes_bot"]
+		}}`)
+	}))
+	defer server.Close()
+
+	client := New("TOKEN", WithBaseURL(server.URL), WithHTTPClient(server.Client()))
+	me, err := client.GetMe(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if me.ID != 42 || !me.IsBot || me.Username != "hermes_bot" ||
+		!me.CanJoinGroups || !me.CanReadAllGroupMessages || !me.CanManageBots ||
+		!me.SupportsJoinRequestQueries {
+		t.Fatalf("legacy GetMe projection = %#v", me)
+	}
+	encoded, err := json.Marshal(me)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, key := range []string{
+		`"can_join_groups"`, `"can_read_all_group_messages"`,
+		`"supports_guest_queries"`, `"supports_inline_queries"`,
+		`"can_manage_bots"`, `"supports_join_request_queries"`,
+	} {
+		if strings.Contains(string(encoded), key) {
+			t.Fatalf("legacy compatibility field leaked into User JSON: %s", encoded)
+		}
+	}
+}

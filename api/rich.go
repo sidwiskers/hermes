@@ -91,7 +91,7 @@ type InputRichMessageMedia struct {
 	Media RichMessageMedia `json:"media"`
 }
 
-// InputRichBlock is one of the block forms accepted by Bot API 10.3.
+// InputRichBlock is one of the block forms accepted by Bot API 10.5.
 type InputRichBlock interface {
 	inputRichBlock()
 	richBlockType() string
