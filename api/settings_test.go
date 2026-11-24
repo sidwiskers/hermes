@@ -25,21 +25,21 @@ func TestSetMySettingsPreservesExplicitOptionalValues(t *testing.T) {
 			t.Fatal(err)
 		}
 		expected := map[string]any{
-			"supports_inline_queries": false,
-			"inline_query_placeholder": "",
-			"needs_inline_query_location": true,
+			"supports_inline_queries":           false,
+			"inline_query_placeholder":          "",
+			"needs_inline_query_location":       true,
 			"inline_feedback_share_denominator": float64(0),
-			"can_join_groups": false,
-			"can_read_all_group_messages": true,
-			"can_connect_to_business": false,
-			"can_manage_bots": true,
-			"supports_guest_queries": false,
-			"supports_join_request_queries": true,
-			"has_topics_enabled": true,
-			"allows_users_to_create_topics": false,
-			"has_topic_sidebar": true,
-			"can_communicate_with_bots": false,
-			"callback_query_mode": "inline",
+			"can_join_groups":                   false,
+			"can_read_all_group_messages":       true,
+			"can_connect_to_business":           false,
+			"can_manage_bots":                   true,
+			"supports_guest_queries":            false,
+			"supports_join_request_queries":     true,
+			"has_topics_enabled":                true,
+			"allows_users_to_create_topics":     false,
+			"has_topic_sidebar":                 true,
+			"can_communicate_with_bots":         false,
+			"callback_query_mode":               "inline",
 		}
 		if len(body) != len(expected) {
 			t.Fatalf("got %d settings, want %d: %#v", len(body), len(expected), body)
