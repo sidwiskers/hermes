@@ -229,20 +229,53 @@ type User struct {
 	IsPremium             bool   `json:"is_premium,omitempty"`
 	AddedToAttachmentMenu bool   `json:"added_to_attachment_menu,omitempty"`
 
-	// The fields below are retained only for source compatibility with the
-	// pre-10.5 GetMe result. They are not part of Telegram's User object and
-	// are populated only by the legacy GetMe compatibility projection.
+	// CanJoinGroups is retained for compatibility with the pre-10.5 GetMe
+	// result. It is populated only by the legacy GetMe compatibility projection.
 	//
-	// Deprecated: use BotFullInfo returned by Client.GetMeFullInfo.
-	CanJoinGroups              bool `json:"-"`
-	CanReadAllGroupMessages    bool `json:"-"`
-	SupportsGuestQueries       bool `json:"-"`
-	SupportsInlineQueries      bool `json:"-"`
-	CanConnectToBusiness       bool `json:"-"`
-	HasMainWebApp              bool `json:"-"`
-	HasTopicsEnabled           bool `json:"-"`
-	AllowsUsersToCreateTopics  bool `json:"-"`
-	CanManageBots              bool `json:"-"`
+	// Deprecated: use BotFullInfo.CanJoinGroups from GetMeFullInfo.
+	CanJoinGroups bool `json:"-"`
+	// CanReadAllGroupMessages is retained for compatibility with the pre-10.5
+	// GetMe result.
+	//
+	// Deprecated: use BotFullInfo.CanReadAllGroupMessages from GetMeFullInfo.
+	CanReadAllGroupMessages bool `json:"-"`
+	// SupportsGuestQueries is retained for compatibility with the pre-10.5
+	// GetMe result.
+	//
+	// Deprecated: use BotFullInfo.SupportsGuestQueries from GetMeFullInfo.
+	SupportsGuestQueries bool `json:"-"`
+	// SupportsInlineQueries is retained for compatibility with the pre-10.5
+	// GetMe result.
+	//
+	// Deprecated: use BotFullInfo.SupportsInlineQueries from GetMeFullInfo.
+	SupportsInlineQueries bool `json:"-"`
+	// CanConnectToBusiness is retained for compatibility with the pre-10.5
+	// GetMe result.
+	//
+	// Deprecated: use BotFullInfo.CanConnectToBusiness from GetMeFullInfo.
+	CanConnectToBusiness bool `json:"-"`
+	// HasMainWebApp is retained for compatibility with the pre-10.5 GetMe result.
+	//
+	// Deprecated: use BotFullInfo.HasMainWebApp from GetMeFullInfo.
+	HasMainWebApp bool `json:"-"`
+	// HasTopicsEnabled is retained for compatibility with the pre-10.5 GetMe
+	// result.
+	//
+	// Deprecated: use BotFullInfo.HasTopicsEnabled from GetMeFullInfo.
+	HasTopicsEnabled bool `json:"-"`
+	// AllowsUsersToCreateTopics is retained for compatibility with the pre-10.5
+	// GetMe result.
+	//
+	// Deprecated: use BotFullInfo.AllowsUsersToCreateTopics from GetMeFullInfo.
+	AllowsUsersToCreateTopics bool `json:"-"`
+	// CanManageBots is retained for compatibility with the pre-10.5 GetMe result.
+	//
+	// Deprecated: use BotFullInfo.CanManageBots from GetMeFullInfo.
+	CanManageBots bool `json:"-"`
+	// SupportsJoinRequestQueries is retained for compatibility with the pre-10.5
+	// GetMe result.
+	//
+	// Deprecated: use BotFullInfo.SupportsJoinRequestQueries from GetMeFullInfo.
 	SupportsJoinRequestQueries bool `json:"-"`
 }
 

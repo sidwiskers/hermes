@@ -62,7 +62,7 @@ func (client *Client) SetMySettings(ctx context.Context, params SetMySettingsPar
 		switch *params.InlineFeedbackShareDenominator {
 		case 0, 1, 10, 100, 1000:
 		default:
-			return fmt.Errorf("hermes: setMySettings inline_feedback_share_denominator must be 0, 1, 10, or 1000, or zero to disable")
+			return fmt.Errorf("hermes: setMySettings inline_feedback_share_denominator must be 0, 1, 10, 100, or 1000")
 		}
 	}
 	switch params.CallbackQueryMode {
