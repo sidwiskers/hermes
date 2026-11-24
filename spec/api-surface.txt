@@ -2338,7 +2338,7 @@ type ChatShareTheme struct{Emoji *ChatShareThemeEmoji; UniqueGift *ChatShareThem
 method (ChatShareTheme) Kind() string
 method (ChatShareTheme) MarshalJSON() ([]byte, error)
 method (*ChatShareTheme) UnmarshalJSON(data []byte) error
-type ChatShareThemeBackdrop struct{ID int64 `json:"id"`; Name string `json:"name"`; Colors UniqueGiftBackdropColors `json:"colors"`}
+type ChatShareThemeBackdrop struct{ID int `json:"id"`; Name string `json:"name"`; Colors UniqueGiftBackdropColors `json:"colors"`}
 type ChatShareThemeBackdrops struct{Backdrops []ChatShareThemeBackdrop `json:"backdrops"`}
 type ChatShareThemeEmoji struct{Type string `json:"type"`; Emojis []EmojiType `json:"emojis"`; BackgroundBackdropID int `json:"background_backdrop_id,omitempty"`}
 method (ChatShareThemeEmoji) MarshalJSON() ([]byte, error)

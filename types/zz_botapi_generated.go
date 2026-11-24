@@ -301,7 +301,7 @@ type ChatPhoto struct {
 
 // ChatShareThemeBackdrop mirrors the object defined by the Telegram Bot API.
 type ChatShareThemeBackdrop struct {
-	ID     int64                    `json:"id"`
+	ID     int                      `json:"id"`
 	Name   string                   `json:"name"`
 	Colors UniqueGiftBackdropColors `json:"colors"`
 }
