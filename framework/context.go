@@ -141,9 +141,9 @@ func (c *Context) Data() string {
 }
 
 // InlineMessageID returns the inline identifier carried by a callback query.
-// It is available for callbacks from inline-mode messages and, when
-// callback_query_mode is configured as "auto" or "inline", from messages sent
-// directly by the bot. In this case Context.Message and Context.ChatID may be
+// It is available for callbacks from inline-mode messages and for bot-sent
+// messages whenever Telegram selects this field under callback_query_mode
+// "auto" or "inline". In this case Context.Message and Context.ChatID may be
 // unavailable; Edit, EditCaption, and EditKeyboard use this identifier.
 func (c *Context) InlineMessageID() (string, bool) {
 	if c == nil || c.Callback == nil || c.Callback.InlineMessageID == "" {

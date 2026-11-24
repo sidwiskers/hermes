@@ -64,6 +64,9 @@ func TestInlineCallbackModeKeepsEditHelpersUsableWithoutMessage(t *testing.T) {
 	if err := ctx.Edit("updated"); err != nil {
 		t.Fatal(err)
 	}
+	if err := ctx.EditCaption("caption"); err != nil {
+		t.Fatal(err)
+	}
 	if err := ctx.EditKeyboard(nil); err != nil {
 		t.Fatal(err)
 	}
@@ -73,8 +76,9 @@ func TestInlineCallbackModeKeepsEditHelpersUsableWithoutMessage(t *testing.T) {
 	if err := ctx.React(ReactionType{}); err == nil {
 		t.Fatal("React should require an ordinary Message")
 	}
-	if len(methods) != 2 || !strings.HasSuffix(methods[0], "/editMessageText") ||
-		!strings.HasSuffix(methods[1], "/editMessageReplyMarkup") {
+	if len(methods) != 3 || !strings.HasSuffix(methods[0], "/editMessageText") ||
+		!strings.HasSuffix(methods[1], "/editMessageCaption") ||
+		!strings.HasSuffix(methods[2], "/editMessageReplyMarkup") {
 		t.Fatalf("edit methods = %#v", methods)
 	}
 }
