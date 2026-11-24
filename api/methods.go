@@ -418,7 +418,37 @@ func (b *Client) SendChatAction(ctx context.Context, params SendChatActionParams
 	return b.callTrue(ctx, "sendChatAction", params)
 }
 
-func (b *Client) GetMe(ctx context.Context) (*BotFullInfo, error) {
+// GetMe returns the bot identity using the source-compatible User view that
+// was exposed before Bot API 10.5. Bot-only settings from the historical User
+// result are populated as deprecated, non-wire compatibility fields.
+//
+// Deprecated: use GetMeFullInfo for the complete official BotFullInfo result.
+func (b *Client) GetMe(ctx context.Context) (*User, error) {
+	info, err := b.GetMeFullInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &User{
+		ID:                         int64(info.ID),
+		IsBot:                      info.IsBot,
+		FirstName:                  info.FirstName,
+		Username:                   info.Username,
+		CanJoinGroups:              info.CanJoinGroups,
+		CanReadAllGroupMessages:    info.CanReadAllGroupMessages,
+		SupportsGuestQueries:       info.SupportsGuestQueries,
+		SupportsInlineQueries:      info.SupportsInlineQueries,
+		CanConnectToBusiness:       info.CanConnectToBusiness,
+		HasMainWebApp:              info.HasMainWebApp,
+		HasTopicsEnabled:           info.HasTopicsEnabled,
+		AllowsUsersToCreateTopics:  info.AllowsUsersToCreateTopics,
+		CanManageBots:              info.CanManageBots,
+		SupportsJoinRequestQueries: info.SupportsJoinRequestQueries,
+	}, nil
+}
+
+// GetMeFullInfo returns the complete BotFullInfo object returned by Telegram's
+// getMe method, including bot settings and active usernames.
+func (b *Client) GetMeFullInfo(ctx context.Context) (*BotFullInfo, error) {
 	var info BotFullInfo
 	if err := b.Call(ctx, "getMe", nil, &info); err != nil {
 		return nil, err

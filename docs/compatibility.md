@@ -25,13 +25,14 @@ layers provide forward-compatible access without claiming typed support that
 has not yet been audited.
 
 
-The Bot API 10.5 change to `getMe` is a source-compatibility boundary:
-Telegram now returns `BotFullInfo`, not `User`, and Hermes reflects that
-return type in `Client.GetMe`. Call sites that explicitly assign the result to
-`*User` must migrate to `*BotFullInfo`. Do not publish this signature change
-as a patch or minor release under the existing 1.x compatibility promise; the
-release must use a deliberate major-version path or an explicitly designed
-compatibility bridge.
+Telegram changed the official `getMe` result to `BotFullInfo` in Bot API
+10.5. Hermes exposes the exact result through `Client.GetMeFullInfo`. The
+existing `Client.GetMe` signature remains available as a deprecated
+source-compatible projection to `*User`; its historical bot-setting fields
+are kept as `json:"-"` compatibility fields and are populated only by that
+method. New code should use `GetMeFullInfo` and `BotFullInfo`. This avoids a
+breaking signature change in the 1.x line while retaining the complete 10.5
+wire model.
 
 ## Go compatibility
 

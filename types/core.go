@@ -228,6 +228,22 @@ type User struct {
 	LanguageCode          string `json:"language_code,omitempty"`
 	IsPremium             bool   `json:"is_premium,omitempty"`
 	AddedToAttachmentMenu bool   `json:"added_to_attachment_menu,omitempty"`
+
+	// The fields below are retained only for source compatibility with the
+	// pre-10.5 GetMe result. They are not part of Telegram's User object and
+	// are populated only by the legacy GetMe compatibility projection.
+	//
+	// Deprecated: use BotFullInfo returned by Client.GetMeFullInfo.
+	CanJoinGroups              bool `json:"-"`
+	CanReadAllGroupMessages    bool `json:"-"`
+	SupportsGuestQueries       bool `json:"-"`
+	SupportsInlineQueries      bool `json:"-"`
+	CanConnectToBusiness       bool `json:"-"`
+	HasMainWebApp              bool `json:"-"`
+	HasTopicsEnabled           bool `json:"-"`
+	AllowsUsersToCreateTopics  bool `json:"-"`
+	CanManageBots              bool `json:"-"`
+	SupportsJoinRequestQueries bool `json:"-"`
 }
 
 type Chat struct {

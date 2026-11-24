@@ -60,10 +60,13 @@ and answering the callback remain available.
 
 ## BotFullInfo and invited users
 
-`Client.GetMe` now returns `*BotFullInfo`, which contains bot identity and
-configuration fields previously exposed on `User`, plus the active username
-list, inline query placeholder/location settings, and topic-sidebar state.
-The ordinary `User` type no longer contains those bot-only settings.
+`Client.GetMeFullInfo` returns the complete official `*BotFullInfo` result,
+including bot identity and configuration fields, active usernames, inline
+query placeholder/location settings, and topic-sidebar state. The existing
+`Client.GetMe` signature remains available as a deprecated compatibility
+projection to `*User`; its historical bot-setting fields are retained as
+`json:"-"` fields and are populated only by that method. New code should
+prefer `GetMeFullInfo`.
 
 A user joining through the bot owner's dedicated invite link is reported with
 a `WriteAccessAllowed` service message. Its new `Inviter` field identifies
@@ -81,8 +84,7 @@ actions and draft-only thinking blocks.
 
 ## Compatibility note
 
-The changed `GetMe` result type is source-incompatible for callers that
-explicitly assign its result to `*User`. This must be released under a
-deliberate major-version strategy or through a separately reviewed
-compatibility bridge; it must not be slipped into a patch/minor release under
-Hermes' current semantic-versioning policy.
+Hermes keeps the pre-10.5 `GetMe() (*User, error)` signature for source
+compatibility and provides `GetMeFullInfo() (*BotFullInfo, error)` for the
+official Telegram result. The legacy projection does not add bot-only fields
+to JSON encoding of ordinary `User` values.

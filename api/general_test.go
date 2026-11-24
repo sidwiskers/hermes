@@ -174,7 +174,7 @@ func TestGetMeDecodesBotFullInfo(t *testing.T) {
 	defer server.Close()
 
 	client := New("TOKEN", WithBaseURL(server.URL), WithHTTPClient(server.Client()))
-	me, err := client.GetMe(context.Background())
+	me, err := client.GetMeFullInfo(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -185,6 +185,6 @@ func TestGetMeDecodesBotFullInfo(t *testing.T) {
 		t.Fatalf("active usernames = %#v", me.ActiveUsernames)
 	}
 	if me.InlineQueryPlaceholder != "Search" || !me.HasTopicSidebar || !me.HasTopicsEnabled {
-		t.Fatalf("Bot API 10.5 settings missing from getMe: %#v", me)
+		t.Fatalf("Bot API 10.5 fields missing from getMe: %#v", me)
 	}
 }

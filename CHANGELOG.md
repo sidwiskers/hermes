@@ -10,16 +10,17 @@
 - Add typed `setMySettings` support for the complete Bot API settings surface,
   including explicit-false handling, validated inline feedback sampling, and
   all callback-query delivery modes.
-- Model `BotFullInfo`, update `GetMe` to the official result type, and remove
-  bot-only settings from the ordinary `User` model.
+- Model `BotFullInfo` and expose the full official result through
+  `GetMeFullInfo`. Retain the existing `GetMe` signature as a deprecated
+  source-compatible projection, with legacy bot-setting fields excluded from
+  User JSON.
 - Add `WriteAccessAllowed.Inviter` and support arbitrary nested blocks in
   sent and received expandable quotations.
 - Expose `Context.InlineMessageID()`; retain edit, caption, and keyboard
   context operations when callback queries arrive without an ordinary message.
 - Add request/response contract tests for settings, getMe, invited users,
   nested expandable quotations, and inline callback editing.
-- Document that the `GetMe` result type is source-incompatible and must follow
-  a deliberate major-version or compatibility-bridge decision before release.
+- Document the `GetMeFullInfo` migration path and compatibility behavior.
 
 ## 1.4.0 - 2026-11-10
 
