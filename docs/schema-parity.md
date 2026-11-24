@@ -64,8 +64,8 @@ Bot API 10.5 allows the selected `callback_query_mode` to determine which is
 present for buttons in messages sent by the bot. Applications should therefore
 handle both fields and must not assume every callback has a `message`.
 
-Bot API 10.5 moves bot-only data into `BotFullInfo`: `GetMe` now returns
-that type, while `User` contains only common user/bot identity fields. The
+Bot API 10.5 moves bot-only settings into `BotFullInfo`: `GetMe` now returns
+that type, while `User` retains the fields defined for the User object. The
 new bot model carries active usernames, inline-query configuration, topic
 settings, the topic-sidebar setting, and the 52-bit bot identifier. The new
 `WriteAccessAllowed.Inviter` field identifies the owner who invited a user

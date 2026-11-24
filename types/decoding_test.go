@@ -46,7 +46,6 @@ func TestLivePhotoAndEditTagDecoding(t *testing.T) {
 	}
 }
 
-
 func TestCallbackQueryInlineMessageIDDecoding(t *testing.T) {
 	t.Parallel()
 

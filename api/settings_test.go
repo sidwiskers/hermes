@@ -9,9 +9,9 @@ import (
 	"testing"
 )
 
-func boolSetting(value bool) *bool     { return &value }
+func boolSetting(value bool) *bool       { return &value }
 func stringSetting(value string) *string { return &value }
-func intSetting(value int) *int         { return &value }
+func intSetting(value int) *int          { return &value }
 
 func TestSetMySettingsPreservesExplicitOptionalValues(t *testing.T) {
 	t.Parallel()

@@ -212,7 +212,7 @@ sendWidget
 func TestBotAPI10_5MethodManifest(t *testing.T) {
 	t.Parallel()
 
-	if len(botAPI10_5Methods) != 193 {
+	if len(botAPI10_5Methods) != 194 {
 		t.Fatalf("manifest contains %d methods, want 194", len(botAPI10_5Methods))
 	}
 	entries, err := os.ReadDir(".")
