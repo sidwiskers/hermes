@@ -470,7 +470,11 @@ func validateRichBlocks(blocks []InputRichBlock, draft bool) error {
 					return fmt.Errorf("hermes: rich list item %d: %w", itemIndex, err)
 				}
 			}
-		case InputRichBlockBlockQuotation, InputRichBlockExpandableBlockQuotation:
+		case InputRichBlockBlockQuotation:
+			if err := validateRichBlocks(value.Blocks, draft); err != nil {
+				return err
+			}
+		case InputRichBlockExpandableBlockQuotation:
 			if err := validateRichBlocks(value.Blocks, draft); err != nil {
 				return err
 			}
