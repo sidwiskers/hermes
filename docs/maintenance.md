@@ -1,9 +1,9 @@
 # Maintaining Hermes over time
 
 Hermes Guardian is a repository-owned maintenance pipeline, independent of any
-ChatGPT session. The runtime library remains Go standard-library-only. Python,
-Docker, model services and GitHub APIs are maintenance tools, never dependencies
-of applications importing Hermes.
+ChatGPT session. The runtime library remains Go standard-library-only. Docker,
+optional model services and GitHub APIs are used only by repository maintenance;
+applications importing Hermes do not need them.
 
 The [owner guide](guardian-owner.md) covers setup, controls, costs and recovery.
 The default policy prepares PRs for approval. Coding repair, automatic merging,
@@ -11,15 +11,15 @@ and automatic releases each require explicit configuration.
 
 ## Detection and evidence
 
-`python3 scripts/guardian/main.py prepare` downloads Telegram's official Bot API
-with a bounded response size, timeout and retries. The trusted Go parser creates
-its structural manifest. An independent HTML parser snapshots normalized
+`go run ./internal/cmd/hermes-guardian prepare` downloads Telegram's official Bot API
+with a bounded response size, timeout and retries. The trusted Go structural
+parser creates its manifest. A separate Go HTML parser snapshots normalized
 section descriptions, return-contract prose, field descriptions and link targets
 in `spec/bot-api-semantics.json`. The snapshot also retains recent release
 announcements so announcement-only changes can be referred for review.
-Cosmetic HTML markup is ignored; changes to
-existing documentation are conservatively referred for review. Wording changes
-can therefore produce a review even when Telegram's actual behavior is unchanged.
+Cosmetic HTML markup is ignored; changes to existing documentation are
+conservatively referred for review. Wording changes can therefore produce a
+review even when Telegram's actual behavior is unchanged.
 
 Both inventories determine a stable source identity. Version rollback, duplicate
 names, incomplete documents and large schema losses stop the update. A missing
@@ -112,21 +112,21 @@ and automatic disabling after repository inactivity in its
 
 ## Running elsewhere and offline replay
 
-The pipeline uses Git, Python 3.10+, a current supported stable Go toolchain, and
-Docker. No Python packages are required. Supply `GITHUB_REPOSITORY=owner/repo`
-when resuming or publishing remote branches. Supply `GH_TOKEN` only to the
-publication/status command. `GUARDIAN_IMAGE` may select a matching `hermes-guardian:VERSION` image.
-The trusted Dockerfile builds it from the official Go image and installs Python
-and Git for the maintenance checks. GitHub selects the Go version installed by
-setup-go; local validation builds a missing image automatically.
+The pipeline uses Git, Go 1.25 or newer, and Docker. Supply
+`GITHUB_REPOSITORY=owner/repo` when resuming or publishing remote branches.
+Supply `GH_TOKEN` only to the publication/status command. `GUARDIAN_IMAGE` may
+select a matching `hermes-guardian:VERSION` image. The trusted Dockerfile builds
+it from the official Go image and installs Git and CA certificates. GitHub
+selects the Go version installed by setup-go; local validation builds a missing
+image automatically.
 
 ```bash
 ./scripts/guardian.sh
 # Or keep repair credentials and publishing credentials in separate processes:
-python3 scripts/guardian/main.py prepare
-python3 scripts/guardian/main.py validate
-python3 scripts/guardian/main.py publish
-python3 scripts/guardian/main.py status
+go run ./internal/cmd/hermes-guardian prepare
+go run ./internal/cmd/hermes-guardian validate
+go run ./internal/cmd/hermes-guardian publish
+go run ./internal/cmd/hermes-guardian status
 ```
 
 Do not run the publisher if no `.guardian/bundle.json` was produced (for example,
@@ -137,11 +137,11 @@ Use a disposable clean checkout; local reports and candidates live in `.guardian
 For offline source replay:
 
 ```bash
-python3 scripts/guardian/main.py prepare --source /path/to/official-bot-api.html
-python3 -m unittest discover -s scripts/guardian -p 'test_*.py'
+go run ./internal/cmd/hermes-guardian prepare --source /path/to/official-bot-api.html
+go test ./internal/guardian
 ```
 
-The legacy `scripts/guardian.sh` entry point now delegates to the same controller.
+The `scripts/guardian.sh` entry point is a shell wrapper for the Go controller.
 A successful no-change run produces no candidate bundle. Detection failures clear
 stale bundles and preserve the last published branch. Reports are retained for
 seven days in Actions and summarized durably in the update PR.

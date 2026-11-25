@@ -55,13 +55,13 @@ jobs:
         run: |
           args=()
           if [[ "$REQUESTED_ACTION" == 'retry-repair' ]]; then args+=(--retry); fi
-          python3 scripts/guardian/main.py prepare "${args[@]}"
+          go run ./internal/cmd/hermes-guardian prepare "${args[@]}"
       - name: Validate update without repair credentials
         if: inputs.action != 'release-current'
-        run: python3 scripts/guardian/main.py validate
+        run: go run ./internal/cmd/hermes-guardian validate
       - name: Validate current main for release
         if: inputs.action == 'release-current'
-        run: python3 scripts/guardian/main.py release-check
+        run: go run ./internal/cmd/hermes-guardian release-check
       - name: Preserve reports and candidate
         if: always()
         uses: actions/upload-artifact@v7
@@ -96,6 +96,11 @@ jobs:
         with:
           ref: main
           persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: stable
+          check-latest: true
+          cache: false
       - uses: actions/download-artifact@v8
         with:
           name: guardian-candidate
@@ -107,12 +112,12 @@ jobs:
         shell: bash
         run: |
           if [[ -f .guardian/bundle.json ]]; then
-            python3 scripts/guardian/main.py publish
+            go run ./internal/cmd/hermes-guardian publish
           elif [[ -f .guardian/release.json ]]; then
-            python3 scripts/guardian/main.py release
+            go run ./internal/cmd/hermes-guardian release
           fi
       - name: Update owner status
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 scripts/guardian/main.py status
+        run: go run ./internal/cmd/hermes-guardian status

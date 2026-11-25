@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
-python3 scripts/guardian/main.py prepare "$@"
-python3 scripts/guardian/main.py validate
+go run ./internal/cmd/hermes-guardian prepare "$@"
+go run ./internal/cmd/hermes-guardian validate

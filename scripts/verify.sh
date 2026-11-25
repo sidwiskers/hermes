@@ -4,6 +4,7 @@ set -euo pipefail
 files="$(gofmt -l .)"
 if [[ -n "$files" ]]; then
   printf 'These files are not gofmt-formatted:\n%s\n' "$files" >&2
+  gofmt -d . >&2 || true
   exit 1
 fi
 
@@ -11,7 +12,6 @@ fi
 ./scripts/test-check-secrets.sh
 ./scripts/check-generated.sh
 ./scripts/test-check-go-version.sh
-python3 -m unittest discover -s scripts/guardian -p 'test_*.py'
 
 go vet ./...
 go test -shuffle=on -count=1 ./...

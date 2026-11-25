@@ -35,7 +35,7 @@ jobs:
         run: ./scripts/verify.sh
 
       - name: Verify Guardian isolation and read-only validation
-        run: python3 scripts/guardian/main.py sandbox-smoke
+        run: go run ./internal/cmd/hermes-guardian sandbox-smoke
 
       - name: Verify competitor adapters
         run: ./scripts/verify-competitors.sh

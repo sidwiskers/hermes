@@ -24,8 +24,13 @@ jobs:
         with:
           ref: main
           persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: stable
+          check-latest: true
+          cache: false
       - name: Check heartbeat and recover a missed run
         env:
           GH_TOKEN: ${{ github.token }}
           GUARDIAN_MODE: ${{ vars.GUARDIAN_MODE || 'pull-request' }}
-        run: python3 scripts/guardian/main.py health
+        run: go run ./internal/cmd/hermes-guardian health
