@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -375,8 +374,8 @@ func (controller *Controller) Prepare(source string, retry bool) error {
 			} else {
 				evidence["final_tests"] = finalTests
 			}
-			if len(patch.Output) <= 250_000 {
-				report["review"] = Review(controller.Work, evidence, patch.Output, controller.getenv)
+			if len(patch) <= 250_000 {
+				report["review"] = Review(controller.Work, evidence, patch, controller.getenv)
 			} else {
 				report["review"] = map[string]any{"approved": false, "summary": "Patch exceeds automated review budget"}
 			}
