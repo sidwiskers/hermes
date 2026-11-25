@@ -119,29 +119,29 @@ func TestSemanticChangesAllowsOnlyNewOptionalObjectRows(t *testing.T) {
 	}
 	// The fixture heading is an object section in the semantic document. The
 	// structural parser uses the same case-insensitive anchor name.
-	before.Sections["sendmessage"] = Section{
-		Title: "sendMessage",
-		Body:  "Returns True.",
-		Rows:  [][]string{{"text", "String", "Yes", "Message text"}},
+	before.Sections["update"] = Section{
+		Title: "Update",
+		Body:  "An update.",
+		Rows:  [][]string{{"update_id", "Integer", "Yes", "Update identifier"}},
 	}
-	after.Sections["sendmessage"] = Section{
-		Title: "sendMessage",
-		Body:  "Returns True.",
-		Rows:  [][]string{
-			{"text", "String", "Yes", "Message text"},
+	after.Sections["update"] = Section{
+		Title: "Update",
+		Body:  "An update.",
+		Rows: [][]string{
+			{"update_id", "Integer", "Yes", "Update identifier"},
 			{"business_connection_id", "String", "No", "Optional. New."},
 		},
 	}
 	diff := structuralDiff("mechanical")
-	diff.Objects.Changed = []string{"sendMessage"}
+	diff.Objects.Changed = []string{"Update"}
 	if got := SemanticChanges(&before, after, diff); len(got) != 0 {
 		t.Fatalf("new optional object row required review: %v", got)
 	}
 
-	after.Sections["sendmessage"] = Section{
-		Title: "sendMessage",
-		Body:  "Returns True.",
-		Rows:  [][]string{{"text", "String", "Yes", "Changed rules"}},
+	after.Sections["update"] = Section{
+		Title: "Update",
+		Body:  "An update.",
+		Rows:  [][]string{{"update_id", "Integer", "Yes", "Changed rules"}},
 	}
 	if got := SemanticChanges(&before, after, diff); len(got) == 0 {
 		t.Fatal("changed existing row was accepted as mechanical")
