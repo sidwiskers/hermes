@@ -148,8 +148,8 @@ GitHub's API and needs only a repository-scoped token with Actions read/write.
 It does not need Go, Docker, AI access, or a permanently running bot.
 
 If GitHub Actions is unavailable, the maintenance commands can run on another
-Linux runner with Git, Python 3.10+, a supported Go toolchain, and Docker. See
-[the maintenance design](maintenance.md). Full validation is build work and
+Linux runner with Git, Go 1.25 or newer, and Docker. See [the maintenance
+design](maintenance.md). Full validation is build work and
 needs more resources than the lightweight watcher. A stopped external scheduler
 also needs your attention; there is no scheduler that can guarantee its own
 availability forever.
