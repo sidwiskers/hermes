@@ -4,11 +4,7 @@ set -euo pipefail
 files="$(gofmt -l .)"
 if [[ -n "$files" ]]; then
   printf 'These files are not gofmt-formatted:\n%s\n' "$files" >&2
-  while IFS= read -r file; do
-    if [[ -n "$file" ]]; then
-      gofmt -d "$file" >&2
-    fi
-  done <<< "$files"
+  gofmt -d . >&2 || true
   exit 1
 fi
 
