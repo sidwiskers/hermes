@@ -151,7 +151,9 @@ func TestCompletionRejectsRedirectAndDoesNotExposeResponseBody(t *testing.T) {
 	}))
 	defer source.Close()
 	previousFactory := providerHTTPClientFactory
-	providerHTTPClientFactory = source.Client
+	client := source.Client()
+	client.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
+	providerHTTPClientFactory = func() *http.Client { return client }
 	t.Cleanup(func() { providerHTTPClientFactory = previousFactory })
 	provider := ProviderConfig{URL: source.URL, Model: "code", KeyEnv: "GUARDIAN_KEY_1"}
 	_, err := Completion(provider, []chatMessage{{Role: "user", Content: "test"}}, func(key string) string {

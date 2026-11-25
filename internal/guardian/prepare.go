@@ -425,7 +425,7 @@ func (controller *Controller) gitTreePaths(commit string) (map[string]struct{}, 
 	}
 	paths := make(map[string]struct{})
 	for _, name := range strings.Split(strings.TrimSpace(output), "\n") {
-		if name != "" {
+		if strings.HasSuffix(name, "_test.go") || strings.HasPrefix(name, "integration/") {
 			paths[name] = struct{}{}
 		}
 	}
