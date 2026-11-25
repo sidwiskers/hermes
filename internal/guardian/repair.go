@@ -452,8 +452,7 @@ func Repair(root string, evidence any, check RepairCheck, maxTurns int, protecte
 			if lines > 200 {
 				lines = 200
 			}
-			all := strings.Split(string(content), "
-")
+			all := strings.Split(string(content), "\n")
 			if start > len(all) {
 				result = ""
 				break
@@ -466,8 +465,7 @@ func Repair(root string, evidence any, check RepairCheck, maxTurns int, protecte
 			for i := start - 1; i < end; i++ {
 				fmt.Fprintf(&output, "%d: %s", i+1, all[i])
 				if i+1 < end {
-					output.WriteByte('
-')
+					output.WriteByte('\n')
 				}
 			}
 			result = output.String()
@@ -501,8 +499,7 @@ func Repair(root string, evidence any, check RepairCheck, maxTurns int, protecte
 				if readErr != nil {
 					return nil
 				}
-				for index, line := range strings.Split(string(data), "
-") {
+				for index, line := range strings.Split(string(data), "\n") {
 					if strings.Contains(line, needle) {
 						rel, _ := filepath.Rel(root, path)
 						hits = append(hits, fmt.Sprintf("%s:%d: %s", filepath.ToSlash(rel), index+1, line))
@@ -516,8 +513,7 @@ func Repair(root string, evidence any, check RepairCheck, maxTurns int, protecte
 			if walkErr != nil && !errors.Is(walkErr, filepath.SkipAll) {
 				result = "Action rejected: search failed"
 			} else {
-				result = strings.Join(hits, "
-")
+				result = strings.Join(hits, "\n")
 			}
 		case "edit":
 			raw, marshalErr := json.Marshal(response["edits"])
