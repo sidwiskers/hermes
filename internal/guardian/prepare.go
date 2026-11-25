@@ -553,7 +553,6 @@ func (controller *Controller) Validate() error {
 	return controller.finish(report)
 }
 
-
 func (controller *Controller) validationAttention(report map[string]any, cause error) error {
 	message := cause.Error()
 	report["status"] = "needs_attention"
