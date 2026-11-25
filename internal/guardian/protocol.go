@@ -44,10 +44,22 @@ type Snapshot struct {
 // compact separators and unescaped HTML characters, matching Guardian's
 // previous canonical identity representation.
 func CanonicalJSON(value any) ([]byte, error) {
+	// Round-trip through generic JSON values so struct fields are canonicalized
+	// with the same recursively sorted key order as the previous Python code.
+	raw, err := json.Marshal(value)
+	if err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(bytes.NewReader(raw))
+	decoder.UseNumber()
+	var normalized any
+	if err := decoder.Decode(&normalized); err != nil {
+		return nil, err
+	}
 	var buffer bytes.Buffer
 	encoder := json.NewEncoder(&buffer)
 	encoder.SetEscapeHTML(false)
-	if err := encoder.Encode(value); err != nil {
+	if err := encoder.Encode(normalized); err != nil {
 		return nil, err
 	}
 	return bytes.TrimSuffix(buffer.Bytes(), []byte("\n")), nil

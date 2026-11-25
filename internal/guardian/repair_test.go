@@ -158,6 +158,17 @@ func TestProvidersRequireHTTPSBoundedAndConfiguredKeys(t *testing.T) {
 	}
 }
 
+func TestCompletionRejectsUnapprovedEnvironmentVariable(t *testing.T) {
+	called := false
+	_, err := Completion(ProviderConfig{URL: "https://provider.example/v1", Model: "code", KeyEnv: "GITHUB_TOKEN"}, nil, func(string) string {
+		called = true
+		return "private"
+	})
+	if err == nil || called {
+		t.Fatalf("unapproved key variable reached environment lookup: err=%v called=%v", err, called)
+	}
+}
+
 func TestCompletionRejectsRedirectAndDoesNotExposeResponseBody(t *testing.T) {
 	var redirected bool
 	destination := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

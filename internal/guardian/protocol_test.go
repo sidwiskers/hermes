@@ -175,6 +175,24 @@ func TestSemanticChangesRequiresBaseline(t *testing.T) {
 	}
 }
 
+func TestCanonicalJSONSortsStructKeysAndDoesNotEscapeHTML(t *testing.T) {
+	value := Snapshot{Format: 1, Sections: map[string]Section{}, Announcements: map[string]string{}}
+	data, err := CanonicalJSON(value)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := string(data), `{"announcements":{},"format":1,"sections":{}}`; got != want {
+		t.Fatalf("canonical struct JSON = %s, want %s", got, want)
+	}
+	data, err = CanonicalJSON(map[string]string{"text": "<tag>&"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := string(data), `{"text":"<tag>&"}`; got != want {
+		t.Fatalf("canonical HTML escaping = %s, want %s", got, want)
+	}
+}
+
 func TestCanonicalDigestIgnoresMapInsertionOrder(t *testing.T) {
 	left := map[string]any{"a": 1, "b": 2}
 	right := map[string]any{"b": 2, "a": 1}

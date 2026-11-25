@@ -235,6 +235,15 @@ type ProviderConfig struct {
 	KeyEnv string `json:"key_env"`
 }
 
+func validProviderKeyEnvironment(name string) bool {
+	switch name {
+	case "GUARDIAN_KEY_1", "GUARDIAN_KEY_2", "GUARDIAN_KEY_3":
+		return true
+	default:
+		return false
+	}
+}
+
 func ProvidersFromEnvironment(getenv func(string) string) ([]ProviderConfig, error) {
 	raw := getenv("GUARDIAN_PROVIDERS")
 	if raw == "" {
@@ -260,9 +269,7 @@ func ProvidersFromEnvironment(getenv func(string) string) ([]ProviderConfig, err
 			parsed.User != nil || parsed.RawQuery != "" {
 			return nil, fmt.Errorf("guardian: provider URL must be HTTPS without embedded credentials/query")
 		}
-		switch entry.KeyEnv {
-		case "GUARDIAN_KEY_1", "GUARDIAN_KEY_2", "GUARDIAN_KEY_3":
-		default:
+		if !validProviderKeyEnvironment(entry.KeyEnv) {
 			return nil, fmt.Errorf("guardian: invalid provider key variable")
 		}
 		if getenv(entry.KeyEnv) != "" {
@@ -304,6 +311,9 @@ var providerHTTPClientFactory = func() *http.Client {
 }
 
 func Completion(provider ProviderConfig, messages []chatMessage, getenv func(string) string) (map[string]any, error) {
+	if !validProviderKeyEnvironment(provider.KeyEnv) {
+		return nil, fmt.Errorf("guardian: invalid provider key variable")
+	}
 	parsed, parseErr := url.Parse(provider.URL)
 	if parseErr != nil || parsed.Scheme != "https" || parsed.Hostname() == "" || parsed.User != nil || parsed.RawQuery != "" {
 		return nil, fmt.Errorf("guardian: provider URL must be HTTPS without embedded credentials/query")
