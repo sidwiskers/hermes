@@ -580,7 +580,7 @@ func (controller *Controller) metadata(report map[string]any) error {
 		date := time.Now().UTC().Format("2006-01-02")
 		entry := fmt.Sprintf("## %s - %s\n\n- Update the typed Telegram API and documentation baseline to Bot API %s.\n- See the Guardian update PR for the official delta, compatibility review and validation evidence.\n\n",
 			newVersion, date, stringValue(report["version"]))
-		body, _ = strings.Cut(strings.Replace(body, "# Changelog\n", "# Changelog\n\n"+entry, 1), "\x00")
+		body = strings.Replace(body, "# Changelog\n", "# Changelog\n\n"+entry, 1)
 		if !strings.Contains(body, entry) {
 			return fmt.Errorf("guardian: unrecognized changelog format")
 		}
