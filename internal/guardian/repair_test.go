@@ -198,10 +198,14 @@ func TestRepairLoopFallbackAndLimits(t *testing.T) {
 	previousFactory := providerHTTPClientFactory
 	providerHTTPClientFactory = server.Client
 	t.Cleanup(func() { providerHTTPClientFactory = previousFactory })
-	raw, _ := json.Marshal([]ProviderConfig{{URL: server.URL, Model: "code", KeyEnv: "GUARDIAN_KEY_1"}}
+	raw, _ := json.Marshal([]ProviderConfig{{URL: server.URL, Model: "code", KeyEnv: "GUARDIAN_KEY_1"}})
 	getenv := func(key string) string {
-		if key == "GUARDIAN_PROVIDERS" { return string(raw) }
-		if key == "GUARDIAN_KEY_1" { return "secret" }
+		if key == "GUARDIAN_PROVIDERS" {
+			return string(raw)
+		}
+		if key == "GUARDIAN_KEY_1" {
+			return "secret"
+		}
 		return ""
 	}
 	result := Repair(t.TempDir(), map[string]any{}, nil, 2, nil, getenv)

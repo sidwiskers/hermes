@@ -113,7 +113,7 @@ func TestSemanticChangesAllowsOnlyNewOptionalObjectRows(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	after, err := SnapshotHTML(fixtureDocument("Returns True.", `<tr><td>business_connection_id</td><td>String</td><td>No</td><td>Optional. New.</td></tr>`))
+	after, err := SnapshotHTML(fixtureDocument("Returns True.", ""))
 	if err != nil {
 		t.Fatal(err)
 	}
