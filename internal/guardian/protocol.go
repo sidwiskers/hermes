@@ -364,7 +364,7 @@ func (p *documentParser) feed(data []byte) error {
 			}
 		}
 	}
-	return nil
+	return p.err
 }
 
 type htmlTag struct {
