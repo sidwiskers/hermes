@@ -53,6 +53,21 @@ func TestSnapshotDecodesLinkAttributeEntitiesExactlyOnce(t *testing.T) {
 	}
 }
 
+func TestSnapshotPreservesTableCellLinkPlacementAndEntityHandling(t *testing.T) {
+	document := fixtureDocument("Returns True.", `<tr><td>url</td><td>String</td><td>No</td><td><a href="tg://table?x=1&amp;amp;y=2">destination</a></td></tr>`)
+	snapshot, err := SnapshotHTML(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	row := snapshot.Sections["sendmessage"].Rows[2]
+	if !strings.Contains(row[3], "[tg://table?x=1&amp;y=2]") {
+		t.Fatalf("table link missing or entity decoding changed: %#v", row)
+	}
+	if strings.Contains(snapshot.Sections["sendmessage"].Body, "tg://table") {
+		t.Fatalf("table link leaked into section prose: %q", snapshot.Sections["sendmessage"].Body)
+	}
+}
+
 func TestSnapshotPreservesLinkDestinations(t *testing.T) {
 	first, err := SnapshotHTML(fixtureDocument(`<a href="tg://first">link</a>`, ""))
 	if err != nil {

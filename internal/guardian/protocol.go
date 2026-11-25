@@ -523,9 +523,14 @@ func (p *documentParser) handleStartTag(tag string, attrs map[string]string) {
 	}
 	if tag == "a" && !p.heading {
 		if href := attrs["href"]; href != "" {
-			// HTMLParser decodes attribute entities once before the original
-			// implementation appends the link marker as already-decoded text.
-			p.current.body = append(p.current.body, " ["+href+"] ")
+			// HTMLParser decodes attribute entities once, then routes this marker
+			// through handle_data. Preserve that routing without decoding twice.
+			marker := " [" + href + "] "
+			if p.cell != nil {
+				p.cell = append(p.cell, marker)
+			} else if p.table == 0 {
+				p.current.body = append(p.current.body, marker)
+			}
 		}
 	}
 }
