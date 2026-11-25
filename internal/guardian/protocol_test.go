@@ -42,6 +42,17 @@ func TestSnapshotIgnoresHTMLPresentationAndWhitespace(t *testing.T) {
 	}
 }
 
+func TestSnapshotDecodesLinkAttributeEntitiesExactlyOnce(t *testing.T) {
+	snapshot, err := SnapshotHTML(fixtureDocument(`<a href="tg://first?x=1&amp;amp;y=2">link</a>`, ""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	body := snapshot.Sections["sendmessage"].Body
+	if !strings.Contains(body, "[tg://first?x=1&amp;y=2]") {
+		t.Fatalf("link attribute entities were decoded differently from HTMLParser: %q", body)
+	}
+}
+
 func TestSnapshotPreservesLinkDestinations(t *testing.T) {
 	first, err := SnapshotHTML(fixtureDocument(`<a href="tg://first">link</a>`, ""))
 	if err != nil {

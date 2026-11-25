@@ -523,7 +523,9 @@ func (p *documentParser) handleStartTag(tag string, attrs map[string]string) {
 	}
 	if tag == "a" && !p.heading {
 		if href := attrs["href"]; href != "" {
-			p.handleData(" [" + href + "] ")
+			// HTMLParser decodes attribute entities once before the original
+			// implementation appends the link marker as already-decoded text.
+			p.current.body = append(p.current.body, " ["+href+"] ")
 		}
 	}
 }
