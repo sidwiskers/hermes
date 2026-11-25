@@ -15,9 +15,9 @@ import (
 
 func TestAutomaticCandidateRequiresAllGatesAndGeneratedFiles(t *testing.T) {
 	report := map[string]any{
-		"status": "ready",
+		"status":     "ready",
 		"mechanical": true,
-		"parity": true,
+		"parity":     true,
 		"validation": map[string]any{"passed": true},
 	}
 	generated := []publicationChange{{Path: "types/zz_botapi_generated.go"}}
@@ -52,7 +52,7 @@ func TestHealthPausedNeverRequiresOrCallsGitHub(t *testing.T) {
 	root := t.TempDir()
 	controller := &Controller{
 		Root: root,
-		Out: filepath.Join(root, ".guardian"),
+		Out:  filepath.Join(root, ".guardian"),
 		Env: func(key string) string {
 			if key == "GUARDIAN_MODE" {
 				return "paused"
@@ -77,7 +77,7 @@ func TestPreparePausedRemovesStalePublicationBundle(t *testing.T) {
 	initGuardianGit(t, root, map[string]string{"README.md": "baseline"})
 	controller := &Controller{
 		Root: root,
-		Out: filepath.Join(root, ".guardian"),
+		Out:  filepath.Join(root, ".guardian"),
 		Work: filepath.Join(root, ".guardian", "work"),
 		Env: func(key string) string {
 			if key == "GUARDIAN_MODE" {
@@ -107,12 +107,12 @@ func TestPreparePausedRemovesStalePublicationBundle(t *testing.T) {
 
 func TestSubprocessEnvironmentExcludesCredentials(t *testing.T) {
 	for key, value := range map[string]string{
-		"GH_TOKEN": "private",
-		"GITHUB_TOKEN": "private",
-		"GUARDIAN_KEY_1": "private",
+		"GH_TOKEN":              "private",
+		"GITHUB_TOKEN":          "private",
+		"GUARDIAN_KEY_1":        "private",
 		"ACTIONS_RUNTIME_TOKEN": "private",
-		"INPUT_TOKEN": "private",
-		"GUARDIAN_PROVIDERS": "private",
+		"INPUT_TOKEN":           "private",
+		"GUARDIAN_PROVIDERS":    "private",
 	} {
 		t.Setenv(key, value)
 	}
@@ -134,9 +134,9 @@ func TestSubprocessEnvironmentExcludesCredentials(t *testing.T) {
 func TestGitTreePathsProtectsOnlyExistingTests(t *testing.T) {
 	root := t.TempDir()
 	base := initGuardianGit(t, root, map[string]string{
-		"api/method.go": "package api",
+		"api/method.go":      "package api",
 		"api/method_test.go": "package api",
-		"README.md": "docs",
+		"README.md":          "docs",
 	})
 	controller := &Controller{Root: root}
 	protected, err := controller.gitTreePaths(base)
@@ -157,7 +157,7 @@ func TestGitTreePathsProtectsOnlyExistingTests(t *testing.T) {
 func TestScopeCheckPreservesExistingTestsButAllowsNewRegressionTests(t *testing.T) {
 	root := t.TempDir()
 	base := initGuardianGit(t, root, map[string]string{
-		"api/method.go": "package api",
+		"api/method.go":        "package api",
 		"api/existing_test.go": "package api",
 	})
 	controller := &Controller{Root: root}
@@ -280,9 +280,9 @@ func TestPublishRejectsConcurrentMainOrRepairChanges(t *testing.T) {
 	controller := &Controller{Root: root, Out: root}
 	bundle := map[string]any{
 		"report": map[string]any{
-			"status": "ready",
-			"branch": "automation/bot-api-10.4-aaaaaaaaaaaa",
-			"base": baseSHA,
+			"status":        "ready",
+			"branch":        "automation/bot-api-10.4-aaaaaaaaaaaa",
+			"base":          baseSHA,
 			"expected_head": changedSHA,
 		},
 		"changes": []any{},
