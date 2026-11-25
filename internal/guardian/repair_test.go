@@ -155,8 +155,10 @@ func TestCompletionRejectsRedirectAndDoesNotExposeResponseBody(t *testing.T) {
 	providerHTTPClientFactory = source.Client
 	t.Cleanup(func() { providerHTTPClientFactory = previousFactory })
 	provider := ProviderConfig{URL: source.URL, Model: "code", KeyEnv: "GUARDIAN_KEY_1"}
-	_, err := Completion(provider, []chatMessage{{Role:"user",Content:"test"}}, func(key string) string {
-		if key == "GUARDIAN_KEY_1" { return "secret" }
+	_, err := Completion(provider, []chatMessage{{Role: "user", Content: "test"}}, func(key string) string {
+		if key == "GUARDIAN_KEY_1" {
+			return "secret"
+		}
 		return ""
 	})
 	if err == nil || redirected {
@@ -186,14 +188,17 @@ func TestCompletionParsesJSONObjectAndRejectsInvalidCompletion(t *testing.T) {
 
 func TestRepairLoopFallbackAndLimits(t *testing.T) {
 	var calls int
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		calls++
 		_ = json.NewEncoder(w).Encode(map[string]any{"choices": []any{map[string]any{
 			"message": map[string]any{"content": `{"action":"done","summary":"finished"}`},
 		}}})
 	}))
 	defer server.Close()
-	raw, _ := json.Marshal([]ProviderConfig{{URL: server.URL, Model: "code", KeyEnv: "GUARDIAN_KEY_1"}})
+	previousFactory := providerHTTPClientFactory
+	providerHTTPClientFactory = server.Client
+	t.Cleanup(func() { providerHTTPClientFactory = previousFactory })
+	raw, _ := json.Marshal([]ProviderConfig{{URL: server.URL, Model: "code", KeyEnv: "GUARDIAN_KEY_1"}}
 	getenv := func(key string) string {
 		if key == "GUARDIAN_PROVIDERS" { return string(raw) }
 		if key == "GUARDIAN_KEY_1" { return "secret" }
