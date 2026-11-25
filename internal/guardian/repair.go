@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -39,7 +40,7 @@ type FileEdit struct {
 // Existing regression tests, integrations, generated sources, manifests,
 // release controls, dependencies and workflow files are never editable.
 func AllowedRepairPath(name string, existing bool) bool {
-	if name == "" || filepath.IsAbs(name) || filepath.ToSlash(filepath.Clean(name)) != name {
+	if name == "" || strings.Contains(name, "\\") || path.IsAbs(name) || path.Clean(name) != name || filepath.IsAbs(filepath.FromSlash(name)) {
 		return false
 	}
 	parts := strings.Split(name, "/")
@@ -51,11 +52,11 @@ func AllowedRepairPath(name string, existing bool) bool {
 	if existing && (strings.HasSuffix(name, "_test.go") || strings.HasPrefix(name, "integration/")) {
 		return false
 	}
-	base := filepath.Base(name)
+	base := parts[len(parts)-1]
 	if strings.HasPrefix(base, "zz_") || base == "doc.go" {
 		return false
 	}
-	ext := filepath.Ext(name)
+	ext := path.Ext(name)
 	if ext == ".go" {
 		if len(parts) == 1 {
 			return true
@@ -73,14 +74,14 @@ func AllowedRepairPath(name string, existing bool) bool {
 // SafeRepairPath checks lexical traversal, repository containment and every
 // existing path component for symlinks before returning the target path.
 func SafeRepairPath(root, name string) (string, error) {
-	if name == "" || filepath.IsAbs(name) {
+	if name == "" || strings.Contains(name, "\\") || path.IsAbs(name) || filepath.IsAbs(filepath.FromSlash(name)) {
 		return "", ErrInvalidRepairPath
 	}
-	clean := filepath.Clean(name)
-	if clean == "." || clean != name || strings.HasPrefix(clean, ".."+string(filepath.Separator)) || clean == ".." {
+	cleanSlash := path.Clean(name)
+	if cleanSlash == "." || cleanSlash != name || strings.HasPrefix(cleanSlash, "../") || cleanSlash == ".." {
 		return "", ErrInvalidRepairPath
 	}
-	for _, part := range strings.Split(filepath.ToSlash(clean), "/") {
+	for _, part := range strings.Split(cleanSlash, "/") {
 		if part == "" || strings.HasPrefix(part, ".") || part == ".." {
 			return "", ErrInvalidRepairPath
 		}
@@ -89,7 +90,7 @@ func SafeRepairPath(root, name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	target := filepath.Join(rootAbs, clean)
+	target := filepath.Join(rootAbs, filepath.FromSlash(cleanSlash))
 	rel, err := filepath.Rel(rootAbs, target)
 	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
 		return "", ErrInvalidRepairPath
