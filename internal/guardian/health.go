@@ -10,6 +10,9 @@ import (
 )
 
 func (controller *Controller) github() (*GitHubClient, error) {
+	if controller.API != nil {
+		return controller.API, nil
+	}
 	repository := controller.getenv("GITHUB_REPOSITORY")
 	token := controller.getenv("GH_TOKEN")
 	if token == "" {

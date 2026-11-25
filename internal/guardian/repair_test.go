@@ -36,6 +36,22 @@ func TestAllowedRepairPath(t *testing.T) {
 	}
 }
 
+func TestApplyRepairEditsAgentCanCorrectItsOwnNewTests(t *testing.T) {
+	root := t.TempDir()
+	name := "api/new_test.go"
+	content := "package api\\n// first"
+	if _, err := ApplyRepairEdits(root, []FileEdit{{Path: name, Content: &content}}, map[string]struct{}{}); err != nil {
+		t.Fatal(err)
+	}
+	oldText, newText := "first", "fixed"
+	if _, err := ApplyRepairEdits(root, []FileEdit{{Path: name, Old: &oldText, New: &newText}}, map[string]struct{}{}); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(mustRead(t, filepath.Join(root, name))), "fixed") {
+		t.Fatal("agent could not correct its newly-created test")
+	}
+}
+
 func TestApplyRepairEditsExactAndAtomicValidation(t *testing.T) {
 	root := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(root, "api"), 0o755); err != nil {
@@ -104,7 +120,7 @@ func TestSafeRepairPathRejectsTraversalAndSymlinks(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := os.Symlink(filepath.Join(target, "real.go"), filepath.Join(target, "link.go")); err != nil {
-		t.Fatal(err)
+		t.Skipf("symlink creation is unavailable: %v", err)
 	}
 	if _, err := SafeRepairPath(root, "api/link.go"); err == nil {
 		t.Fatal("symlink was accepted")

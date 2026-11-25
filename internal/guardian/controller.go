@@ -42,6 +42,7 @@ type Controller struct {
 	Out  string
 	Work string
 	Env  func(string) string
+	API  *GitHubClient
 }
 
 func NewController(root string) (*Controller, error) {
