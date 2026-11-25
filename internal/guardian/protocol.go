@@ -63,8 +63,8 @@ func CanonicalJSON(value any) ([]byte, error) {
 		return nil, err
 	}
 	canonical := bytes.TrimSuffix(buffer.Bytes(), []byte("\n"))
-	canonical = bytes.ReplaceAll(canonical, []byte(`\\u2028`), []byte("\u2028"))
-	canonical = bytes.ReplaceAll(canonical, []byte(`\\u2029`), []byte("\u2029"))
+	canonical = bytes.ReplaceAll(canonical, []byte(`\u2028`), []byte("\u2028"))
+	canonical = bytes.ReplaceAll(canonical, []byte(`\u2029`), []byte("\u2029"))
 	return canonical, nil
 }
 

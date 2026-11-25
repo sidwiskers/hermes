@@ -192,8 +192,8 @@ func writeJSONFile(path string, value any) error {
 	if err := encoder.Encode(value); err != nil {
 		return err
 	}
-	data := bytes.ReplaceAll(buffer.Bytes(), []byte(`\\u2028`), []byte("\u2028"))
-	data = bytes.ReplaceAll(data, []byte(`\\u2029`), []byte("\u2029"))
+	data := bytes.ReplaceAll(buffer.Bytes(), []byte(`\u2028`), []byte("\u2028"))
+	data = bytes.ReplaceAll(data, []byte(`\u2029`), []byte("\u2029"))
 	return writeFileAtomic(path, data, 0o644)
 }
 
