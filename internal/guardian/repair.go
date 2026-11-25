@@ -16,14 +16,14 @@ import (
 )
 
 const (
-	MaxRepairFile = 160_000
-	MaxRepairReply = 512_000
+	MaxRepairFile    = 160_000
+	MaxRepairReply   = 512_000
 	maxRepairContext = 700_000
 )
 
 var (
 	ErrInvalidRepairPath = errors.New("guardian: invalid repair path")
-	ErrProtectedFile = errors.New("guardian: protected file")
+	ErrProtectedFile     = errors.New("guardian: protected file")
 )
 
 // FileEdit is either an exact one-time text replacement or creation of a new
@@ -293,7 +293,20 @@ type chatResponse struct {
 
 // Completion performs one provider request. Redirects and raw provider errors
 // are never surfaced because they could leak Authorization headers or secrets.
+var providerHTTPClientFactory = func() *http.Client {
+	return &http.Client{
+		Timeout: 90 * time.Second,
+		CheckRedirect: func(*http.Request, []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+}
+
 func Completion(provider ProviderConfig, messages []chatMessage, getenv func(string) string) (map[string]any, error) {
+	parsed, parseErr := url.Parse(provider.URL)
+	if parseErr != nil || parsed.Scheme != "https" || parsed.Hostname() == "" || parsed.User != nil || parsed.RawQuery != "" {
+		return nil, fmt.Errorf("guardian: provider URL must be HTTPS without embedded credentials/query")
+	}
 	key := getenv(provider.KeyEnv)
 	if key == "" {
 		return nil, fmt.Errorf("guardian: provider key is not configured")
@@ -311,11 +324,9 @@ func Completion(provider ProviderConfig, messages []chatMessage, getenv func(str
 	}
 	request.Header.Set("Authorization", "Bearer "+key)
 	request.Header.Set("Content-Type", "application/json")
-	client := &http.Client{
-		Timeout: 90 * time.Second,
-		CheckRedirect: func(*http.Request, []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
+	client := providerHTTPClientFactory()
+	if client == nil {
+		return nil, fmt.Errorf("guardian: repair provider client is unavailable")
 	}
 	response, err := client.Do(request)
 	if err != nil {

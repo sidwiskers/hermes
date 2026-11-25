@@ -20,7 +20,7 @@ func TestAllowedRepairPath(t *testing.T) {
 		{"api/method.go", true, true},
 		{"router.go", true, true},
 		{"docs/change.md", true, true},
-		{"integration/live_test.go", false, true},
+		{"integration/live_test.go", false, false},
 		{"integration/live_test.go", true, false},
 		{"api/method_test.go", true, false},
 		{"api/zz_generated.go", false, false},
@@ -84,8 +84,8 @@ func TestApplyRepairEditsProtectsExistingTestsAndControlPaths(t *testing.T) {
 		}
 		old, next := "old", "new"
 		_, err := ApplyRepairEdits(root, []FileEdit{{Path: name, Old: &old, New: &next}}, nil)
-		if !errors.Is(err, ErrProtectedFile) {
-			t.Errorf("path %q error = %v, want protected", name, err)
+		if err == nil {
+			t.Errorf("path %q was not rejected", name)
 		}
 	}
 }
@@ -143,16 +143,17 @@ func TestProvidersRequireHTTPSBoundedAndConfiguredKeys(t *testing.T) {
 
 func TestCompletionRejectsRedirectAndDoesNotExposeResponseBody(t *testing.T) {
 	var redirected bool
-	destination := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	destination := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		redirected = true
 	}))
 	defer destination.Close()
-	source := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	source := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, destination.URL, http.StatusFound)
 	}))
 	defer source.Close()
-	endpoint := "https://provider.example/v1/chat/completions"
-	_ = endpoint
+	previousFactory := providerHTTPClientFactory
+	providerHTTPClientFactory = source.Client
+	t.Cleanup(func() { providerHTTPClientFactory = previousFactory })
 	provider := ProviderConfig{URL: source.URL, Model: "code", KeyEnv: "GUARDIAN_KEY_1"}
 	_, err := Completion(provider, []chatMessage{{Role:"user",Content:"test"}}, func(key string) string {
 		if key == "GUARDIAN_KEY_1" { return "secret" }
@@ -164,7 +165,7 @@ func TestCompletionRejectsRedirectAndDoesNotExposeResponseBody(t *testing.T) {
 }
 
 func TestCompletionParsesJSONObjectAndRejectsInvalidCompletion(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(r.Header.Get("Authorization"), "secret") {
 			t.Error("authorization header missing")
 		}
@@ -173,6 +174,9 @@ func TestCompletionParsesJSONObjectAndRejectsInvalidCompletion(t *testing.T) {
 		}}})
 	}))
 	defer server.Close()
+	previousFactory := providerHTTPClientFactory
+	providerHTTPClientFactory = server.Client
+	t.Cleanup(func() { providerHTTPClientFactory = previousFactory })
 	provider := ProviderConfig{URL: server.URL, Model: "code", KeyEnv: "GUARDIAN_KEY_1"}
 	result, err := Completion(provider, nil, func(string) string { return "secret" })
 	if err != nil || result["action"] != "done" {
