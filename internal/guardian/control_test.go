@@ -184,6 +184,25 @@ func TestScopeCheckPreservesExistingTestsButAllowsNewRegressionTests(t *testing.
 	}
 }
 
+func TestScopeCheckRejectsSymlinkedParentDirectory(t *testing.T) {
+	root := t.TempDir()
+	base := initGuardianGit(t, root, map[string]string{"api/method.go": "package api"})
+	outside := t.TempDir()
+	if err := os.WriteFile(filepath.Join(outside, "method.go"), []byte("package api\\n// changed"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.RemoveAll(filepath.Join(root, "api")); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(outside, filepath.Join(root, "api")); err != nil {
+		t.Skipf("symlink creation is unavailable: %v", err)
+	}
+	controller := &Controller{Root: root}
+	if _, err := controller.scopeCheck(root, base); err == nil {
+		t.Fatal("scope check accepted a changed file through a symlinked parent")
+	}
+}
+
 func TestPublishReleaseNeverMovesExistingTag(t *testing.T) {
 	const existingSHA = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	calls := 0

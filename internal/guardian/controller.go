@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -290,6 +291,47 @@ func isGeneratedPath(name string) bool {
 	return ok
 }
 
+func safeRepositoryFile(root, name string) (string, error) {
+	if name == "" || strings.Contains(name, "\\\\") || path.IsAbs(name) ||
+		path.Clean(name) != name || name == "." || name == ".." || strings.HasPrefix(name, "../") {
+		return "", fmt.Errorf("guardian: candidate path is invalid")
+	}
+	rootAbs, err := filepath.Abs(root)
+	if err != nil {
+		return "", err
+	}
+	rootReal, err := filepath.EvalSymlinks(rootAbs)
+	if err != nil {
+		return "", err
+	}
+	current := rootReal
+	parts := strings.Split(name, "/")
+	for index, part := range parts {
+		if part == "" || part == "." || part == ".." {
+			return "", fmt.Errorf("guardian: candidate path is invalid")
+		}
+		current = filepath.Join(current, filepath.FromSlash(part))
+		info, err := os.Lstat(current)
+		if err != nil {
+			return "", err
+		}
+		if info.Mode()&os.ModeSymlink != 0 {
+			return "", fmt.Errorf("guardian: candidate path contains a symlink: %s", name)
+		}
+		if index < len(parts)-1 && !info.IsDir() {
+			return "", fmt.Errorf("guardian: candidate parent is not a directory: %s", name)
+		}
+		if index == len(parts)-1 && !info.Mode().IsRegular() {
+			return "", fmt.Errorf("guardian: candidate is not a regular file: %s", name)
+		}
+	}
+	rel, err := filepath.Rel(rootReal, current)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return "", fmt.Errorf("guardian: candidate path escapes repository")
+	}
+	return current, nil
+}
+
 func (controller *Controller) scopeCheck(root, base string) ([]string, error) {
 	changed, err := controller.runOK([]string{"git", "diff", "--name-only", base}, root, 120*time.Second)
 	if err != nil {
@@ -311,18 +353,17 @@ func (controller *Controller) scopeCheck(root, base string) ([]string, error) {
 		return nil, err
 	}
 	for name := range names {
-		path := filepath.Join(rootAbs, filepath.FromSlash(name))
 		existingResult := controller.runUnchecked([]string{"git", "cat-file", "-e", base + ":" + name}, root, 30*time.Second)
 		existed := existingResult.ExitCode == 0
 		if !isGeneratedPath(name) && !AllowedRepairPath(name, existed) {
 			return nil, fmt.Errorf("guardian: candidate modified protected file: %s", name)
 		}
-		rel, relErr := filepath.Rel(rootAbs, path)
-		if relErr != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
-			return nil, fmt.Errorf("guardian: candidate path escapes repository")
+		filePath, pathErr := safeRepositoryFile(rootAbs, name)
+		if pathErr != nil {
+			return nil, fmt.Errorf("guardian: candidate deleted or replaced a file: %s", name)
 		}
-		info, statErr := os.Lstat(path)
-		if statErr != nil || !info.Mode().IsRegular() || info.Mode()&os.ModeSymlink != 0 {
+		info, statErr := os.Stat(filePath)
+		if statErr != nil {
 			return nil, fmt.Errorf("guardian: candidate deleted or replaced a file: %s", name)
 		}
 		if info.Size() > 2_000_000 {
