@@ -23,17 +23,17 @@ var (
 )
 
 var generatedPaths = map[string]struct{}{
-	"spec/bot-api.json": {},
-	"spec/bot-api-semantics.json": {},
-	"spec/api-surface.txt": {},
-	"types/zz_botapi_generated.go": {},
+	"spec/bot-api.json":                  {},
+	"spec/bot-api-semantics.json":        {},
+	"spec/api-surface.txt":               {},
+	"types/zz_botapi_generated.go":       {},
 	"api/zz_botapi_aliases_generated.go": {},
-	"zz_botapi_aliases_generated.go": {},
-	".github/guardian/update.json": {},
-	"CHANGELOG.md": {},
-	"README.md": {},
-	"docs/schema-parity.md": {},
-	"api/client.go": {},
+	"zz_botapi_aliases_generated.go":     {},
+	".github/guardian/update.json":       {},
+	"CHANGELOG.md":                       {},
+	"README.md":                          {},
+	"docs/schema-parity.md":              {},
+	"api/client.go":                      {},
 }
 
 // Controller owns one repository-scoped Guardian run.

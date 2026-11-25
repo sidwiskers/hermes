@@ -131,7 +131,9 @@ func TestProvidersRequireHTTPSBoundedAndConfiguredKeys(t *testing.T) {
 	for _, endpoint := range []string{"http://provider.example/api", "https://user:pass@provider.example/api", "https://provider.example/api?key=x"} {
 		invalid, _ := json.Marshal([]ProviderConfig{{URL: endpoint, Model: "code", KeyEnv: "GUARDIAN_KEY_1"}})
 		_, err := ProvidersFromEnvironment(func(key string) string {
-			if key == "GUARDIAN_PROVIDERS" { return string(invalid) }
+			if key == "GUARDIAN_PROVIDERS" {
+				return string(invalid)
+			}
 			return "secret"
 		})
 		if err == nil {

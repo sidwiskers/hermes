@@ -392,10 +392,10 @@ func (controller *Controller) ReleaseCheck() error {
 		return fmt.Errorf("guardian: release validation failed:\n%s", result.Output)
 	}
 	report := map[string]any{
-		"status": "release_verified",
-		"base": strings.TrimSpace(shaOutput),
-		"release": "v" + string(versionLine[1]),
-		"message": "Current main passed release validation.",
+		"status":     "release_verified",
+		"base":       strings.TrimSpace(shaOutput),
+		"release":    "v" + string(versionLine[1]),
+		"message":    "Current main passed release validation.",
 		"validation": result,
 	}
 	if err := writeJSONFile(filepath.Join(controller.Out, "release.json"), report); err != nil {

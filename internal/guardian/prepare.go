@@ -296,12 +296,12 @@ func (controller *Controller) Prepare(source string, retry bool) error {
 		}
 	}
 	evidence := map[string]any{
-		"diff": diff,
-		"semantic_reasons": reasons,
+		"diff":                  diff,
+		"semantic_reasons":      reasons,
 		"release_announcements": semantics.Announcements,
-		"official_sections": changedSections,
-		"previous_review": previousState["review"],
-		"previous_validation": previousState["validation"],
+		"official_sections":     changedSections,
+		"previous_review":       previousState["review"],
+		"previous_validation":   previousState["validation"],
 	}
 	if data, err := os.ReadFile(filepath.Join(controller.Out, "audit.json")); err == nil {
 		var audit any
