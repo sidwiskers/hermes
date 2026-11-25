@@ -305,10 +305,26 @@ type documentParser struct {
 	row      []string
 	cell     []string
 	skip     int
+	rawTag   string
+	err      error
 }
 
 func (p *documentParser) feed(data []byte) error {
 	for len(data) > 0 {
+		if p.err != nil {
+			return p.err
+		}
+		if p.rawTag != "" {
+			closing := []byte("</" + p.rawTag)
+			index := bytes.Index(bytes.ToLower(data), closing)
+			if index < 0 {
+				p.handleData(string(data))
+				break
+			}
+			p.handleData(string(data[:index]))
+			data = data[index:]
+			p.rawTag = ""
+		}
 		open := bytes.IndexByte(data, '<')
 		if open < 0 {
 			p.handleData(string(data))
@@ -459,6 +475,7 @@ func isHTMLSpaceRune(value rune) bool {
 func (p *documentParser) handleStartTag(tag string, attrs map[string]string) {
 	if tag == "script" || tag == "style" {
 		p.skip++
+		p.rawTag = tag
 	}
 	if isHeading(tag) {
 		p.current = nil
@@ -469,7 +486,7 @@ func (p *documentParser) handleStartTag(tag string, attrs map[string]string) {
 			if _, exists := p.sections[anchor]; exists {
 				// Duplicate anchors are rejected by the scanner before a snapshot
 				// can be used as release evidence.
-				p.skip = -1
+				p.err = fmt.Errorf("guardian: duplicate documentation anchor %q", anchor)
 				return
 			}
 			section := &sectionBuilder{rows: make([][]string, 0)}
