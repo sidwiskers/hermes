@@ -144,6 +144,7 @@ type (
 	InputProfilePhotoStatic                 = api.InputProfilePhotoStatic
 	InputProfilePhotoAnimated               = api.InputProfilePhotoAnimated
 	SetMyProfilePhotoParams                 = api.SetMyProfilePhotoParams
+	SetMySettingsParams                     = api.SetMySettingsParams
 	ReadBusinessMessageParams               = api.ReadBusinessMessageParams
 	DeleteBusinessMessagesParams            = api.DeleteBusinessMessagesParams
 	SetBusinessAccountNameParams            = api.SetBusinessAccountNameParams

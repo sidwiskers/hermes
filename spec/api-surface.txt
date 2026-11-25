@@ -84,6 +84,7 @@ type BotCommandScopeChatAdministrators = github.com/sidwiskers/hermes/api.BotCom
 type BotCommandScopeChatMember = github.com/sidwiskers/hermes/api.BotCommandScopeChatMember
 type BotCommandScopeDefault = github.com/sidwiskers/hermes/api.BotCommandScopeDefault
 type BotDescription = github.com/sidwiskers/hermes/types.BotDescription
+type BotFullInfo = github.com/sidwiskers/hermes/types.BotFullInfo
 type BotName = github.com/sidwiskers/hermes/types.BotName
 type BotShortDescription = github.com/sidwiskers/hermes/types.BotShortDescription
 type BotSubscriptionUpdated = github.com/sidwiskers/hermes/types.BotSubscriptionUpdated
@@ -679,6 +680,7 @@ type SetMyDefaultAdministratorRightsParams = github.com/sidwiskers/hermes/api.Se
 type SetMyDescriptionParams = github.com/sidwiskers/hermes/api.SetMyDescriptionParams
 type SetMyNameParams = github.com/sidwiskers/hermes/api.SetMyNameParams
 type SetMyProfilePhotoParams = github.com/sidwiskers/hermes/api.SetMyProfilePhotoParams
+type SetMySettingsParams = github.com/sidwiskers/hermes/api.SetMySettingsParams
 type SetMyShortDescriptionParams = github.com/sidwiskers/hermes/api.SetMyShortDescriptionParams
 type SetPassportDataErrorsParams = github.com/sidwiskers/hermes/api.SetPassportDataErrorsParams
 type SetStickerEmojiListParams = github.com/sidwiskers/hermes/api.SetStickerEmojiListParams
@@ -914,6 +916,7 @@ type BotCommandScopeChatAdministrators struct{Type string `json:"type"`; ChatID 
 type BotCommandScopeChatMember struct{Type string `json:"type"`; ChatID any `json:"chat_id"`; UserID int64 `json:"user_id"`}
 type BotCommandScopeDefault struct{Type string `json:"type"`}
 type BotDescription = github.com/sidwiskers/hermes/types.BotDescription
+type BotFullInfo = github.com/sidwiskers/hermes/types.BotFullInfo
 type BotName = github.com/sidwiskers/hermes/types.BotName
 type BotShortDescription = github.com/sidwiskers/hermes/types.BotShortDescription
 type BotSubscriptionUpdated = github.com/sidwiskers/hermes/types.BotSubscriptionUpdated
@@ -1065,7 +1068,7 @@ method (*Client) GetForumTopicIconStickers(ctx context.Context) ([]Sticker, erro
 method (*Client) GetGameHighScores(ctx context.Context, params GetGameHighScoresParams) ([]GameHighScore, error)
 method (*Client) GetManagedBotAccessSettings(ctx context.Context, params ManagedBotParams) (BotAccessSettings, error)
 method (*Client) GetManagedBotToken(ctx context.Context, params ManagedBotParams) (string, error)
-method (*Client) GetMe(ctx context.Context) (*User, error)
+method (*Client) GetMe(ctx context.Context) (*BotFullInfo, error)
 method (*Client) GetMyCommands(ctx context.Context, params GetMyCommandsParams) ([]BotCommand, error)
 method (*Client) GetMyDefaultAdministratorRights(ctx context.Context, params GetMyDefaultAdministratorRightsParams) (ChatAdministratorRights, error)
 method (*Client) GetMyDescription(ctx context.Context, params GetMyDescriptionParams) (BotDescription, error)
@@ -1170,6 +1173,7 @@ method (*Client) SetMyDefaultAdministratorRights(ctx context.Context, params Set
 method (*Client) SetMyDescription(ctx context.Context, params SetMyDescriptionParams) error
 method (*Client) SetMyName(ctx context.Context, params SetMyNameParams) error
 method (*Client) SetMyProfilePhoto(ctx context.Context, params SetMyProfilePhotoParams, uploads ...Upload) error
+method (*Client) SetMySettings(ctx context.Context, params SetMySettingsParams) error
 method (*Client) SetMyShortDescription(ctx context.Context, params SetMyShortDescriptionParams) error
 method (*Client) SetPassportDataErrors(ctx context.Context, params SetPassportDataErrorsParams) error
 method (*Client) SetStickerEmojiList(ctx context.Context, params SetStickerEmojiListParams) error
@@ -1218,7 +1222,7 @@ const DefaultBaseURL untyped string = "https://api.telegram.org"
 func DefaultCommandScope() BotCommandScopeDefault
 func DefaultMenuButton() MenuButton
 const DefaultResponseLimit untyped int = 33554432
-const DefaultUserAgent untyped string = "hermes-go/1.4.0"
+const DefaultUserAgent untyped string = "hermes-go/1.5.0"
 type DeleteAllMessageReactionsParams struct{ChatID any `json:"chat_id"`; UserID int64 `json:"user_id,omitempty"`; ActorChatID int64 `json:"actor_chat_id,omitempty"`}
 type DeleteBusinessAccountGiftParams struct{BusinessConnectionID string `json:"business_connection_id"`; OwnedGiftID string `json:"owned_gift_id"`}
 type DeleteBusinessMessagesParams struct{BusinessConnectionID string `json:"business_connection_id"`; MessageIDs []int `json:"message_ids"`}
@@ -1418,7 +1422,7 @@ type InputRichBlockDivider struct{}
 method (InputRichBlockDivider) MarshalJSON() ([]byte, error)
 type InputRichBlockDocument struct{Document InputMediaDocument `json:"document"`; Caption *RichBlockCaption `json:"caption,omitempty"`}
 method (InputRichBlockDocument) MarshalJSON() ([]byte, error)
-type InputRichBlockExpandableBlockQuotation struct{Text RichText `json:"text"`; Credit RichText `json:"credit,omitempty"`}
+type InputRichBlockExpandableBlockQuotation struct{Blocks []InputRichBlock `json:"blocks"`; Credit RichText `json:"credit,omitempty"`}
 method (InputRichBlockExpandableBlockQuotation) MarshalJSON() ([]byte, error)
 type InputRichBlockFooter struct{Text RichText `json:"text"`}
 method (InputRichBlockFooter) MarshalJSON() ([]byte, error)
@@ -1710,6 +1714,7 @@ type SetMyDefaultAdministratorRightsParams struct{Rights *ChatAdministratorRight
 type SetMyDescriptionParams struct{Description string `json:"description,omitempty"`; LanguageCode string `json:"language_code,omitempty"`}
 type SetMyNameParams struct{Name string `json:"name,omitempty"`; LanguageCode string `json:"language_code,omitempty"`}
 type SetMyProfilePhotoParams struct{Photo InputProfilePhoto `json:"photo"`}
+type SetMySettingsParams struct{SupportsInlineQueries *bool `json:"supports_inline_queries,omitempty"`; InlineQueryPlaceholder *string `json:"inline_query_placeholder,omitempty"`; NeedsInlineQueryLocation *bool `json:"needs_inline_query_location,omitempty"`; InlineFeedbackShareDenominator *int `json:"inline_feedback_share_denominator,omitempty"`; CanJoinGroups *bool `json:"can_join_groups,omitempty"`; CanReadAllGroupMessages *bool `json:"can_read_all_group_messages,omitempty"`; CanConnectToBusiness *bool `json:"can_connect_to_business,omitempty"`; CanManageBots *bool `json:"can_manage_bots,omitempty"`; SupportsGuestQueries *bool `json:"supports_guest_queries,omitempty"`; SupportsJoinRequestQueries *bool `json:"supports_join_request_queries,omitempty"`; HasTopicsEnabled *bool `json:"has_topics_enabled,omitempty"`; AllowsUsersToCreateTopics *bool `json:"allows_users_to_create_topics,omitempty"`; HasTopicSidebar *bool `json:"has_topic_sidebar,omitempty"`; CanCommunicateWithBots *bool `json:"can_communicate_with_bots,omitempty"`; CallbackQueryMode *string `json:"callback_query_mode,omitempty"`}
 type SetMyShortDescriptionParams struct{ShortDescription string `json:"short_description,omitempty"`; LanguageCode string `json:"language_code,omitempty"`}
 type SetPassportDataErrorsParams struct{UserID int64 `json:"user_id"`; Errors []PassportElementError `json:"errors"`}
 type SetStickerEmojiListParams struct{Sticker string `json:"sticker"`; EmojiList []string `json:"emoji_list"`}
@@ -2278,6 +2283,7 @@ type Birthdate struct{Day int `json:"day"`; Month int `json:"month"`; Year int `
 type BotAccessSettings struct{IsAccessRestricted bool `json:"is_access_restricted"`; AddedUsers []User `json:"added_users,omitempty"`}
 type BotCommand struct{Command string `json:"command"`; Description string `json:"description"`; IsEphemeral bool `json:"is_ephemeral,omitempty"`}
 type BotDescription struct{Description string `json:"description"`}
+type BotFullInfo struct{ID int64 `json:"id"`; IsBot bool `json:"is_bot"`; FirstName string `json:"first_name"`; Username string `json:"username,omitempty"`; ActiveUsernames []string `json:"active_usernames,omitempty"`; CanJoinGroups bool `json:"can_join_groups"`; CanReadAllGroupMessages bool `json:"can_read_all_group_messages"`; SupportsGuestQueries bool `json:"supports_guest_queries"`; SupportsInlineQueries bool `json:"supports_inline_queries"`; InlineQueryPlaceholder string `json:"inline_query_placeholder,omitempty"`; NeedsInlineQueryLocation bool `json:"needs_inline_query_location"`; CanConnectToBusiness bool `json:"can_connect_to_business"`; HasMainWebApp bool `json:"has_main_web_app"`; HasTopicsEnabled bool `json:"has_topics_enabled"`; AllowsUsersToCreateTopics bool `json:"allows_users_to_create_topics"`; HasTopicSidebar bool `json:"has_topic_sidebar"`; CanManageBots bool `json:"can_manage_bots"`; SupportsJoinRequestQueries bool `json:"supports_join_request_queries"`}
 type BotName struct{Name string `json:"name"`}
 type BotShortDescription struct{ShortDescription string `json:"short_description"`}
 type BotSubscriptionUpdated struct{User User `json:"user"`; InvoicePayload string `json:"invoice_payload"`; State string `json:"state"`}
@@ -2662,7 +2668,7 @@ type RichBlockCollage struct{Type string `json:"type"`; Blocks []RichBlock `json
 type RichBlockDetails struct{Type string `json:"type"`; Summary RichText `json:"summary"`; Blocks []RichBlock `json:"blocks"`; IsOpen bool `json:"is_open,omitempty"`}
 type RichBlockDivider struct{Type string `json:"type"`}
 type RichBlockDocument struct{Type string `json:"type"`; Document Document `json:"document"`; Caption *RichBlockCaption `json:"caption,omitempty"`}
-type RichBlockExpandableBlockQuotation struct{Type string `json:"type"`; Text RichText `json:"text"`; Credit *RichText `json:"credit,omitempty"`}
+type RichBlockExpandableBlockQuotation struct{Type string `json:"type"`; Blocks []RichBlock `json:"blocks"`; Credit *RichText `json:"credit,omitempty"`}
 type RichBlockFooter struct{Type string `json:"type"`; Text RichText `json:"text"`}
 type RichBlockList struct{Type string `json:"type"`; Items []RichBlockListItem `json:"items"`}
 type RichBlockListItem struct{RichBlockListItemBotAPIFields; Blocks []RichBlock `json:"blocks"`; HasCheckbox bool `json:"has_checkbox,omitempty"`; IsChecked bool `json:"is_checked,omitempty"`; Value int `json:"value,omitempty"`; Type string `json:"type,omitempty"`}
@@ -2838,7 +2844,7 @@ const UpdateSubscription UpdateType = "subscription"
 type UpdateType string
 const UpdateUnknown UpdateType = "unknown"
 const UpdateWidgetQuery UpdateType = "widget_query"
-type User struct{ID int64 `json:"id"`; IsBot bool `json:"is_bot"`; FirstName string `json:"first_name"`; LastName string `json:"last_name,omitempty"`; Username string `json:"username,omitempty"`; LanguageCode string `json:"language_code,omitempty"`; IsPremium bool `json:"is_premium,omitempty"`; AddedToAttachmentMenu bool `json:"added_to_attachment_menu,omitempty"`; CanJoinGroups bool `json:"can_join_groups,omitempty"`; CanReadAllGroupMessages bool `json:"can_read_all_group_messages,omitempty"`; SupportsGuestQueries bool `json:"supports_guest_queries,omitempty"`; SupportsInlineQueries bool `json:"supports_inline_queries,omitempty"`; CanConnectToBusiness bool `json:"can_connect_to_business,omitempty"`; HasMainWebApp bool `json:"has_main_web_app,omitempty"`; HasTopicsEnabled bool `json:"has_topics_enabled,omitempty"`; AllowsUsersToCreateTopics bool `json:"allows_users_to_create_topics,omitempty"`; CanManageBots bool `json:"can_manage_bots,omitempty"`; SupportsJoinRequestQueries bool `json:"supports_join_request_queries,omitempty"`}
+type User struct{ID int64 `json:"id"`; IsBot bool `json:"is_bot"`; FirstName string `json:"first_name"`; LastName string `json:"last_name,omitempty"`; Username string `json:"username,omitempty"`; LanguageCode string `json:"language_code,omitempty"`; IsPremium bool `json:"is_premium,omitempty"`; AddedToAttachmentMenu bool `json:"added_to_attachment_menu,omitempty"`}
 type UserChatBoosts struct{Boosts []ChatBoost `json:"boosts"`}
 type UserProfileAudios struct{TotalCount int `json:"total_count"`; Audios []Audio `json:"audios"`}
 type UserProfilePhotos struct{TotalCount int `json:"total_count"`; Photos [][]PhotoSize `json:"photos"`}
@@ -2871,4 +2877,4 @@ method (WidgetQueryTypeSentTransaction) MarshalJSON() ([]byte, error)
 type WidgetQueryTypeSignData struct{Type string `json:"type"`; Wallet WidgetQueryWallet `json:"wallet"`; SignData string `json:"sign_data"`}
 method (WidgetQueryTypeSignData) MarshalJSON() ([]byte, error)
 type WidgetQueryWallet struct{Address string `json:"address"`; Amount string `json:"amount"`; PublicKey string `json:"public_key,omitempty"`; StateInit string `json:"state_init,omitempty"`}
-type WriteAccessAllowed struct{FromRequest bool `json:"from_request,omitempty"`; WebAppName string `json:"web_app_name,omitempty"`; FromAttachmentMenu bool `json:"from_attachment_menu,omitempty"`}
+type WriteAccessAllowed struct{FromRequest bool `json:"from_request,omitempty"`; WebAppName string `json:"web_app_name,omitempty"`; FromAttachmentMenu bool `json:"from_attachment_menu,omitempty"`; Inviter *User `json:"inviter,omitempty"`}

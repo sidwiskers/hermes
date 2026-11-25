@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.5.0 - 2026-11-25
+
+### Telegram Bot API 10.5
+
+- Update the checked-in official schema to Bot API 10.5 (2026-11-22):
+  194 methods, 997 method parameters, 397 objects, 1,992 object fields,
+  29 union roots, and 204 union variants.
+- Add typed `SetMySettings` support for all 15 settings. Pointer fields
+  preserve explicit false, zero, and empty-string updates; invalid feedback
+  denominators and callback modes are rejected before transport.
+- Return `BotFullInfo` from `GetMe`, move bot-only fields out of `User`,
+  and add the owner inviter field on `WriteAccessAllowed`.
+- Support nested block content in expandable rich-message quotations in both
+  requests and responses, and document callback-query mode handling.
+- Add focused request, response-decoding, and validation regression tests.
+
 ## 1.4.0 - 2026-11-10
 
 ### Telegram Bot API 10.4

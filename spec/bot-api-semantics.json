@@ -113,7 +113,7 @@
         [
           "chosen_inline_result",
           "[#choseninlineresult] ChosenInlineResult",
-          "Optional . The result of an [#inline-mode] inline query that was chosen by a user and sent to their chat partner. Please see our documentation on the [/bots/inline#collecting-feedback] feedback collecting for details on how to enable these updates for your bot."
+          "Optional . The result of an [#inline-mode] inline query that was chosen by a user and sent to their chat partner. Please see our documentation on the [/bots/inline#collecting-feedback] feedback collecting for details on how to enable these updates for your bot. The updates can also be enabled using the parameter inline_feedback_share_denominator of the method [#setmysettings] setMySettings ."
         ],
         [
           "callback_query",
@@ -371,6 +371,107 @@
       "body": "All types used in the Bot API responses are represented as JSON-objects. It is safe to use 32-bit signed integers for storing all Integer fields unless otherwise noted. Optional fields may be not returned when irrelevant.",
       "rows": []
     },
+    "botfullinfo": {
+      "title": "BotFullInfo",
+      "body": "This object contains full information about the bot itself.",
+      "rows": [
+        [
+          "Field",
+          "Type",
+          "Description"
+        ],
+        [
+          "id",
+          "Integer",
+          "Unique identifier for this bot. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier."
+        ],
+        [
+          "is_bot",
+          "True",
+          "Always True"
+        ],
+        [
+          "first_name",
+          "String",
+          "Bot's first name"
+        ],
+        [
+          "username",
+          "String",
+          "Optional . Bot's username"
+        ],
+        [
+          "active_usernames",
+          "Array of String",
+          "Optional . If non-empty, the list of all [https://telegram.org/blog/topics-in-groups-collectible-usernames#collectible-usernames] active usernames of the bot"
+        ],
+        [
+          "can_join_groups",
+          "Boolean",
+          "True , if the bot can be added to groups"
+        ],
+        [
+          "can_read_all_group_messages",
+          "Boolean",
+          "True , if [/bots/features#privacy-mode] privacy mode is disabled for the bot"
+        ],
+        [
+          "supports_guest_queries",
+          "Boolean",
+          "True , if the bot supports guest queries from chats it is not a member of"
+        ],
+        [
+          "supports_inline_queries",
+          "Boolean",
+          "True , if the bot supports inline queries"
+        ],
+        [
+          "inline_query_placeholder",
+          "String",
+          "Optional . Placeholder for inline queries, which is shown in the input field after the bot's username; omitted if the default placeholder is used"
+        ],
+        [
+          "needs_inline_query_location",
+          "Boolean",
+          "True , if the bot requests the location of the user with every inline query"
+        ],
+        [
+          "can_connect_to_business",
+          "Boolean",
+          "True , if the bot can be connected to a user account to manage it"
+        ],
+        [
+          "has_main_web_app",
+          "Boolean",
+          "True , if the bot has a main Web App"
+        ],
+        [
+          "has_topics_enabled",
+          "Boolean",
+          "True , if the bot has forum topic mode enabled in private chats"
+        ],
+        [
+          "allows_users_to_create_topics",
+          "Boolean",
+          "True , if the bot allows users to create and delete topics in private chats"
+        ],
+        [
+          "has_topic_sidebar",
+          "Boolean",
+          "True , if topics in private chats with the bot are shown in a sidebar"
+        ],
+        [
+          "can_manage_bots",
+          "Boolean",
+          "True , if other bots can be created to be controlled by the bot"
+        ],
+        [
+          "supports_join_request_queries",
+          "Boolean",
+          "True , if the bot supports join request queries and can be assigned to process them"
+        ]
+      ]
+    },
     "user": {
       "title": "User",
       "body": "This object represents a Telegram user or bot.",
@@ -419,56 +520,6 @@
           "added_to_attachment_menu",
           "True",
           "Optional . True , if this user added the bot to the attachment menu"
-        ],
-        [
-          "can_join_groups",
-          "Boolean",
-          "Optional . True , if the bot can be invited to groups. Returned only in [#getme] getMe ."
-        ],
-        [
-          "can_read_all_group_messages",
-          "Boolean",
-          "Optional . True , if [/bots/features#privacy-mode] privacy mode is disabled for the bot. Returned only in [#getme] getMe ."
-        ],
-        [
-          "supports_guest_queries",
-          "Boolean",
-          "Optional . True , if the bot supports guest queries from chats it is not a member of. Returned only in [#getme] getMe ."
-        ],
-        [
-          "supports_inline_queries",
-          "Boolean",
-          "Optional . True , if the bot supports inline queries. Returned only in [#getme] getMe ."
-        ],
-        [
-          "can_connect_to_business",
-          "Boolean",
-          "Optional . True , if the bot can be connected to a user account to manage it. Returned only in [#getme] getMe ."
-        ],
-        [
-          "has_main_web_app",
-          "Boolean",
-          "Optional . True , if the bot has a main Web App. Returned only in [#getme] getMe ."
-        ],
-        [
-          "has_topics_enabled",
-          "Boolean",
-          "Optional . True , if the bot has forum topic mode enabled in private chats. Returned only in [#getme] getMe ."
-        ],
-        [
-          "allows_users_to_create_topics",
-          "Boolean",
-          "Optional . True , if the bot allows users to create and delete topics in private chats. Returned only in [#getme] getMe ."
-        ],
-        [
-          "can_manage_bots",
-          "Boolean",
-          "Optional . True , if other bots can be created to be controlled by the bot. Returned only in [#getme] getMe ."
-        ],
-        [
-          "supports_join_request_queries",
-          "Boolean",
-          "Optional . True , if the bot supports join request queries and can be assigned to process them. Returned only in [#getme] getMe ."
         ]
       ]
     },
@@ -1246,7 +1297,7 @@
         [
           "write_access_allowed",
           "[#writeaccessallowed] WriteAccessAllowed",
-          "Optional . Service message: the user allowed the bot to write messages after adding it to the attachment or side menu, launching a Web App from a link, or accepting an explicit request from a Web App sent by the method [/bots/webapps#initializing-mini-apps] requestWriteAccess"
+          "Optional . Service message: the user allowed the bot to write messages after adding it to the attachment or side menu, launching a Web App from a link, or accepting an explicit request from a Web App sent by the method [/bots/webapps#initializing-mini-apps] requestWriteAccess , or the user was invited to the private chat with the bot by the owner of the bot"
         ],
         [
           "passport_data",
@@ -3865,7 +3916,7 @@
     },
     "writeaccessallowed": {
       "title": "WriteAccessAllowed",
-      "body": "This object represents a service message about a user allowing a bot to write messages after adding it to the attachment menu, launching a Web App from a link, or accepting an explicit request from a Web App sent by the method [/bots/webapps#initializing-mini-apps] requestWriteAccess .",
+      "body": "This object represents a service message about a user allowing a bot to write messages after adding it to the attachment menu, launching a Web App from a link, or accepting an explicit request from a Web App sent by the method [/bots/webapps#initializing-mini-apps] requestWriteAccess , or about a user being invited to the private chat with the bot by the owner of the bot.",
       "rows": [
         [
           "Field",
@@ -3886,6 +3937,11 @@
           "from_attachment_menu",
           "Boolean",
           "Optional . True , if the access was granted when the bot was added to the attachment or side menu"
+        ],
+        [
+          "inviter",
+          "[#user] User",
+          "Optional . The owner of the bot, if the access was granted when the owner invited the user to the private chat with the bot. Bot owners can invite up to 10 users at once by pressing the link https://t.me/botinvite/<bot_username> ."
         ]
       ]
     },
@@ -4606,7 +4662,7 @@
         [
           "request_managed_bot",
           "[#keyboardbuttonrequestmanagedbot] KeyboardButtonRequestManagedBot",
-          "Optional . If specified, pressing the button will ask the user to create and share a bot that will be managed by the current bot. Available for bots that enabled management of other bots in the [https://t.me/BotFather] @BotFather Mini App. Available in private chats only."
+          "Optional . If specified, pressing the button will ask the user to create and share a bot that will be managed by the current bot. Available for bots that enabled management of other bots in the [https://t.me/BotFather] @BotFather Mini App or using the parameter can_manage_bots of the method [#setmysettings] setMySettings . Available in private chats only."
         ],
         [
           "request_contact",
@@ -4997,7 +5053,7 @@
     },
     "callbackquery": {
       "title": "CallbackQuery",
-      "body": "This object represents an incoming callback query from a callback button in an [/bots/features#inline-keyboards] inline keyboard . If the button that originated the query was attached to a message sent by the bot, the field message will be present. If the button was attached to a message sent via the bot (in [#inline-mode] inline mode ), the field inline_message_id will be present. Exactly one of the fields data or game_short_name will be present. NOTE: After the user presses a callback button, Telegram clients will display a progress bar until you call [#answercallbackquery] answerCallbackQuery . It is, therefore, necessary to react by calling [#answercallbackquery] answerCallbackQuery even if no notification to the user is needed (e.g., without specifying any of the optional parameters).",
+      "body": "This object represents an incoming callback query from a callback button in an [/bots/features#inline-keyboards] inline keyboard or in a [#richmessage] rich message . If the button that originated the query belongs to a message sent by the bot, the field message will be present, unless the field inline_message_id is used instead as specified by the parameter callback_query_mode of the method [#setmysettings] setMySettings . If the button belongs to a message sent via the bot (in [#inline-mode] inline mode ), the field inline_message_id will be present. Exactly one of the fields data or game_short_name will be present. NOTE: After the user presses a callback button, Telegram clients will display a progress bar until you call [#answercallbackquery] answerCallbackQuery . It is, therefore, necessary to react by calling [#answercallbackquery] answerCallbackQuery even if no notification to the user is needed (e.g., without specifying any of the optional parameters).",
       "rows": [
         [
           "Field",
@@ -5022,7 +5078,7 @@
         [
           "inline_message_id",
           "String",
-          "Optional . Identifier of the message sent via the bot in inline mode, that originated the query"
+          "Optional . Identifier of the message sent via the bot in inline mode, that originated the query. Can also be present for messages sent by the bot, depending on the parameter callback_query_mode of the method [#setmysettings] setMySettings ."
         ],
         [
           "chat_instance",
@@ -9278,7 +9334,7 @@
     },
     "getme": {
       "title": "getMe",
-      "body": "A simple method for testing your bot's authentication token. Requires no parameters. Returns basic information about the bot in form of a [#user] User object.",
+      "body": "A simple method for testing your bot's authentication token. Requires no parameters. Returns information about the bot in form of a [#botfullinfo] BotFullInfo object.",
       "rows": []
     },
     "logout": {
@@ -13416,7 +13472,7 @@
     },
     "answercallbackquery": {
       "title": "answerCallbackQuery",
-      "body": "Use this method to send answers to callback queries sent from [/bots/features#inline-keyboards] inline keyboards . The answer will be displayed to the user as a notification at the top of the chat screen or as an alert. On success, True is returned. Alternatively, the user can be redirected to the specified Game URL. For this option to work, you must first create a game for your bot via [https://t.me/botfather] @BotFather and accept the terms. Otherwise, you may use links like t.me/your_bot?start=XXXX that open your bot with a parameter.",
+      "body": "Use this method to send answers to callback queries sent from [/bots/features#inline-keyboards] inline keyboards or [#richmessage] rich messages . The answer will be displayed to the user as a notification at the top of the chat screen or as an alert. On success, True is returned. Alternatively, the user can be redirected to the specified Game URL. For this option to work, you must first create a game for your bot via [https://t.me/botfather] @BotFather and accept the terms. Otherwise, you may use links like t.me/your_bot?start=XXXX that open your bot with a parameter.",
       "rows": [
         [
           "Parameter",
@@ -13627,6 +13683,108 @@
           "Array of Integer",
           "Optional",
           "A JSON-serialized list of up to 10 identifiers of users who will have access to the bot in addition to its owner. Ignored if is_access_restricted is False ."
+        ]
+      ]
+    },
+    "setmysettings": {
+      "title": "setMySettings",
+      "body": "Use this method to change settings of the bot. Settings that aren't specified remain unchanged. Returns True on success.",
+      "rows": [
+        [
+          "Parameter",
+          "Type",
+          "Required",
+          "Description"
+        ],
+        [
+          "supports_inline_queries",
+          "Boolean",
+          "Optional",
+          "Pass True to enable [#inline-mode] inline mode for the bot or False to disable it"
+        ],
+        [
+          "inline_query_placeholder",
+          "String",
+          "Optional",
+          "New placeholder for inline queries, which is shown in the input field after the bot's username. Pass an empty string to use the default placeholder."
+        ],
+        [
+          "needs_inline_query_location",
+          "Boolean",
+          "Optional",
+          "Pass True to request the location of the user with every inline query to the bot or False to stop requesting it"
+        ],
+        [
+          "inline_feedback_share_denominator",
+          "Integer",
+          "Optional",
+          "Denominator of the share of [#choseninlineresult] chosen inline results received by the bot; the bot receives 1 out of inline_feedback_share_denominator chosen results. Must be one of 1, 10, 100, or 1000. Pass 0 to stop receiving chosen inline results."
+        ],
+        [
+          "can_join_groups",
+          "Boolean",
+          "Optional",
+          "Pass True to allow adding the bot to groups or False to disallow it"
+        ],
+        [
+          "can_read_all_group_messages",
+          "Boolean",
+          "Optional",
+          "Pass True to disable [/bots/features#privacy-mode] privacy mode for the bot or False to enable it"
+        ],
+        [
+          "can_connect_to_business",
+          "Boolean",
+          "Optional",
+          "Pass True to allow connecting the bot to user accounts to manage them or False to disallow it"
+        ],
+        [
+          "can_manage_bots",
+          "Boolean",
+          "Optional",
+          "Pass True to allow creating other bots that will be controlled by the bot or False to disallow it"
+        ],
+        [
+          "supports_guest_queries",
+          "Boolean",
+          "Optional",
+          "Pass True to allow guest queries to the bot from chats it isn't a member of or False to disallow them"
+        ],
+        [
+          "supports_join_request_queries",
+          "Boolean",
+          "Optional",
+          "Pass True to allow assigning the bot to process join request queries or False to disallow it"
+        ],
+        [
+          "has_topics_enabled",
+          "Boolean",
+          "Optional",
+          "Pass True to enable forum topic mode in private chats with the bot or False to disable it"
+        ],
+        [
+          "allows_users_to_create_topics",
+          "Boolean",
+          "Optional",
+          "Pass True to allow users to create and delete topics in private chats with the bot or False to disallow it"
+        ],
+        [
+          "has_topic_sidebar",
+          "Boolean",
+          "Optional",
+          "Pass True to show topics in private chats with the bot in a sidebar or False to stop showing them in a sidebar"
+        ],
+        [
+          "can_communicate_with_bots",
+          "Boolean",
+          "Optional",
+          "Pass True to allow the bot to communicate with other bots in groups, private chats, and through business accounts or False to disallow it"
+        ],
+        [
+          "callback_query_mode",
+          "String",
+          "Optional",
+          "Mode in which the bot receives [#callbackquery] callback queries from buttons in messages sent by the bot. Must be one of “default” (the field message is always used and contains an [#inaccessiblemessage] InaccessibleMessage if the message is inaccessible to the bot), “auto” (the field inline_message_id is used instead of the field message if the message is inaccessible to the bot; the field message can still contain an inaccessible message if the message has just been deleted), or “inline” (the field inline_message_id is always used instead of the field message )."
         ]
       ]
     },
@@ -17935,8 +18093,8 @@
           "Type of the block, always “expandable_blockquote”"
         ],
         [
-          "text",
-          "[#richtext] RichText",
+          "blocks",
+          "Array of [#richblock] RichBlock",
           "Content of the block"
         ],
         [
@@ -18610,8 +18768,8 @@
           "Type of the block, always “expandable_blockquote”"
         ],
         [
-          "text",
-          "[#richtext] RichText",
+          "blocks",
+          "Array of [#inputrichblock] InputRichBlock",
           "Content of the block"
         ],
         [
@@ -19017,7 +19175,7 @@
     },
     "inline-mode": {
       "title": "Inline mode",
-      "body": "The following methods and objects allow your bot to work in [/bots/inline] inline mode . Please see our [/bots/inline] Introduction to Inline bots for more details. To enable this option, send the /setinline command to [https://t.me/botfather] @BotFather and provide the placeholder text that the user will see in the input field after typing your bot's name.",
+      "body": "The following methods and objects allow your bot to work in [/bots/inline] inline mode . Please see our [/bots/inline] Introduction to Inline bots for more details. To enable this option, send the /setinline command to [https://t.me/botfather] @BotFather and provide the placeholder text that the user will see in the input field after typing your bot's name, or use the parameters supports_inline_queries and inline_query_placeholder of the method [#setmysettings] setMySettings .",
       "rows": []
     },
     "inlinequery": {
@@ -19057,7 +19215,7 @@
         [
           "location",
           "[#location] Location",
-          "Optional . Sender location, only for bots that request user location"
+          "Optional . Sender location, only for bots that enabled user location requests via [https://t.me/botfather] @BotFather or using the parameter needs_inline_query_location of the method [#setmysettings] setMySettings"
         ]
       ]
     },
@@ -20870,7 +21028,7 @@
     },
     "choseninlineresult": {
       "title": "ChosenInlineResult",
-      "body": "Represents a [#inlinequeryresult] result of an inline query that was chosen by the user and sent to their chat partner. Note: It is necessary to enable [/bots/inline#collecting-feedback] inline feedback via [https://t.me/botfather] @BotFather in order to receive these objects in updates.",
+      "body": "Represents a [#inlinequeryresult] result of an inline query that was chosen by the user and sent to their chat partner. Note: It is necessary to enable [/bots/inline#collecting-feedback] inline feedback via [https://t.me/botfather] @BotFather or using the parameter inline_feedback_share_denominator of the method [#setmysettings] setMySettings in order to receive these objects in updates.",
       "rows": [
         [
           "Field",
@@ -20890,7 +21048,7 @@
         [
           "location",
           "[#location] Location",
-          "Optional . Sender location, only for bots that require user location"
+          "Optional . Sender location, only for bots that enabled user location requests via [https://t.me/botfather] @BotFather or using the parameter needs_inline_query_location of the method [#setmysettings] setMySettings"
         ],
         [
           "inline_message_id",
@@ -22796,6 +22954,7 @@
     }
   },
   "announcements": {
+    "November 22, 2026": "Bot API 10.5 Bot Settings Added the method [#setmysettings] setMySettings , allowing bots to change their settings, including inline mode settings, privacy mode, the ability to be added to groups, forum topic mode in private chats, and the mode of receiving callback queries. Added the ability to receive callback queries from buttons in messages sent by the bot with the field inline_message_id instead of the field message in the class [#callbackquery] CallbackQuery , depending on the parameter callback_query_mode of the method [#setmysettings] setMySettings . Added the ability for bots to show the list of topics in a sidebar in private chats with the bot using the parameter has_topic_sidebar of the method [#setmysettings] setMySettings . Split out the class [#botfullinfo] BotFullInfo from the class [#user] User and changed the return type of the method [#getme] getMe to BotFullInfo . The fields that were returned only in [#getme] getMe were removed from the class [#user] User . Added the field active_usernames to the class [#botfullinfo] BotFullInfo , allowing the bot to get the list of all its active usernames. Added the field inline_query_placeholder to the class [#botfullinfo] BotFullInfo , allowing the bot to get its placeholder for inline queries. Added the field needs_inline_query_location to the class [#botfullinfo] BotFullInfo , allowing the bot to check whether it requests the location of the user with every inline query. Added the field has_topic_sidebar to the class [#botfullinfo] BotFullInfo , allowing the bot to check whether topics in private chats with the bot are shown in a sidebar. General Added the ability for bot owners to invite up to 10 users at once to private chats with the bot by pressing the link https://t.me/botinvite/<bot_username> . The bot can send messages to the invited users. Added the field inviter to the class [#writeaccessallowed] WriteAccessAllowed for service messages about users invited to the private chat with the bot by the owner of the bot. Replaced the field text with the field blocks in the classes [#richblockexpandableblockquotation] RichBlockExpandableBlockQuotation and [#inputrichblockexpandableblockquotation] InputRichBlockExpandableBlockQuotation , allowing expandable block quotations to contain arbitrary blocks.",
     "November 9, 2026": "Bot API 10.4 Widgets Added the class [#widget] Widget and the field widget to the classes [#message] Message and [#externalreplyinfo] ExternalReplyInfo for messages with [/bots/widgets] HTML widgets . Added the method [#sendwidget] sendWidget , allowing bots to send messages with HTML widgets. Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded. Added the method [#sendsharedwidget] sendSharedWidget , allowing bots to send again shared widgets created by the bot. Added the class [#widgetquery] WidgetQuery and the field widget_query to the class [#update] Update for queries sent to the bot by widgets in messages sent by the bot or via the bot. Added the class [#sharedwidgetquery] SharedWidgetQuery and the field shared_widget_query to the class [#update] Update for queries sent to the bot from forwarded messages with shared widgets. Added the classes [#widgetquerytype] WidgetQueryType , [#widgetquerytypedata] WidgetQueryTypeData , [#widgetquerytypesigndata] WidgetQueryTypeSignData , [#widgetquerytypesenttransaction] WidgetQueryTypeSentTransaction and [#widgetquerywallet] WidgetQueryWallet , describing the type of a query from a widget. A query can contain data for the bot together with the TON wallet card of the user, data signed by a TON wallet of the user, or a notification about a transaction sent from a TON wallet of the user. Added the method [#answerwidgetquery] answerWidgetQuery , allowing bots to answer queries from widgets. Added the method [#editmessagewidgetdata] editMessageWidgetData , allowing bots to change data of a widget in a message. Added the method [#editsharedwidgetdata] editSharedWidgetData , allowing bots to change public data of a shared widget. Added the classes [#inputwidgetmessagecontent] InputWidgetMessageContent and [#inputsharedwidgetmessagecontent] InputSharedWidgetMessageContent , allowing bots to send widgets in response to inline queries. Currently, widgets can't be sent in response to inline queries in the production environment. Widget messages can't be copied using the methods [#copymessage] copyMessage and [#copymessages] copyMessages . The right can_send_other_messages in the classes [#chatpermissions] ChatPermissions and [#chatmemberrestricted] ChatMemberRestricted now also allows sending widgets. Ephemeral messages Allowed bots to send ephemeral replies to callback queries in any chat except channel direct messages chats by specifying callback_query_id without receiver_user_id in the parameter ephemeral_message_parameters of the methods [#sendmessage] sendMessage , [#sendrichmessage] sendRichMessage , [#sendanimation] sendAnimation , [#sendaudio] sendAudio , [#sendcontact] sendContact , [#senddocument] sendDocument , [#sendlivephoto] sendLivePhoto , [#sendlocation] sendLocation , [#sendphoto] sendPhoto , [#sendsticker] sendSticker , [#sendvenue] sendVenue , [#sendvideo] sendVideo , [#sendvideonote] sendVideoNote and [#sendvoice] sendVoice . The field receiver_user_id of the class [#ephemeralmessageparameters] EphemeralMessageParameters and the parameter chat_id of the mentioned methods are optional now. Quotes from rich messages Added the field rich_texts to the class [#textquote] TextQuote for quotes chosen from a [#richmessage] RichMessage . Added the field quote_rich_texts to the class [#replyparameters] ReplyParameters , allowing bots to quote rich messages. TON wallet Added the classes [#tonwalletcard] TonWalletCard , [#tonwalletcardsticker] TonWalletCardSticker , [#tonnft] TonNft and [#tonnftattribute] TonNftAttribute , and the field ton_wallet_card to the class [#chatfullinfo] ChatFullInfo . Added the class [#tonwallettransfer] TonWalletTransfer and the field ton_wallet_transfer to the class [#message] Message for service messages about transfers with a TON wallet. Renamed the class StoryAreaPosition to [#areaposition] AreaPosition , because it is now also used to describe the position of stickers on TON wallet cards. Chat share themes Added the classes [#chatsharetheme] ChatShareTheme , [#chatsharethemeemoji] ChatShareThemeEmoji and [#chatsharethemeuniquegift] ChatShareThemeUniqueGift , and the field share_theme to the class [#chatfullinfo] ChatFullInfo , describing the theme of the screen for sharing a link to a user or a chat. Added the classes [#emojitype] EmojiType , [#emojitypeemoji] EmojiTypeEmoji and [#emojitypecustomemoji] EmojiTypeCustomEmoji . Added the classes [#chatsharethemebackdrop] ChatShareThemeBackdrop and [#chatsharethemebackdrops] ChatShareThemeBackdrops and the method [#getchatsharethemebackdrops] getChatShareThemeBackdrops . Gifts Added the method [#getuniquegift] getUniqueGift , allowing bots to get information about a unique gift by its name. Added the method [#deletebusinessaccountgift] deleteBusinessAccountGift , allowing bots to delete regular gifts owned by a managed business account without receiving Telegram Stars for them. General Allowed users with a Telegram Premium subscription to assign secondary usernames ending with “agent”, “ai”, “app”, “game”, or “gay” to up to 2 owned bots. Such usernames can be suggested in the field suggested_username of the class [#keyboardbuttonrequestmanagedbot] KeyboardButtonRequestManagedBot . Added the class [#richtexttonaddress] RichTextTonAddress representing an address in the TON blockchain in a [#richmessage] RichMessage . Added the type “ton_address” to the class [#messageentity] MessageEntity for addresses in the TON blockchain. Added the type “bank_card_number” to the class [#messageentity] MessageEntity for bank card numbers. Added the parameters custom_description_parse_mode and custom_description_entities to the methods [#verifyuser] verifyUser and [#verifychat] verifyChat . Added the class [#paidmessageswaived] PaidMessagesWaived and the field paid_messages_waived to the class [#message] Message for service messages about the sender using a link which allows sending messages without paying Telegram Stars. Added the ability to create links to topics in private chats with the bot in the format https://t.me/<bot_username>/<message_thread_id> . Such a link opens the topic only for the user in the private chat with whom the topic exists.",
     "August 24, 2026": "Bot API 10.3 Rich Messages Added the class [#richmessagebutton] RichMessageButton representing a button in a [#richmessage] RichMessage . Added the class [#richtextbutton] RichTextButton . Added the classes [#richblockbuttons] RichBlockButtons and [#inputrichblockbuttons] InputRichBlockButtons . Added the field is_compact to the classes [#richblocktable] RichBlockTable and [#inputrichblocktable] InputRichBlockTable . Added the classes [#richblockexpandableblockquotation] RichBlockExpandableBlockQuotation and [#inputrichblockexpandableblockquotation] InputRichBlockExpandableBlockQuotation representing a block quotation, which can be expanded or collapsed back. Added the classes [#richblockdocument] RichBlockDocument and [#inputrichblockdocument] InputRichBlockDocument , containing a file. Added support for links of the form tg://document?id= for general file uploads in rich messages. Ephemeral messages Added the class [#ephemeralmessageparameters] EphemeralMessageParameters and replaced the parameters receiver_user_id and callback_query_id in the methods [#sendmessage] sendMessage , [#sendanimation] sendAnimation , [#sendaudio] sendAudio , [#senddocument] sendDocument , [#sendlivephoto] sendLivePhoto , [#sendphoto] sendPhoto , [#sendsticker] sendSticker , [#sendvideo] sendVideo , [#sendvideonote] sendVideoNote , [#sendvoice] sendVoice , [#sendcontact] sendContact , [#sendlocation] sendLocation and [#sendvenue] sendVenue with the parameter ephemeral_message_parameters . Added the parameter ephemeral_message_parameters to the method [#sendrichmessage] sendRichMessage . Added the field replace_callback_query_message to the class [#ephemeralmessageparameters] EphemeralMessageParameters , which allows bots to show an ephemeral message in place of the original message. Supported upload of new files in [#editephemeralmessagemedia] editEphemeralMessageMedia . Added the parameter show_caption_above_media to the method [#editephemeralmessagecaption] editEphemeralMessageCaption . Added the parameter rich_message to the method [#editephemeralmessagetext] editEphemeralMessageText . Added the field can_send_welcome_messages to the classes [#chatadministratorrights] ChatAdministratorRights and [#chatmemberadministrator] ChatMemberAdministrator . Added the parameter can_send_welcome_messages to the method [#promotechatmember] promoteChatMember . Reply markup Added the class [#disabledbutton] DisabledButton and the field disabled to the class [#inlinekeyboardbutton] InlineKeyboardButton . Added the field force_reply to the classes [#inlinekeyboardmarkup] InlineKeyboardMarkup and [#replykeyboardmarkup] ReplyKeyboardMarkup . General Added the parameters can_stop and keep_on_stop to the methods [#sendmessagedraft] sendMessageDraft and [#sendrichmessagedraft] sendRichMessageDraft . Added updates about user stopping message generation, represented by the class [#messagegenerationstopped] MessageGenerationStopped and the field stopped_message_generation in the class [#update] Update . Added the class [#communitychatjoined] CommunityChatJoined and the field community_chat_joined to the class [#message] Message for service messages about join of a chat from a community. Added the fields text , entities and is_private to the class [#uniquegiftinfo] UniqueGiftInfo .",
     "July 14, 2026": "Bot API 10.2 Rich Messages Added the class [#inputrichmessagemedia] InputRichMessageMedia and the field media to the class [#inputrichmessage] InputRichMessage , allowing bots to explicitly specify media used in markdown or html formatting when sending a rich message. Added the class [#inputmediavoicenote] InputMediaVoiceNote , representing a voice message to be sent. Added the class [#inputrichblocklistitem] InputRichBlockListItem , which represents an item in a list to be sent. Added the classes [#inputrichblockparagraph] InputRichBlockParagraph , [#inputrichblocksectionheading] InputRichBlockSectionHeading , [#inputrichblockpreformatted] InputRichBlockPreformatted , [#inputrichblockfooter] InputRichBlockFooter , [#inputrichblockdivider] InputRichBlockDivider , [#inputrichblockmathematicalexpression] InputRichBlockMathematicalExpression , [#inputrichblockanchor] InputRichBlockAnchor , [#inputrichblocklist] InputRichBlockList , [#inputrichblockblockquotation] InputRichBlockBlockQuotation , [#inputrichblockpullquotation] InputRichBlockPullQuotation , [#inputrichblockcollage] InputRichBlockCollage , [#inputrichblockslideshow] InputRichBlockSlideshow , [#inputrichblocktable] InputRichBlockTable , [#inputrichblockdetails] InputRichBlockDetails , [#inputrichblockmap] InputRichBlockMap , [#inputrichblockanimation] InputRichBlockAnimation , [#inputrichblockaudio] InputRichBlockAudio , [#inputrichblockphoto] InputRichBlockPhoto , [#inputrichblockvideo] InputRichBlockVideo , [#inputrichblockvoicenote] InputRichBlockVoiceNote and [#inputrichblockthinking] InputRichBlockThinking , which represent different types of blocks available to format an outgoing rich message. Added the field blocks to the class [#inputrichmessage] InputRichMessage , allowing bots to specify rich message formatting via block entities. Ephemeral Messages Introduced support for [/bots/features#ephemeral-messages] Ephemeral Messages , allowing bots to send group messages and receive commands that are visible only to a specific user and the bot. Added the field is_ephemeral to the class [#botcommand] BotCommand . Added the field receiver_user to the class [#message] Message . Added the field ephemeral_message_id to the class [#message] Message . Added the parameters receiver_user_id and callback_query_id to the methods [#sendmessage] sendMessage , [#sendanimation] sendAnimation , [#sendaudio] sendAudio , [#senddocument] sendDocument , [#sendlivephoto] sendLivePhoto , [#sendphoto] sendPhoto , [#sendsticker] sendSticker , [#sendvideo] sendVideo , [#sendvideonote] sendVideoNote , [#sendvoice] sendVoice , [#sendcontact] sendContact , [#sendlocation] sendLocation , [#sendvenue] sendVenue . Added the field ephemeral_message_id to the class [#replyparameters] ReplyParameters , allowing bots to reply to ephemeral messages. Marked the field message_id in the class [#replyparameters] ReplyParameters as optional if the field ephemeral_message_id is present. Added the methods [#editephemeralmessagetext] editEphemeralMessageText , [#editephemeralmessagemedia] editEphemeralMessageMedia , [#editephemeralmessagecaption] editEphemeralMessageCaption , and [#editephemeralmessagereplymarkup] editEphemeralMessageReplyMarkup allowing bots to edit ephemeral messages. Added the method [#deleteephemeralmessage] deleteEphemeralMessage allowing bots to delete ephemeral messages. Communities Introduced initial support for Communities - several supergroups, channels, and bots linked together around a shared topic or audience. Added the class [#community] Community which represents a community. Added the class [#communitychatadded] CommunityChatAdded and the field community_chat_added to the class [#message] Message . Added the class [#communitychatremoved] CommunityChatRemoved and the field community_chat_removed to the class [#message] Message . Added the field community to the class [#chatfullinfo] ChatFullInfo . General Added updates about changes to a user payment subscription, represented by the class [#botsubscriptionupdated] BotSubscriptionUpdated and the field subscription in the class [#update] Update . Hardened the security of Mini Apps by disallowing the usage of Mini App methods from origins different from the original Mini App domain. The protection will be automatically enabled for all Mini Apps on July 20, 2026. You can opt-out from the protection through the [https://t.me/BotFather] @BotFather Mini App. If you do so, you acknowledge that it is the responsibility of the bot to ensure that the Mini App has no links to untrusted sites. [/bots/api-changelog] See earlier changes »"

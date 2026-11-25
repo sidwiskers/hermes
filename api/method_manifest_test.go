@@ -10,9 +10,9 @@ import (
 	"testing"
 )
 
-// Bot API 10.4 method manifest, published 2026-11-09 at
+// Bot API 10.5 method manifest, published 2026-11-22 at
 // https://core.telegram.org/bots/api.
-var botAPI10_4Methods = strings.Fields(`
+var botAPI10_5Methods = strings.Fields(`
 getUpdates
 setWebhook
 deleteWebhook
@@ -112,6 +112,7 @@ setMyDescription
 getMyDescription
 setMyShortDescription
 getMyShortDescription
+setMySettings
 setMyProfilePhoto
 removeMyProfilePhoto
 setChatMenuButton
@@ -208,17 +209,17 @@ sendSharedWidget
 sendWidget
 `)
 
-func TestBotAPI10_4MethodManifest(t *testing.T) {
+func TestBotAPI10_5MethodManifest(t *testing.T) {
 	t.Parallel()
 
-	if len(botAPI10_4Methods) != 193 {
-		t.Fatalf("manifest contains %d methods, want 193", len(botAPI10_4Methods))
+	if len(botAPI10_5Methods) != 194 {
+		t.Fatalf("manifest contains %d methods, want 194", len(botAPI10_5Methods))
 	}
 	entries, err := os.ReadDir(".")
 	if err != nil {
 		t.Fatal(err)
 	}
-	productionStrings := make(map[string]struct{}, len(botAPI10_4Methods))
+	productionStrings := make(map[string]struct{}, len(botAPI10_5Methods))
 	files := token.NewFileSet()
 	for _, entry := range entries {
 		name := entry.Name()
@@ -241,9 +242,9 @@ func TestBotAPI10_4MethodManifest(t *testing.T) {
 			return true
 		})
 	}
-	for _, method := range botAPI10_4Methods {
+	for _, method := range botAPI10_5Methods {
 		if _, exists := productionStrings[method]; !exists {
-			t.Errorf("Bot API 10.4 method %s has no production entry point", method)
+			t.Errorf("Bot API 10.5 method %s has no production entry point", method)
 		}
 	}
 }

@@ -174,7 +174,7 @@ func writeStruct(output *bytes.Buffer, name string, fields []botapi.Field) {
 		if !field.Required {
 			tag += ",omitempty"
 		}
-		fmt.Fprintf(output, "\t%s %s `json:%q`\n", goName(field.Name), goType(field), tag)
+		fmt.Fprintf(output, "\t%s %s `json:%q`\n", goName(field.Name), goType(name, field), tag)
 	}
 	output.WriteString("}\n\n")
 }
@@ -237,8 +237,8 @@ func inlineQueryResultKind(name string) string {
 	}
 }
 
-func goType(field botapi.Field) string {
-	result := baseType(field.Type, field.Name)
+func goType(objectName string, field botapi.Field) string {
+	result := baseType(field.Type, objectName, field.Name)
 	if field.Required || strings.HasPrefix(result, "[]") || result == "any" || result == "InputMessageContent" {
 		return result
 	}
@@ -250,10 +250,10 @@ func goType(field botapi.Field) string {
 	}
 }
 
-func baseType(name, fieldName string) string {
+func baseType(name, objectName, fieldName string) string {
 	const array = "Array of "
 	if strings.HasPrefix(name, array) {
-		return "[]" + baseType(strings.TrimPrefix(name, array), fieldName)
+		return "[]" + baseType(strings.TrimPrefix(name, array), objectName, fieldName)
 	}
 	switch name {
 	case "Boolean", "True":
@@ -261,7 +261,7 @@ func baseType(name, fieldName string) string {
 	case "Float", "Float number":
 		return "float64"
 	case "Integer":
-		if fieldName == "date" || strings.HasSuffix(fieldName, "_date") ||
+		if (objectName == "BotFullInfo" && fieldName == "id") || fieldName == "date" || strings.HasSuffix(fieldName, "_date") ||
 			strings.HasSuffix(fieldName, "_timestamp") || fieldName == "unix_time" ||
 			strings.HasSuffix(fieldName, "_user_id") || fieldName == "user_id" ||
 			strings.HasSuffix(fieldName, "_chat_id") || fieldName == "chat_id" ||
