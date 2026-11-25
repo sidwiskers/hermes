@@ -62,7 +62,10 @@ func CanonicalJSON(value any) ([]byte, error) {
 	if err := encoder.Encode(normalized); err != nil {
 		return nil, err
 	}
-	return bytes.TrimSuffix(buffer.Bytes(), []byte("\n")), nil
+	canonical := bytes.TrimSuffix(buffer.Bytes(), []byte("\n"))
+	canonical = bytes.ReplaceAll(canonical, []byte(`\\u2028`), []byte("\u2028"))
+	canonical = bytes.ReplaceAll(canonical, []byte(`\\u2029`), []byte("\u2029"))
+	return canonical, nil
 }
 
 // Digest returns the SHA-256 identity of a canonical JSON-compatible value.

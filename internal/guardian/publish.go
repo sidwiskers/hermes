@@ -164,6 +164,9 @@ func (controller *Controller) Publish() error {
 	diff, _ := os.ReadFile(filepath.Join(controller.Out, "diff.md"))
 	validation := mapValue(report["validation"])
 	validationOutput := stringValue(validation["output"])
+	if validationOutput == "" {
+		validationOutput = "No complete validation"
+	}
 	if len(validationOutput) > 12_000 {
 		validationOutput = validationOutput[len(validationOutput)-12_000:]
 	}

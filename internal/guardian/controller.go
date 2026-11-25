@@ -185,11 +185,15 @@ func readJSONFile(path string) (map[string]any, error) {
 }
 
 func writeJSONFile(path string, value any) error {
-	data, err := json.MarshalIndent(value, "", "  ")
-	if err != nil {
+	var buffer bytes.Buffer
+	encoder := json.NewEncoder(&buffer)
+	encoder.SetIndent("", "  ")
+	encoder.SetEscapeHTML(false)
+	if err := encoder.Encode(value); err != nil {
 		return err
 	}
-	data = append(data, '\n')
+	data := bytes.ReplaceAll(buffer.Bytes(), []byte(`\\u2028`), []byte("\u2028"))
+	data = bytes.ReplaceAll(data, []byte(`\\u2029`), []byte("\u2029"))
 	return writeFileAtomic(path, data, 0o644)
 }
 

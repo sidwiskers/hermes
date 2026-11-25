@@ -193,6 +193,17 @@ func TestCanonicalJSONSortsStructKeysAndDoesNotEscapeHTML(t *testing.T) {
 	}
 }
 
+func TestCanonicalJSONPreservesUnicodeLineSeparators(t *testing.T) {
+	value := map[string]string{"text": "before\\u2028middle\\u2029after"}
+	data, err := CanonicalJSON(value)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), value["text"]) || strings.Contains(string(data), `\\u2028`) || strings.Contains(string(data), `\\u2029`) {
+		t.Fatalf("canonical JSON escaped Unicode line separators: %s", data)
+	}
+}
+
 func TestCanonicalDigestIgnoresMapInsertionOrder(t *testing.T) {
 	left := map[string]any{"a": 1, "b": 2}
 	right := map[string]any{"b": 2, "a": 1}

@@ -442,6 +442,125 @@ func (controller *Controller) Validate() error {
 	}
 	base := stringValue(report["base"])
 	parity := boolValue(report["parity"])
+
+	// Keep validation setup failures in the report and still publish the
+	// bounded candidate bundle as a draft. This preserves the previous
+	// Guardian contract: failed validation must not silently discard a
+	// prepared update that a maintainer may need to inspect.
+	var validationErr error
+	var result SandboxResult
+	if parity {
+		if err := controller.metadata(report); err != nil {
+			validationErr = err
+		}
+		if validationErr == nil {
+			if _, err := controller.regenerate(); err != nil {
+				validationErr = err
+			}
+		}
+	}
+	if validationErr == nil {
+		if _, err := controller.scopeCheck(controller.Work, base); err != nil {
+			// An invalid scope cannot safely be published, even as a draft.
+			return controller.validationAttention(report, err)
+		}
+	}
+	if validationErr == nil {
+		result, err = controller.sandbox("./scripts/release-check.sh", true, 2100*time.Second, false)
+		if err != nil {
+			validationErr = err
+		} else if result.Passed {
+			minimum, minErr := controller.sandbox("./scripts/check-generated.sh && go vet ./... && go test -shuffle=on -count=1 ./...",
+				false, 600*time.Second, true)
+			if minErr != nil {
+				validationErr = minErr
+			} else {
+				result = SandboxResult{Passed: minimum.Passed, Output: result.Output + "\nGo 1.25 verification:\n" + tailText(minimum.Output, 4000)}
+			}
+		}
+	}
+
+	if validationErr != nil {
+		report["status"] = "needs_attention"
+		report["message"] = tailText(validationErr.Error(), 6000)
+	} else {
+		report["validation"] = result
+		status := "needs_attention"
+		if result.Passed && parity {
+			status = "ready"
+		}
+		if status == "ready" && !boolValue(report["mechanical"]) {
+			if boolValue(mapValue(report["review"])["approved"]) {
+				status = "reviewed"
+			} else {
+				status = "needs_attention"
+			}
+		}
+		report["status"] = status
+		switch status {
+		case "ready":
+			report["message"] = "Generated update passed the complete release gates."
+		case "reviewed":
+			report["message"] = "Repaired update passed release gates and a separate AI review; maintainer release approval is required."
+		default:
+			report["message"] = "Update is preserved as a draft. See validation and repair evidence for the remaining work."
+		}
+	}
+
+	state := map[string]any{}
+	for _, key := range []string{"identity", "repair_runs", "repair", "review", "status"} {
+		if value, ok := report[key]; ok {
+			state[key] = value
+		}
+	}
+	state["last_base"] = base
+	candidateDigest, err := controller.candidateDigest(controller.Work, base)
+	if err != nil {
+		return err
+	}
+	state["candidate_digest"] = candidateDigest
+	if stringValue(report["status"]) == "needs_attention" {
+		state["validation"] = report["validation"]
+	}
+	if err := writeJSONFile(filepath.Join(controller.Work, filepath.FromSlash(guardianStatePath)), state); err != nil {
+		return err
+	}
+	paths, err := controller.scopeCheck(controller.Work, base)
+	if err != nil {
+		return err
+	}
+	changes := make([]map[string]any, 0, len(paths))
+	totalBytes := 0
+	for _, name := range paths {
+		data, err := os.ReadFile(filepath.Join(controller.Work, filepath.FromSlash(name)))
+		if err != nil {
+			return err
+		}
+		totalBytes += len(data)
+		changes = append(changes, map[string]any{"path": name, "content": string(data), "mode": "100644"})
+	}
+	bundle := map[string]any{"report": report, "changes": changes}
+	encoded, err := CanonicalJSON(bundle)
+	if err != nil {
+		return err
+	}
+	if len(encoded) > 6_000_000 || totalBytes > 6_000_000 {
+		return fmt.Errorf("guardian: update bundle exceeds publication limit")
+	}
+	if err := writeJSONFile(filepath.Join(controller.Out, "bundle.json"), bundle); err != nil {
+		return err
+	}
+	return controller.finish(report)
+}
+	report, err := readJSONFile(filepath.Join(controller.Out, "report.json"))
+	if err != nil {
+		return err
+	}
+	if stringValue(report["status"]) != "prepared" {
+		return nil
+	}
+	base := stringValue(report["base"])
+	parity := boolValue(report["parity"])
 	if parity {
 		if err := controller.metadata(report); err != nil {
 			return controller.validationAttention(report, err)

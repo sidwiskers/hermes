@@ -105,6 +105,21 @@ func TestPreparePausedRemovesStalePublicationBundle(t *testing.T) {
 	}
 }
 
+func TestWriteJSONFilePreservesUnicodeAndHTML(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "report.json")
+	value := map[string]string{"text": "<tag>&\\u2028\\u2029"}
+	if err := writeJSONFile(path, value); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), "<tag>&\\u2028\\u2029") || strings.Contains(string(data), `\\u003c`) {
+		t.Fatalf("JSON encoding changed Unicode or escaped HTML: %s", data)
+	}
+}
+
 func TestSubprocessEnvironmentExcludesCredentials(t *testing.T) {
 	for key, value := range map[string]string{
 		"GH_TOKEN":              "private",
