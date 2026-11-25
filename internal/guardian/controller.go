@@ -292,7 +292,7 @@ func isGeneratedPath(name string) bool {
 }
 
 func safeRepositoryFile(root, name string) (string, error) {
-	if name == "" || strings.Contains(name, "\\\\") || path.IsAbs(name) ||
+	if name == "" || strings.Contains(name, "\\") || path.IsAbs(name) ||
 		path.Clean(name) != name || name == "." || name == ".." || strings.HasPrefix(name, "../") {
 		return "", fmt.Errorf("guardian: candidate path is invalid")
 	}
