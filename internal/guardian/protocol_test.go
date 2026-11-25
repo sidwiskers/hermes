@@ -140,8 +140,8 @@ func TestSemanticChangesAllowsOnlyNewOptionalObjectRows(t *testing.T) {
 
 	after.Sections["sendmessage"] = Section{
 		Title: "sendMessage",
-		Body: "Returns True.",
-		Rows: [][]string{{"text", "String", "Yes", "Changed rules"}},
+		Body:  "Returns True.",
+		Rows:  [][]string{{"text", "String", "Yes", "Changed rules"}},
 	}
 	if got := SemanticChanges(&before, after, diff); len(got) == 0 {
 		t.Fatal("changed existing row was accepted as mechanical")
