@@ -121,13 +121,13 @@ func TestSemanticChangesAllowsOnlyNewOptionalObjectRows(t *testing.T) {
 	// structural parser uses the same case-insensitive anchor name.
 	before.Sections["sendmessage"] = Section{
 		Title: "sendMessage",
-		Body: "Returns True.",
-		Rows: [][]string{{"text", "String", "Yes", "Message text"}},
+		Body:  "Returns True.",
+		Rows:  [][]string{{"text", "String", "Yes", "Message text"}},
 	}
 	after.Sections["sendmessage"] = Section{
 		Title: "sendMessage",
-		Body: "Returns True.",
-		Rows: [][]string{
+		Body:  "Returns True.",
+		Rows:  [][]string{
 			{"text", "String", "Yes", "Message text"},
 			{"business_connection_id", "String", "No", "Optional. New."},
 		},
